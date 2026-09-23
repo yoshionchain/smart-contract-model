@@ -1,0 +1,42 @@
+spec_version: '2.2'
+# The v2.2 release is derived from the unchanged, mechanically validated v2.1 inventory.
+inventory_dir: data/processed/reentrancy-v2.1
+inventory_content_sha256: 2ba41c2d507e791b3a0d035e37cd0b579d9632864325be3efdd3be64f4049de9
+output_dir: data/processed/reentrancy-v2.2
+seed: 42
+# Documented stratum-level coverage for native "no findings" negatives. A source is
+# listed only when its published protocol assessed reentrancy for every annotated file.
+coverage_confirmed_sources:
+  salzano: >-
+    Salzano et al. (arXiv:2505.15756): three validators manually annotated every
+    instance at line level against all DASP Top-10 categories, including reentrancy;
+    every not-vulnerable judgment was double-validated and all instances reached consensus.
+# Functions of one project are not independent: at most this many queries per group
+# and polarity are kept (seeded hash order) before splitting and matching.
+max_queries_per_group_polarity: 3
+# 1:1 matched sampling of the majority polarity. Each minority-polarity query receives
+# one control, trying these match keys in order; the final empty key matches any control.
+match_levels:
+  - [collection, scope_kind, pragma_minor]
+  - [collection, scope_kind]
+  - [scope_kind, pragma_minor]
+  - [scope_kind]
+  - []
+folds: 7
+heldout_fold: 0
+validation_fold: 1
+split_seed_first: 42
+split_seed_last: 1041
+min_groups_per_polarity:
+  train: 30
+  validation: 5
+  heldout: 10
+# Pre-review only: the held-out fold must offer this many distinct groups per polarity
+# so the one-query-per-group reviewed primary queue can reach its 20/20 target.
+heldout_review_target_groups: 20
+review_seed: 42
+audit_per_cell: 5
+audit_max_cards: 120
+primary_per_polarity: 20
+# Filled only after the training-label audit, by a human stratum decision.
+quarantined_cells: []

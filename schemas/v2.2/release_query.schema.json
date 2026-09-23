@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One eligible upstream-reviewed query; its verdict is upstream, not locally reviewed.",
+  "properties": {
+    "artifact_id": {
+      "title": "Artifact Id",
+      "type": "string"
+    },
+    "assessment_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Assessment Ids",
+      "type": "array"
+    },
+    "code_identity_sha256": {
+      "title": "Code Identity Sha256",
+      "type": "string"
+    },
+    "collection": {
+      "title": "Collection",
+      "type": "string"
+    },
+    "group_id": {
+      "title": "Group Id",
+      "type": "string"
+    },
+    "match_level": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Match Level"
+    },
+    "match_partner": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Match Partner"
+    },
+    "match_role": {
+      "anyOf": [
+        {
+          "enum": [
+            "case",
+            "control"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Match Role"
+    },
+    "model_input_sha256": {
+      "title": "Model Input Sha256",
+      "type": "string"
+    },
+    "partition": {
+      "anyOf": [
+        {
+          "enum": [
+            "train",
+            "validation",
+            "heldout"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Partition"
+    },
+    "pragma_minor": {
+      "title": "Pragma Minor",
+      "type": "string"
+    },
+    "qualifying_assessment_ids": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Qualifying Assessment Ids",
+      "type": "array"
+    },
+    "query_id": {
+      "title": "Query Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "2.2",
+      "default": "2.2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope_end_line": {
+      "title": "Scope End Line",
+      "type": "integer"
+    },
+    "scope_kind": {
+      "enum": [
+        "FILE",
+        "CONTRACT",
+        "FUNCTION"
+      ],
+      "title": "Scope Kind",
+      "type": "string"
+    },
+    "scope_name": {
+      "title": "Scope Name",
+      "type": "string"
+    },
+    "scope_start_line": {
+      "title": "Scope Start Line",
+      "type": "integer"
+    },
+    "upstream_verdict": {
+      "enum": [
+        "PRESENT",
+        "ABSENT"
+      ],
+      "title": "Upstream Verdict",
+      "type": "string"
+    }
+  },
+  "required": [
+    "query_id",
+    "artifact_id",
+    "group_id",
+    "code_identity_sha256",
+    "model_input_sha256",
+    "upstream_verdict",
+    "collection",
+    "scope_kind",
+    "scope_name",
+    "scope_start_line",
+    "scope_end_line",
+    "pragma_minor",
+    "assessment_ids",
+    "qualifying_assessment_ids"
+  ],
+  "title": "ReleaseQuery",
+  "type": "object"
+}

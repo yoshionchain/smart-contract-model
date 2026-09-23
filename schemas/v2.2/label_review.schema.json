@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One signed human decision. Only a person may create these records.",
+  "properties": {
+    "assumptions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Assumptions",
+      "type": "array"
+    },
+    "check_equivalent": {
+      "title": "Check Equivalent",
+      "type": "boolean"
+    },
+    "evidence_references": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Evidence References",
+      "type": "array"
+    },
+    "final_verdict": {
+      "enum": [
+        "PRESENT",
+        "ABSENT",
+        "UNKNOWN"
+      ],
+      "title": "Final Verdict",
+      "type": "string"
+    },
+    "initial_verdict": {
+      "enum": [
+        "PRESENT",
+        "ABSENT",
+        "UNKNOWN"
+      ],
+      "title": "Initial Verdict",
+      "type": "string"
+    },
+    "input_sha256": {
+      "title": "Input Sha256",
+      "type": "string"
+    },
+    "input_sufficient": {
+      "title": "Input Sufficient",
+      "type": "boolean"
+    },
+    "query_id": {
+      "title": "Query Id",
+      "type": "string"
+    },
+    "queue": {
+      "enum": [
+        "training_audit",
+        "primary_test"
+      ],
+      "title": "Queue",
+      "type": "string"
+    },
+    "rationale": {
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Rationale",
+      "type": "string"
+    },
+    "reviewed_at": {
+      "minLength": 1,
+      "title": "Reviewed At",
+      "type": "string"
+    },
+    "reviewer": {
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Reviewer",
+      "type": "string"
+    },
+    "reviewer_kind": {
+      "const": "human",
+      "title": "Reviewer Kind",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "2.2",
+      "default": "2.2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "upstream_verdict": {
+      "enum": [
+        "PRESENT",
+        "ABSENT"
+      ],
+      "title": "Upstream Verdict",
+      "type": "string"
+    },
+    "vulnerable_lines": {
+      "items": {
+        "type": "integer"
+      },
+      "title": "Vulnerable Lines",
+      "type": "array"
+    }
+  },
+  "required": [
+    "queue",
+    "query_id",
+    "input_sha256",
+    "reviewer",
+    "reviewer_kind",
+    "reviewed_at",
+    "initial_verdict",
+    "upstream_verdict",
+    "final_verdict",
+    "input_sufficient",
+    "check_equivalent",
+    "assumptions",
+    "vulnerable_lines",
+    "evidence_references",
+    "rationale"
+  ],
+  "title": "LabelReview",
+  "type": "object"
+}

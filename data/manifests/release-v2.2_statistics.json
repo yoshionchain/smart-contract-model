@@ -1,0 +1,650 @@
+{
+  "audit_queue_cards": 44,
+  "audit_queue_cells": {
+    "SCRUBD-CD|ABSENT": 5,
+    "SCRUBD-CD|PRESENT": 5,
+    "dappscan|PRESENT": 5,
+    "scbench|ABSENT": 5,
+    "scbench|PRESENT": 5,
+    "smartbugs_results|ABSENT": 5,
+    "smartbugs_results|PRESENT": 5,
+    "zeus_vulnerable|ABSENT": 5,
+    "zeus_vulnerable|PRESENT": 4
+  },
+  "by_collection": [
+    {
+      "collection": "SCRUBD-CD",
+      "groups": 21,
+      "partition": "heldout",
+      "queries": 21,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "scbench",
+      "groups": 2,
+      "partition": "heldout",
+      "queries": 2,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "smartbugs_results",
+      "groups": 4,
+      "partition": "heldout",
+      "queries": 4,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "zeus_vulnerable",
+      "groups": 1,
+      "partition": "heldout",
+      "queries": 1,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "SCRUBD-CD",
+      "groups": 9,
+      "partition": "heldout",
+      "queries": 11,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "dappscan",
+      "groups": 9,
+      "partition": "heldout",
+      "queries": 10,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "scbench",
+      "groups": 2,
+      "partition": "heldout",
+      "queries": 2,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "smartbugs_results",
+      "groups": 4,
+      "partition": "heldout",
+      "queries": 4,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "zeus_vulnerable",
+      "groups": 1,
+      "partition": "heldout",
+      "queries": 1,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "SCRUBD-CD",
+      "groups": 97,
+      "partition": "train",
+      "queries": 101,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "scbench",
+      "groups": 7,
+      "partition": "train",
+      "queries": 7,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "smartbugs_results",
+      "groups": 20,
+      "partition": "train",
+      "queries": 20,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "zeus_vulnerable",
+      "groups": 5,
+      "partition": "train",
+      "queries": 5,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "SCRUBD-CD",
+      "groups": 39,
+      "partition": "train",
+      "queries": 53,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "dappscan",
+      "groups": 40,
+      "partition": "train",
+      "queries": 49,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "scbench",
+      "groups": 6,
+      "partition": "train",
+      "queries": 6,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "smartbugs_results",
+      "groups": 20,
+      "partition": "train",
+      "queries": 20,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "zeus_vulnerable",
+      "groups": 4,
+      "partition": "train",
+      "queries": 5,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "SCRUBD-CD",
+      "groups": 21,
+      "partition": "validation",
+      "queries": 21,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "scbench",
+      "groups": 1,
+      "partition": "validation",
+      "queries": 1,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "smartbugs_results",
+      "groups": 4,
+      "partition": "validation",
+      "queries": 4,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "zeus_vulnerable",
+      "groups": 1,
+      "partition": "validation",
+      "queries": 1,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "SCRUBD-CD",
+      "groups": 10,
+      "partition": "validation",
+      "queries": 11,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "dappscan",
+      "groups": 8,
+      "partition": "validation",
+      "queries": 10,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "scbench",
+      "groups": 1,
+      "partition": "validation",
+      "queries": 1,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "smartbugs_results",
+      "groups": 4,
+      "partition": "validation",
+      "queries": 4,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "zeus_vulnerable",
+      "groups": 1,
+      "partition": "validation",
+      "queries": 1,
+      "upstream_verdict": "PRESENT"
+    }
+  ],
+  "by_pragma": [
+    {
+      "groups": 23,
+      "partition": "heldout",
+      "pragma_minor": "0.4",
+      "queries": 23,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 1,
+      "partition": "heldout",
+      "pragma_minor": "0.5",
+      "queries": 1,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 3,
+      "partition": "heldout",
+      "pragma_minor": "0.8",
+      "queries": 3,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 1,
+      "partition": "heldout",
+      "pragma_minor": "unspecified",
+      "queries": 1,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 20,
+      "partition": "heldout",
+      "pragma_minor": "0.4",
+      "queries": 23,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 1,
+      "partition": "heldout",
+      "pragma_minor": "0.5",
+      "queries": 1,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 1,
+      "partition": "heldout",
+      "pragma_minor": "0.7",
+      "queries": 1,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 3,
+      "partition": "heldout",
+      "pragma_minor": "0.8",
+      "queries": 3,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 102,
+      "partition": "train",
+      "pragma_minor": "0.4",
+      "queries": 102,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 13,
+      "partition": "train",
+      "pragma_minor": "0.5",
+      "queries": 14,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 3,
+      "partition": "train",
+      "pragma_minor": "0.6",
+      "queries": 3,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 10,
+      "partition": "train",
+      "pragma_minor": "0.8",
+      "queries": 13,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 1,
+      "partition": "train",
+      "pragma_minor": "unspecified",
+      "queries": 1,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 62,
+      "partition": "train",
+      "pragma_minor": "0.4",
+      "queries": 76,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 12,
+      "partition": "train",
+      "pragma_minor": "0.5",
+      "queries": 15,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 19,
+      "partition": "train",
+      "pragma_minor": "0.6",
+      "queries": 24,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 3,
+      "partition": "train",
+      "pragma_minor": "0.7",
+      "queries": 3,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 10,
+      "partition": "train",
+      "pragma_minor": "0.8",
+      "queries": 13,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 2,
+      "partition": "train",
+      "pragma_minor": "unspecified",
+      "queries": 2,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 24,
+      "partition": "validation",
+      "pragma_minor": "0.4",
+      "queries": 24,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 3,
+      "partition": "validation",
+      "pragma_minor": "0.5",
+      "queries": 3,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 15,
+      "partition": "validation",
+      "pragma_minor": "0.4",
+      "queries": 16,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 1,
+      "partition": "validation",
+      "pragma_minor": "0.5",
+      "queries": 1,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 4,
+      "partition": "validation",
+      "pragma_minor": "0.6",
+      "queries": 4,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 1,
+      "partition": "validation",
+      "pragma_minor": "0.7",
+      "queries": 3,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 2,
+      "partition": "validation",
+      "pragma_minor": "0.8",
+      "queries": 2,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 1,
+      "partition": "validation",
+      "pragma_minor": "unspecified",
+      "queries": 1,
+      "upstream_verdict": "PRESENT"
+    }
+  ],
+  "by_scope": [
+    {
+      "groups": 7,
+      "partition": "heldout",
+      "queries": 7,
+      "scope_kind": "FILE",
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 21,
+      "partition": "heldout",
+      "queries": 21,
+      "scope_kind": "FUNCTION",
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 7,
+      "partition": "heldout",
+      "queries": 7,
+      "scope_kind": "FILE",
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 18,
+      "partition": "heldout",
+      "queries": 21,
+      "scope_kind": "FUNCTION",
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 32,
+      "partition": "train",
+      "queries": 32,
+      "scope_kind": "FILE",
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 97,
+      "partition": "train",
+      "queries": 101,
+      "scope_kind": "FUNCTION",
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 31,
+      "partition": "train",
+      "queries": 32,
+      "scope_kind": "FILE",
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 78,
+      "partition": "train",
+      "queries": 101,
+      "scope_kind": "FUNCTION",
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 6,
+      "partition": "validation",
+      "queries": 6,
+      "scope_kind": "FILE",
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 21,
+      "partition": "validation",
+      "queries": 21,
+      "scope_kind": "FUNCTION",
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "groups": 6,
+      "partition": "validation",
+      "queries": 6,
+      "scope_kind": "FILE",
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "groups": 18,
+      "partition": "validation",
+      "queries": 21,
+      "scope_kind": "FUNCTION",
+      "upstream_verdict": "PRESENT"
+    }
+  ],
+  "eligible_by_collection": [
+    {
+      "collection": "SCRUBD-CD",
+      "groups": 155,
+      "partition": "unassigned",
+      "queries": 243,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "scbench",
+      "groups": 37,
+      "partition": "unassigned",
+      "queries": 40,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "smartbugs_results",
+      "groups": 289,
+      "partition": "unassigned",
+      "queries": 352,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "smartbugs_results+zeus_safe",
+      "groups": 1,
+      "partition": "unassigned",
+      "queries": 1,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "smartbugs_results+zeus_vulnerable",
+      "groups": 1,
+      "partition": "unassigned",
+      "queries": 1,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "zeus_safe",
+      "groups": 147,
+      "partition": "unassigned",
+      "queries": 164,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "zeus_vulnerable",
+      "groups": 30,
+      "partition": "unassigned",
+      "queries": 35,
+      "upstream_verdict": "ABSENT"
+    },
+    {
+      "collection": "SCRUBD-CD",
+      "groups": 58,
+      "partition": "unassigned",
+      "queries": 92,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "dappscan",
+      "groups": 57,
+      "partition": "unassigned",
+      "queries": 89,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "scbench",
+      "groups": 9,
+      "partition": "unassigned",
+      "queries": 9,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "smartbugs_results",
+      "groups": 28,
+      "partition": "unassigned",
+      "queries": 28,
+      "upstream_verdict": "PRESENT"
+    },
+    {
+      "collection": "zeus_vulnerable",
+      "groups": 6,
+      "partition": "unassigned",
+      "queries": 7,
+      "upstream_verdict": "PRESENT"
+    }
+  ],
+  "eligible_pool": {
+    "ABSENT": {
+      "groups": 653,
+      "queries": 836
+    },
+    "PRESENT": {
+      "groups": 157,
+      "queries": 225
+    }
+  },
+  "exclusion_reasons": {
+    "balancing_surplus": 606,
+    "group_query_cap": 79,
+    "unknown_or_disputed": 186,
+    "unverified_evidence_only": 1154
+  },
+  "external_reservations": {
+    "forge_external": 27,
+    "smartbugs_external": 151
+  },
+  "human_reviews": 0,
+  "match_levels": {
+    "0": 119,
+    "2": 32,
+    "3": 37
+  },
+  "notes": [
+    "Verdicts are upstream-reviewed candidate labels, not local human decisions.",
+    "Balancing is 1:1 matched sampling; surplus controls are excluded, not relabeled.",
+    "Groups are the inventory components: a conservative superset of release edges.",
+    "Pragma is a first-pragma compiler screen, not a deployment date or EVM fork."
+  ],
+  "partitions": {
+    "heldout": {
+      "ABSENT": {
+        "groups": 28,
+        "queries": 28
+      },
+      "PRESENT": {
+        "groups": 25,
+        "queries": 28
+      }
+    },
+    "train": {
+      "ABSENT": {
+        "groups": 129,
+        "queries": 133
+      },
+      "PRESENT": {
+        "groups": 108,
+        "queries": 133
+      }
+    },
+    "validation": {
+      "ABSENT": {
+        "groups": 27,
+        "queries": 27
+      },
+      "PRESENT": {
+        "groups": 24,
+        "queries": 27
+      }
+    }
+  },
+  "primary_queue": {
+    "ABSENT": 28,
+    "PRESENT": 25
+  },
+  "selected": {
+    "ABSENT": {
+      "groups": 184,
+      "queries": 188
+    },
+    "PRESENT": {
+      "groups": 157,
+      "queries": 188
+    }
+  },
+  "split_attempts": 1,
+  "split_seed": 42,
+  "state": "provisional_split",
+  "training_ready": false
+}

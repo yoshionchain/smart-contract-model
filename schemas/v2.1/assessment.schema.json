@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "annotation_path": {
+      "title": "Annotation Path",
+      "type": "string"
+    },
+    "annotation_sha256": {
+      "title": "Annotation Sha256",
+      "type": "string"
+    },
+    "artifact_id": {
+      "title": "Artifact Id",
+      "type": "string"
+    },
+    "assessment_id": {
+      "title": "Assessment Id",
+      "type": "string"
+    },
+    "candidate_checks": {
+      "items": {
+        "const": "REENTRANCY",
+        "type": "string"
+      },
+      "title": "Candidate Checks",
+      "type": "array"
+    },
+    "evidence_reference": {
+      "title": "Evidence Reference",
+      "type": "string"
+    },
+    "evidence_tier": {
+      "enum": [
+        "UPSTREAM_REVIEWED",
+        "UNVERIFIED"
+      ],
+      "title": "Evidence Tier",
+      "type": "string"
+    },
+    "issues": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Issues",
+      "type": "array"
+    },
+    "metadata": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Metadata",
+      "type": "object"
+    },
+    "native_id": {
+      "title": "Native Id",
+      "type": "string"
+    },
+    "native_lines": {
+      "items": {
+        "type": "integer"
+      },
+      "title": "Native Lines",
+      "type": "array"
+    },
+    "native_property": {
+      "title": "Native Property",
+      "type": "string"
+    },
+    "native_scope": {
+      "title": "Native Scope",
+      "type": "string"
+    },
+    "native_scope_kind": {
+      "enum": [
+        "FILE",
+        "CONTRACT",
+        "FUNCTION"
+      ],
+      "title": "Native Scope Kind",
+      "type": "string"
+    },
+    "native_verdict": {
+      "enum": [
+        "PRESENT",
+        "ABSENT",
+        "UNKNOWN"
+      ],
+      "title": "Native Verdict",
+      "type": "string"
+    },
+    "rationale": {
+      "default": "",
+      "title": "Rationale",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "2.1",
+      "default": "2.1",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "assessment_id",
+    "artifact_id",
+    "annotation_path",
+    "annotation_sha256",
+    "native_id",
+    "native_property",
+    "native_verdict",
+    "native_scope_kind",
+    "native_scope",
+    "candidate_checks",
+    "evidence_tier",
+    "evidence_reference"
+  ],
+  "title": "Assessment",
+  "type": "object"
+}

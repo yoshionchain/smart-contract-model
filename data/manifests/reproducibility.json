@@ -1,0 +1,33 @@
+{
+  "human_reviews": 0,
+  "inventory_v2.1": {
+    "byte_identical_files": [
+      "artifacts.parquet",
+      "assessments.parquet",
+      "conflicts.jsonl",
+      "dataset_statistics.csv",
+      "dataset_statistics.json",
+      "effective_config.json",
+      "exclusions.jsonl",
+      "group_edges.jsonl",
+      "groups.jsonl",
+      "ingestion_issues.jsonl",
+      "queries.parquet",
+      "taxonomy.json"
+    ],
+    "command": "HF_HUB_OFFLINE=1 uv run python scripts/build_dataset.py --stage inventory",
+    "content_sha256": "2ba41c2d507e791b3a0d035e37cd0b579d9632864325be3efdd3be64f4049de9",
+    "independent_rebuild_sha256": "2ba41c2d507e791b3a0d035e37cd0b579d9632864325be3efdd3be64f4049de9"
+  },
+  "release_v2.2": {
+    "command": "uv run python scripts/build_dataset.py --stage split",
+    "content_sha256": "72e53f148859b0e40f829ba5d567d3c0c58320d28fc203f72c0eb1bf126f086f",
+    "rebuilds_identical": true
+  },
+  "ruff": "PASS",
+  "tests": {
+    "command": "uv run pytest",
+    "passed": 113
+  },
+  "training_ready": false
+}

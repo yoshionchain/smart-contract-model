@@ -1,0 +1,35 @@
+{
+  "active_checks": [
+    "REENTRANCY"
+  ],
+  "counts": {
+    "candidate_queries": 2579,
+    "groups": 1860,
+    "native_assessments": 28730,
+    "source_artifacts": 31185,
+    "training_ready_queries": 0
+  },
+  "dataset_content_sha256": "2ba41c2d507e791b3a0d035e37cd0b579d9632864325be3efdd3be64f4049de9",
+  "files": {
+    "artifacts.parquet": "24d1020be2d4ce16a75fdeb06c7e384c782f45f4aa460035134875efcad16364",
+    "assessments.parquet": "e91890fa0607ddaecf7a10295eca73bd649a79464bf446c2ec38a50fb62a40c2",
+    "conflicts.jsonl": "9bc2b430e967f49c371e8269310883ef77a7bb8cf4d3b56f9509c1e106f37e00",
+    "dataset_statistics.csv": "9e0b295bd39473eebc262c20e39958c6e673af089a6369bc407cf84d412d7279",
+    "dataset_statistics.json": "079a8303ca4ea13beae25b4253c41e1e5294b0550edce1d1396043c3ae5749bd",
+    "effective_config.json": "9b5cc34b140aef21a43fe9c779f5f7a8e11478b2faa535feb64e5e7d7109dd53",
+    "exclusions.jsonl": "97fc4b72b60a8847808d41b0d110f9ed4c18fc6943ff55e0b6a9ae1f95ba120a",
+    "group_edges.jsonl": "df734991c1d3bff4677f723867dbecf948b014e72889279ae8924fad2ec4454f",
+    "groups.jsonl": "e53842024264c8b5366765c949ee262fc06fc98a7dff9b8a9ccad178819f3edd",
+    "ingestion_issues.jsonl": "72a0a3ec90d58b62abc9626e0a81edff3acaab1d7fcb5ce38b1ad7b4730fa191",
+    "provenance.json": "4e5010759c19755db93d4ff54084231d19f0a58f5b77d3f0e1306c27c19e3a3f",
+    "queries.parquet": "a12a139f12a67e02dd90f545a9696fde60f5ee69799c34eaeb6b15792f3fa08a",
+    "taxonomy.json": "7ea64033776dfe67e1897afb88e720a4a6911ee29a5d5effa6e9c4c82a8dee7d"
+  },
+  "next_stage": "v2.2 release (build_dataset.py --stage split), then human review",
+  "schema_version": "2.1",
+  "spec_version": "2.1",
+  "state": "inventory",
+  "teacher_generation_run": false,
+  "training_ready": false,
+  "training_run": false
+}

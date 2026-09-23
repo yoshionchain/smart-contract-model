@@ -1,0 +1,28 @@
+{
+  "active_checks": [
+    "REENTRANCY"
+  ],
+  "checks": [
+    "manifest hashes and version compatibility",
+    "typed records and evidence references",
+    "source identities, line counts and exact model input hashes",
+    "candidate token budgets and comment sanitization",
+    "group membership, known-project isolation and external reservations",
+    "recomputed statistics"
+  ],
+  "counts": {
+    "candidate_queries": 2579,
+    "groups": 1860,
+    "native_assessments": 28730,
+    "source_artifacts": 31185,
+    "training_ready_queries": 0
+  },
+  "dataset_content_sha256": "2ba41c2d507e791b3a0d035e37cd0b579d9632864325be3efdd3be64f4049de9",
+  "human_label_validation": "PENDING",
+  "mechanical_validation": "PASS",
+  "schema_version": "2.1",
+  "spec_version": "2.1",
+  "split_support_gates": "NOT_RUN",
+  "training_ready": false,
+  "validated_file_count": 13
+}

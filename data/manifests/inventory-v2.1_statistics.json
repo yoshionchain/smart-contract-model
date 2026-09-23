@@ -1,0 +1,1222 @@
+{
+  "active_group_edges": 6888,
+  "artifacts_by_source": {
+    "cgt": 3103,
+    "dappscan": 21457,
+    "forge": 997,
+    "salzano": 4363,
+    "scbench": 653,
+    "scrubd": 469,
+    "smartbugs": 143
+  },
+  "artifacts_without_native_assessments": 22690,
+  "assessment_evidence_tiers": {
+    "UNVERIFIED": 22246,
+    "UPSTREAM_REVIEWED": 6484
+  },
+  "assessment_exclusion_reasons": {
+    "excluded_original_collection": 87,
+    "overlength_source": 703,
+    "unresolved_scope": 16
+  },
+  "assessments_by_source": {
+    "cgt": 19456,
+    "dappscan": 1646,
+    "forge": 2790,
+    "salzano": 2486,
+    "scbench": 653,
+    "scrubd": 1492,
+    "smartbugs": 207
+  },
+  "assessments_supporting_candidates": 3275,
+  "assessments_without_target_mapping": 24649,
+  "baseline": {
+    "active_checks": [
+      "REENTRANCY"
+    ],
+    "candidate_source_identities": 2297,
+    "compiler_era_cells": [
+      {
+        "first_pragma_minor": "0.3",
+        "proposed_verdict": "ABSENT",
+        "role": "development",
+        "source_identities": 2
+      },
+      {
+        "first_pragma_minor": "0.4",
+        "proposed_verdict": "ABSENT",
+        "role": "development",
+        "source_identities": 1357
+      },
+      {
+        "first_pragma_minor": "0.5",
+        "proposed_verdict": "ABSENT",
+        "role": "development",
+        "source_identities": 26
+      },
+      {
+        "first_pragma_minor": "0.6",
+        "proposed_verdict": "ABSENT",
+        "role": "development",
+        "source_identities": 6
+      },
+      {
+        "first_pragma_minor": "0.7",
+        "proposed_verdict": "ABSENT",
+        "role": "development",
+        "source_identities": 1
+      },
+      {
+        "first_pragma_minor": "0.8",
+        "proposed_verdict": "ABSENT",
+        "role": "development",
+        "source_identities": 26
+      },
+      {
+        "first_pragma_minor": "unspecified",
+        "proposed_verdict": "ABSENT",
+        "role": "development",
+        "source_identities": 357
+      },
+      {
+        "first_pragma_minor": "0.4",
+        "proposed_verdict": "PRESENT",
+        "role": "development",
+        "source_identities": 145
+      },
+      {
+        "first_pragma_minor": "0.5",
+        "proposed_verdict": "PRESENT",
+        "role": "development",
+        "source_identities": 16
+      },
+      {
+        "first_pragma_minor": "0.6",
+        "proposed_verdict": "PRESENT",
+        "role": "development",
+        "source_identities": 29
+      },
+      {
+        "first_pragma_minor": "0.7",
+        "proposed_verdict": "PRESENT",
+        "role": "development",
+        "source_identities": 10
+      },
+      {
+        "first_pragma_minor": "0.8",
+        "proposed_verdict": "PRESENT",
+        "role": "development",
+        "source_identities": 16
+      },
+      {
+        "first_pragma_minor": "unspecified",
+        "proposed_verdict": "PRESENT",
+        "role": "development",
+        "source_identities": 24
+      },
+      {
+        "first_pragma_minor": "0.4",
+        "proposed_verdict": "UNKNOWN",
+        "role": "development",
+        "source_identities": 59
+      },
+      {
+        "first_pragma_minor": "unspecified",
+        "proposed_verdict": "UNKNOWN",
+        "role": "development",
+        "source_identities": 97
+      },
+      {
+        "first_pragma_minor": "0.8",
+        "proposed_verdict": "PRESENT",
+        "role": "forge_external",
+        "source_identities": 27
+      },
+      {
+        "first_pragma_minor": "0.4",
+        "proposed_verdict": "ABSENT",
+        "role": "smartbugs_external",
+        "source_identities": 23
+      },
+      {
+        "first_pragma_minor": "unspecified",
+        "proposed_verdict": "ABSENT",
+        "role": "smartbugs_external",
+        "source_identities": 4
+      },
+      {
+        "first_pragma_minor": "0.4",
+        "proposed_verdict": "PRESENT",
+        "role": "smartbugs_external",
+        "source_identities": 96
+      },
+      {
+        "first_pragma_minor": "0.5",
+        "proposed_verdict": "PRESENT",
+        "role": "smartbugs_external",
+        "source_identities": 1
+      }
+    ],
+    "development_source_identities": 2147,
+    "notes": [
+      "All counts describe candidates, not certified training or evaluation examples.",
+      "Supporting sources overlap; repackaged collections are not independent evidence.",
+      "A source/group may support multiple scopes, verdicts, or compiler-pragma cells.",
+      "Upstream-reviewed support still needs check/scope/context/coverage verification.",
+      "The first pragma is a compiler-era screen, not a deployment date or EVM fork.",
+      "Protected-group aliases are reservations, not extra benchmark observations."
+    ],
+    "support_cells": [
+      {
+        "dimension": "evidence",
+        "groups": 653,
+        "proposed_verdict": "ABSENT",
+        "queries": 836,
+        "role": "development",
+        "source_identities": 780,
+        "value": "has_upstream_reviewed_support"
+      },
+      {
+        "dimension": "evidence",
+        "groups": 916,
+        "proposed_verdict": "ABSENT",
+        "queries": 1090,
+        "role": "development",
+        "source_identities": 1089,
+        "value": "unverified_only"
+      },
+      {
+        "dimension": "scope",
+        "groups": 916,
+        "proposed_verdict": "ABSENT",
+        "queries": 1090,
+        "role": "development",
+        "source_identities": 1089,
+        "value": "CONTRACT"
+      },
+      {
+        "dimension": "scope",
+        "groups": 504,
+        "proposed_verdict": "ABSENT",
+        "queries": 593,
+        "role": "development",
+        "source_identities": 593,
+        "value": "FILE"
+      },
+      {
+        "dimension": "scope",
+        "groups": 155,
+        "proposed_verdict": "ABSENT",
+        "queries": 243,
+        "role": "development",
+        "source_identities": 190,
+        "value": "FUNCTION"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 916,
+        "proposed_verdict": "ABSENT",
+        "queries": 1090,
+        "role": "development",
+        "source_identities": 1089,
+        "value": "cgt"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 467,
+        "proposed_verdict": "ABSENT",
+        "queries": 553,
+        "role": "development",
+        "source_identities": 553,
+        "value": "salzano"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 37,
+        "proposed_verdict": "ABSENT",
+        "queries": 40,
+        "role": "development",
+        "source_identities": 40,
+        "value": "scbench"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 155,
+        "proposed_verdict": "ABSENT",
+        "queries": 243,
+        "role": "development",
+        "source_identities": 190,
+        "value": "scrubd"
+      },
+      {
+        "dimension": "evidence",
+        "groups": 157,
+        "proposed_verdict": "PRESENT",
+        "queries": 225,
+        "role": "development",
+        "source_identities": 183,
+        "value": "has_upstream_reviewed_support"
+      },
+      {
+        "dimension": "evidence",
+        "groups": 51,
+        "proposed_verdict": "PRESENT",
+        "queries": 64,
+        "role": "development",
+        "source_identities": 64,
+        "value": "unverified_only"
+      },
+      {
+        "dimension": "scope",
+        "groups": 51,
+        "proposed_verdict": "PRESENT",
+        "queries": 64,
+        "role": "development",
+        "source_identities": 64,
+        "value": "CONTRACT"
+      },
+      {
+        "dimension": "scope",
+        "groups": 44,
+        "proposed_verdict": "PRESENT",
+        "queries": 45,
+        "role": "development",
+        "source_identities": 45,
+        "value": "FILE"
+      },
+      {
+        "dimension": "scope",
+        "groups": 114,
+        "proposed_verdict": "PRESENT",
+        "queries": 180,
+        "role": "development",
+        "source_identities": 138,
+        "value": "FUNCTION"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 51,
+        "proposed_verdict": "PRESENT",
+        "queries": 64,
+        "role": "development",
+        "source_identities": 64,
+        "value": "cgt"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 57,
+        "proposed_verdict": "PRESENT",
+        "queries": 89,
+        "role": "development",
+        "source_identities": 71,
+        "value": "dappscan"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 34,
+        "proposed_verdict": "PRESENT",
+        "queries": 35,
+        "role": "development",
+        "source_identities": 35,
+        "value": "salzano"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 9,
+        "proposed_verdict": "PRESENT",
+        "queries": 9,
+        "role": "development",
+        "source_identities": 9,
+        "value": "scbench"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 58,
+        "proposed_verdict": "PRESENT",
+        "queries": 92,
+        "role": "development",
+        "source_identities": 68,
+        "value": "scrubd"
+      },
+      {
+        "dimension": "evidence",
+        "groups": 27,
+        "proposed_verdict": "UNKNOWN",
+        "queries": 32,
+        "role": "development",
+        "source_identities": 28,
+        "value": "has_upstream_reviewed_support"
+      },
+      {
+        "dimension": "evidence",
+        "groups": 87,
+        "proposed_verdict": "UNKNOWN",
+        "queries": 154,
+        "role": "development",
+        "source_identities": 154,
+        "value": "unverified_only"
+      },
+      {
+        "dimension": "scope",
+        "groups": 87,
+        "proposed_verdict": "UNKNOWN",
+        "queries": 154,
+        "role": "development",
+        "source_identities": 154,
+        "value": "CONTRACT"
+      },
+      {
+        "dimension": "scope",
+        "groups": 23,
+        "proposed_verdict": "UNKNOWN",
+        "queries": 24,
+        "role": "development",
+        "source_identities": 24,
+        "value": "FILE"
+      },
+      {
+        "dimension": "scope",
+        "groups": 6,
+        "proposed_verdict": "UNKNOWN",
+        "queries": 8,
+        "role": "development",
+        "source_identities": 6,
+        "value": "FUNCTION"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 87,
+        "proposed_verdict": "UNKNOWN",
+        "queries": 154,
+        "role": "development",
+        "source_identities": 154,
+        "value": "cgt"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 20,
+        "proposed_verdict": "UNKNOWN",
+        "queries": 21,
+        "role": "development",
+        "source_identities": 21,
+        "value": "salzano"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 3,
+        "proposed_verdict": "UNKNOWN",
+        "queries": 3,
+        "role": "development",
+        "source_identities": 3,
+        "value": "scbench"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 6,
+        "proposed_verdict": "UNKNOWN",
+        "queries": 8,
+        "role": "development",
+        "source_identities": 6,
+        "value": "scrubd"
+      },
+      {
+        "dimension": "evidence",
+        "groups": 20,
+        "proposed_verdict": "PRESENT",
+        "queries": 27,
+        "role": "forge_external",
+        "source_identities": 27,
+        "value": "unverified_only"
+      },
+      {
+        "dimension": "scope",
+        "groups": 20,
+        "proposed_verdict": "PRESENT",
+        "queries": 27,
+        "role": "forge_external",
+        "source_identities": 27,
+        "value": "FILE"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 20,
+        "proposed_verdict": "PRESENT",
+        "queries": 27,
+        "role": "forge_external",
+        "source_identities": 27,
+        "value": "forge"
+      },
+      {
+        "dimension": "evidence",
+        "groups": 15,
+        "proposed_verdict": "ABSENT",
+        "queries": 24,
+        "role": "smartbugs_external",
+        "source_identities": 23,
+        "value": "has_upstream_reviewed_support"
+      },
+      {
+        "dimension": "evidence",
+        "groups": 4,
+        "proposed_verdict": "ABSENT",
+        "queries": 4,
+        "role": "smartbugs_external",
+        "source_identities": 4,
+        "value": "unverified_only"
+      },
+      {
+        "dimension": "scope",
+        "groups": 4,
+        "proposed_verdict": "ABSENT",
+        "queries": 4,
+        "role": "smartbugs_external",
+        "source_identities": 4,
+        "value": "CONTRACT"
+      },
+      {
+        "dimension": "scope",
+        "groups": 3,
+        "proposed_verdict": "ABSENT",
+        "queries": 5,
+        "role": "smartbugs_external",
+        "source_identities": 5,
+        "value": "FILE"
+      },
+      {
+        "dimension": "scope",
+        "groups": 12,
+        "proposed_verdict": "ABSENT",
+        "queries": 19,
+        "role": "smartbugs_external",
+        "source_identities": 18,
+        "value": "FUNCTION"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 4,
+        "proposed_verdict": "ABSENT",
+        "queries": 4,
+        "role": "smartbugs_external",
+        "source_identities": 4,
+        "value": "cgt"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 3,
+        "proposed_verdict": "ABSENT",
+        "queries": 5,
+        "role": "smartbugs_external",
+        "source_identities": 5,
+        "value": "salzano"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 12,
+        "proposed_verdict": "ABSENT",
+        "queries": 19,
+        "role": "smartbugs_external",
+        "source_identities": 18,
+        "value": "scrubd"
+      },
+      {
+        "dimension": "evidence",
+        "groups": 17,
+        "proposed_verdict": "PRESENT",
+        "queries": 119,
+        "role": "smartbugs_external",
+        "source_identities": 97,
+        "value": "has_upstream_reviewed_support"
+      },
+      {
+        "dimension": "evidence",
+        "groups": 1,
+        "proposed_verdict": "PRESENT",
+        "queries": 4,
+        "role": "smartbugs_external",
+        "source_identities": 4,
+        "value": "unverified_only"
+      },
+      {
+        "dimension": "scope",
+        "groups": 1,
+        "proposed_verdict": "PRESENT",
+        "queries": 4,
+        "role": "smartbugs_external",
+        "source_identities": 4,
+        "value": "CONTRACT"
+      },
+      {
+        "dimension": "scope",
+        "groups": 16,
+        "proposed_verdict": "PRESENT",
+        "queries": 96,
+        "role": "smartbugs_external",
+        "source_identities": 96,
+        "value": "FILE"
+      },
+      {
+        "dimension": "scope",
+        "groups": 5,
+        "proposed_verdict": "PRESENT",
+        "queries": 23,
+        "role": "smartbugs_external",
+        "source_identities": 23,
+        "value": "FUNCTION"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 1,
+        "proposed_verdict": "PRESENT",
+        "queries": 4,
+        "role": "smartbugs_external",
+        "source_identities": 4,
+        "value": "cgt"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 15,
+        "proposed_verdict": "PRESENT",
+        "queries": 31,
+        "role": "smartbugs_external",
+        "source_identities": 31,
+        "value": "salzano"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 5,
+        "proposed_verdict": "PRESENT",
+        "queries": 85,
+        "role": "smartbugs_external",
+        "source_identities": 85,
+        "value": "scbench"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 5,
+        "proposed_verdict": "PRESENT",
+        "queries": 23,
+        "role": "smartbugs_external",
+        "source_identities": 23,
+        "value": "scrubd"
+      },
+      {
+        "dimension": "supporting_source",
+        "groups": 15,
+        "proposed_verdict": "PRESENT",
+        "queries": 30,
+        "role": "smartbugs_external",
+        "source_identities": 30,
+        "value": "smartbugs"
+      }
+    ]
+  },
+  "candidate_cells": [
+    {
+      "check_id": "REENTRANCY",
+      "groups": 1381,
+      "proposed_verdict": "ABSENT",
+      "queries": 1926,
+      "role": "development",
+      "source_identities": 1775
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 198,
+      "proposed_verdict": "PRESENT",
+      "queries": 289,
+      "role": "development",
+      "source_identities": 240
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 89,
+      "proposed_verdict": "UNKNOWN",
+      "queries": 186,
+      "role": "development",
+      "source_identities": 156
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 20,
+      "proposed_verdict": "PRESENT",
+      "queries": 27,
+      "role": "forge_external",
+      "source_identities": 27
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 19,
+      "proposed_verdict": "ABSENT",
+      "queries": 28,
+      "role": "smartbugs_external",
+      "source_identities": 27
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 17,
+      "proposed_verdict": "PRESENT",
+      "queries": 123,
+      "role": "smartbugs_external",
+      "source_identities": 97
+    }
+  ],
+  "candidate_queries": 2579,
+  "candidate_roles": {
+    "development": 2401,
+    "forge_external": 27,
+    "smartbugs_external": 151
+  },
+  "candidate_source_compiler_eras_first_pragma": {
+    "0.3": 2,
+    "0.4": 1657,
+    "0.5": 42,
+    "0.6": 35,
+    "0.7": 11,
+    "0.8": 69,
+    "unspecified": 481
+  },
+  "disagreements": 158,
+  "disputed_identities": 158,
+  "group_roles": {
+    "development": 1608,
+    "forge_external": 147,
+    "smartbugs_external": 105
+  },
+  "groups": 1860,
+  "human_reviews": 0,
+  "inactive_raw_matches": 3907,
+  "ingestion_issue_reasons": {
+    "audit_report_without_source": 115,
+    "no_published_source": 999
+  },
+  "largest_groups": [
+    {
+      "group_id": "5cee67882ea43e71f92f15abb993450fbfa46140e28c23276ce3baff9dc797d9",
+      "role": "smartbugs_external",
+      "source_identities": 66
+    },
+    {
+      "group_id": "90d22ae34cabbee52129efb71459ef05b9c0ee24a53353c2bf0e875896b9c680",
+      "role": "forge_external",
+      "source_identities": 58
+    },
+    {
+      "group_id": "9002e0640e9c411338b3ee47b1487ba479dba2fd7e5fbaef59a3389eb00a9581",
+      "role": "forge_external",
+      "source_identities": 54
+    },
+    {
+      "group_id": "d461b071b544766d3f2e28abd55ab8112536985088384649434cd0772de6fef7",
+      "role": "development",
+      "source_identities": 53
+    },
+    {
+      "group_id": "b06c37556a5e8a0e8b7c27a25cedac16dafe3190c08ef8288f5944a47a9e442e",
+      "role": "forge_external",
+      "source_identities": 36
+    },
+    {
+      "group_id": "f29459fc757dc7b4ab7b55b533bb501f6f9304dd0f9397b22ca9dc57003b03be",
+      "role": "forge_external",
+      "source_identities": 26
+    },
+    {
+      "group_id": "e366aac6f9719805d0bdadfb2e0f558f69e73a5679487809a95828e70b3a0192",
+      "role": "forge_external",
+      "source_identities": 25
+    },
+    {
+      "group_id": "f79ee11892e5875c827ef257e12081c1e7c28ef354283b9e85687f5406132204",
+      "role": "forge_external",
+      "source_identities": 22
+    },
+    {
+      "group_id": "742acb1d98b738c5f6e643d5f444a90c38ac55f8077f60d0a447a1001e700380",
+      "role": "forge_external",
+      "source_identities": 21
+    },
+    {
+      "group_id": "8dcf8216231978b714dd529af35260411636343748ec895e37de340d0cbc0e14",
+      "role": "forge_external",
+      "source_identities": 21
+    },
+    {
+      "group_id": "9f5ea3daa8d0b7f35f868bd0712d2e869cd8c548642fea3881b63dcba7bfec1d",
+      "role": "forge_external",
+      "source_identities": 21
+    },
+    {
+      "group_id": "c75ea2dd651a15472cf8b9ac4cd425ac601ed9fe9bd6abaec660fede3eb1d9ed",
+      "role": "forge_external",
+      "source_identities": 21
+    },
+    {
+      "group_id": "eeb1087f5ee1264341cff0a0a76709422c4096c982dbe35e5c0cd9d4930ad277",
+      "role": "forge_external",
+      "source_identities": 20
+    },
+    {
+      "group_id": "55315eb75e1c653df020fd94c99c9dc372ff5e152d0570012e3ef16fc39aecdc",
+      "role": "forge_external",
+      "source_identities": 19
+    },
+    {
+      "group_id": "ea312a1c8e5a74264a9286455033790b8b763b96652cb65537f7f29bf4b5e4a3",
+      "role": "development",
+      "source_identities": 18
+    },
+    {
+      "group_id": "cdff53252c3fe2f90b95e7399273a0be761bc99e4fbedff9010e3bf70c005c25",
+      "role": "forge_external",
+      "source_identities": 17
+    },
+    {
+      "group_id": "e25ca1e91d2866373ee7de2a6d6504e7e55e1657b1876e0408df3059924b8606",
+      "role": "forge_external",
+      "source_identities": 16
+    },
+    {
+      "group_id": "3ea4f56c9460f9aeb970f8d118a94c258276a228b677717f535262bdcb56bbd7",
+      "role": "forge_external",
+      "source_identities": 15
+    },
+    {
+      "group_id": "6286f0bdde02e54c77f59631939211c59cfc8a1b6b8b5df77e223a54c8f233bc",
+      "role": "forge_external",
+      "source_identities": 15
+    },
+    {
+      "group_id": "7a23c0e4a8a2be051f8da1a3ee173a3d725cdec7be232d98640dd4c328567e76",
+      "role": "forge_external",
+      "source_identities": 15
+    }
+  ],
+  "lexical_identities": 21493,
+  "native_assessments": 28730,
+  "native_verdicts": {
+    "ABSENT": 15830,
+    "PRESENT": 12720,
+    "UNKNOWN": 180
+  },
+  "original_collection_cells": [
+    {
+      "check_id": "REENTRANCY",
+      "groups": 325,
+      "original_collection": "CodeSmells",
+      "proposed_verdict": "ABSENT",
+      "queries": 354,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 7,
+      "original_collection": "CodeSmells",
+      "proposed_verdict": "PRESENT",
+      "queries": 7,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 2,
+      "original_collection": "CodeSmells",
+      "proposed_verdict": "UNKNOWN",
+      "queries": 2,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 8,
+      "original_collection": "ContractFuzzer",
+      "proposed_verdict": "PRESENT",
+      "queries": 8,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 25,
+      "original_collection": "Doublade",
+      "proposed_verdict": "ABSENT",
+      "queries": 27,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 9,
+      "original_collection": "Doublade",
+      "proposed_verdict": "PRESENT",
+      "queries": 10,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 1,
+      "original_collection": "Doublade",
+      "proposed_verdict": "UNKNOWN",
+      "queries": 1,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 3,
+      "original_collection": "EverEvolvingG",
+      "proposed_verdict": "PRESENT",
+      "queries": 6,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 33,
+      "original_collection": "NPChecker",
+      "proposed_verdict": "ABSENT",
+      "queries": 34,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 1,
+      "original_collection": "NPChecker",
+      "proposed_verdict": "PRESENT",
+      "queries": 1,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 7,
+      "original_collection": "NPChecker",
+      "proposed_verdict": "UNKNOWN",
+      "queries": 7,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 155,
+      "original_collection": "SCRUBD-CD",
+      "proposed_verdict": "ABSENT",
+      "queries": 243,
+      "role": "development",
+      "scope_kind": "FUNCTION"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 58,
+      "original_collection": "SCRUBD-CD",
+      "proposed_verdict": "PRESENT",
+      "queries": 92,
+      "role": "development",
+      "scope_kind": "FUNCTION"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 6,
+      "original_collection": "SCRUBD-CD",
+      "proposed_verdict": "UNKNOWN",
+      "queries": 8,
+      "role": "development",
+      "scope_kind": "FUNCTION"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 578,
+      "original_collection": "Zeus",
+      "proposed_verdict": "ABSENT",
+      "queries": 708,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 18,
+      "original_collection": "Zeus",
+      "proposed_verdict": "PRESENT",
+      "queries": 23,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 84,
+      "original_collection": "Zeus",
+      "proposed_verdict": "UNKNOWN",
+      "queries": 151,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 1,
+      "original_collection": "dappscan",
+      "proposed_verdict": "PRESENT",
+      "queries": 1,
+      "role": "development",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 56,
+      "original_collection": "dappscan",
+      "proposed_verdict": "PRESENT",
+      "queries": 88,
+      "role": "development",
+      "scope_kind": "FUNCTION"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 336,
+      "original_collection": "eThor",
+      "proposed_verdict": "ABSENT",
+      "queries": 417,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 18,
+      "original_collection": "eThor",
+      "proposed_verdict": "PRESENT",
+      "queries": 23,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 83,
+      "original_collection": "eThor",
+      "proposed_verdict": "UNKNOWN",
+      "queries": 150,
+      "role": "development",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 37,
+      "original_collection": "scbench",
+      "proposed_verdict": "ABSENT",
+      "queries": 40,
+      "role": "development",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 9,
+      "original_collection": "scbench",
+      "proposed_verdict": "PRESENT",
+      "queries": 9,
+      "role": "development",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 3,
+      "original_collection": "scbench",
+      "proposed_verdict": "UNKNOWN",
+      "queries": 3,
+      "role": "development",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 291,
+      "original_collection": "smartbugs_results",
+      "proposed_verdict": "ABSENT",
+      "queries": 354,
+      "role": "development",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 28,
+      "original_collection": "smartbugs_results",
+      "proposed_verdict": "PRESENT",
+      "queries": 28,
+      "role": "development",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 147,
+      "original_collection": "zeus_safe",
+      "proposed_verdict": "ABSENT",
+      "queries": 165,
+      "role": "development",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 12,
+      "original_collection": "zeus_safe",
+      "proposed_verdict": "UNKNOWN",
+      "queries": 13,
+      "role": "development",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 31,
+      "original_collection": "zeus_vulnerable",
+      "proposed_verdict": "ABSENT",
+      "queries": 36,
+      "role": "development",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 6,
+      "original_collection": "zeus_vulnerable",
+      "proposed_verdict": "PRESENT",
+      "queries": 7,
+      "role": "development",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 8,
+      "original_collection": "zeus_vulnerable",
+      "proposed_verdict": "UNKNOWN",
+      "queries": 8,
+      "role": "development",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 20,
+      "original_collection": "forge",
+      "proposed_verdict": "PRESENT",
+      "queries": 27,
+      "role": "forge_external",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 1,
+      "original_collection": "ContractFuzzer",
+      "proposed_verdict": "PRESENT",
+      "queries": 3,
+      "role": "smartbugs_external",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 1,
+      "original_collection": "Doublade",
+      "proposed_verdict": "PRESENT",
+      "queries": 2,
+      "role": "smartbugs_external",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 12,
+      "original_collection": "SCRUBD-CD",
+      "proposed_verdict": "ABSENT",
+      "queries": 19,
+      "role": "smartbugs_external",
+      "scope_kind": "FUNCTION"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 5,
+      "original_collection": "SCRUBD-CD",
+      "proposed_verdict": "PRESENT",
+      "queries": 23,
+      "role": "smartbugs_external",
+      "scope_kind": "FUNCTION"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 4,
+      "original_collection": "Zeus",
+      "proposed_verdict": "ABSENT",
+      "queries": 4,
+      "role": "smartbugs_external",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 3,
+      "original_collection": "eThor",
+      "proposed_verdict": "ABSENT",
+      "queries": 3,
+      "role": "smartbugs_external",
+      "scope_kind": "CONTRACT"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 5,
+      "original_collection": "scbench",
+      "proposed_verdict": "PRESENT",
+      "queries": 85,
+      "role": "smartbugs_external",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 15,
+      "original_collection": "smartbugs",
+      "proposed_verdict": "PRESENT",
+      "queries": 30,
+      "role": "smartbugs_external",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 3,
+      "original_collection": "smartbugs_curated",
+      "proposed_verdict": "ABSENT",
+      "queries": 3,
+      "role": "smartbugs_external",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 15,
+      "original_collection": "smartbugs_curated",
+      "proposed_verdict": "PRESENT",
+      "queries": 30,
+      "role": "smartbugs_external",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 1,
+      "original_collection": "smartbugs_results",
+      "proposed_verdict": "ABSENT",
+      "queries": 2,
+      "role": "smartbugs_external",
+      "scope_kind": "FILE"
+    },
+    {
+      "check_id": "REENTRANCY",
+      "groups": 2,
+      "original_collection": "smartbugs_results",
+      "proposed_verdict": "PRESENT",
+      "queries": 2,
+      "role": "smartbugs_external",
+      "scope_kind": "FILE"
+    }
+  ],
+  "project_independence_verified": false,
+  "review_flags": {
+    "exact_model_input_sufficiency": 2579,
+    "execution_assumptions": 2579,
+    "native_check_equivalence": 2579,
+    "negative_coverage": 579,
+    "protected_external_group": 178,
+    "unresolved_identity_disagreement": 186,
+    "unverified_native_evidence": 1343
+  },
+  "source_artifacts": 31185,
+  "state": "inventory",
+  "training_ready_queries": 0,
+  "unreadable_artifacts": 7
+}

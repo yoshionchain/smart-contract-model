@@ -1,0 +1,169 @@
+{
+  "$defs": {
+    "Location": {
+      "additionalProperties": false,
+      "properties": {
+        "end_line": {
+          "minimum": 1,
+          "title": "End Line",
+          "type": "integer"
+        },
+        "function": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Function"
+        },
+        "start_line": {
+          "minimum": 1,
+          "title": "Start Line",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start_line",
+        "end_line",
+        "function"
+      ],
+      "title": "Location",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "else": {
+        "properties": {
+          "exploit_scenario": {
+            "maxLength": 900,
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "location": {
+            "$ref": "#/$defs/Location"
+          },
+          "recommendation": {
+            "maxLength": 900,
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ]
+          }
+        }
+      },
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "ABSENT"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "exploit_scenario": {
+            "type": "null"
+          },
+          "location": {
+            "type": "null"
+          },
+          "recommendation": {
+            "type": "null"
+          },
+          "severity": {
+            "const": "NONE"
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "analysis": {
+      "maxLength": 1200,
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Analysis",
+      "type": "string"
+    },
+    "exploit_scenario": {
+      "anyOf": [
+        {
+          "maxLength": 900,
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Exploit Scenario"
+    },
+    "location": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Location"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "recommendation": {
+      "anyOf": [
+        {
+          "maxLength": 900,
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Recommendation"
+    },
+    "severity": {
+      "enum": [
+        "NONE",
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "CRITICAL"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "verdict": {
+      "enum": [
+        "PRESENT",
+        "ABSENT"
+      ],
+      "title": "Verdict",
+      "type": "string"
+    }
+  },
+  "required": [
+    "analysis",
+    "verdict",
+    "severity",
+    "location",
+    "exploit_scenario",
+    "recommendation"
+  ],
+  "title": "ScopedReport",
+  "type": "object"
+}

@@ -1,0 +1,23 @@
+base_model: Qwen/Qwen2.5-Coder-1.5B-Instruct
+model_revision: 2e1fd397ee46e1388853d2af2c993145b0f1098a
+max_seq_length: 8192
+quantization: 4bit
+bnb_4bit_quant_type: nf4
+bnb_4bit_use_double_quant: true
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_bias: none
+lora_targets: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+learning_rate: 0.0002
+num_train_epochs: 3
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 1
+gradient_accumulation_steps: 4
+weight_decay: 0.01
+warmup_ratio: 0.05
+lr_scheduler_type: cosine
+max_grad_norm: 1.0
+gradient_checkpointing: true
+packing: false
+seed: 42
