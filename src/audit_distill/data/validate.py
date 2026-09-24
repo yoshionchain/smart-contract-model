@@ -85,7 +85,7 @@ def validate_baseline(directory: Path) -> dict[str, object]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset", type=Path, default=Path("data/processed/reentrancy-v2.1"))
+    parser.add_argument("--dataset", type=Path, default=Path("data/processed/inventory"))
     parser.add_argument("--output", type=Path, help="Optional small validation report")
     args = parser.parse_args()
     try:

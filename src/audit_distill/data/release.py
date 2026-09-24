@@ -1,14 +1,13 @@
-"""SPEC v2.2 release stage: eligibility, matched balancing, grouped split and review queues.
+"""Build the final dataset from the inventory: eligibility, balancing and grouped split.
 
-The stage reads the unchanged v2.1 inventory and never edits upstream labels. It
-produces a provisional split and fixed human-review queues; only the later freeze
-stage, after actual human review, can produce training or evaluation files.
+Labels are the upstream human annotations under the SWC-107 reentrancy convention;
+this stage never edits them. It writes train/validation/test cohorts that carry the
+exact model input, plus the protected SmartBugs external positives.
 """
 
 import json
 import logging
 import os
-import random
 import re
 import tempfile
 from collections import Counter, defaultdict
@@ -21,7 +20,8 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sklearn.model_selection import StratifiedGroupKFold
 
 from audit_distill.config import ConfigModel
-from audit_distill.data.inventory import read_records, verify_manifest, write_jsonl
+from audit_distill.data.candidates import canonical_payload
+from audit_distill.data.inventory import read_records, verify_manifest, write_jsonl, write_records
 from audit_distill.data.records import Assessment, CandidateQuery
 from audit_distill.data.scopes import digest
 from audit_distill.provenance import file_sha256, project_provenance, write_json
@@ -29,20 +29,20 @@ from audit_distill.provenance import file_sha256, project_provenance, write_json
 logger = logging.getLogger(__name__)
 
 Polarity = Literal["PRESENT", "ABSENT"]
-Partition = Literal["train", "validation", "heldout"]
+Partition = Literal["train", "validation", "test"]
 MatchKey = Literal["collection", "scope_kind", "pragma_minor"]
-PARTITIONS: tuple[Partition, ...] = ("train", "validation", "heldout")
+PARTITIONS: tuple[Partition, ...] = ("train", "validation", "test")
 POLARITIES: tuple[Polarity, ...] = ("PRESENT", "ABSENT")
 
 
 class Gates(ConfigModel):
     train: Literal[30]
     validation: Literal[5]
-    heldout: Literal[10]
+    test: Literal[10]
 
 
 class ReleaseConfig(ConfigModel):
-    spec_version: Literal["2.2"]
+    spec_version: Literal["2.3"]
     inventory_dir: Path
     inventory_content_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     output_dir: Path
@@ -51,18 +51,11 @@ class ReleaseConfig(ConfigModel):
     max_queries_per_group_polarity: Literal[3]
     match_levels: list[list[MatchKey]]
     folds: Literal[7]
-    heldout_fold: Literal[0]
+    test_fold: Literal[0]
     validation_fold: Literal[1]
     split_seed_first: Literal[42]
     split_seed_last: Literal[1041]
     min_groups_per_polarity: Gates
-    heldout_review_target_groups: Literal[20]
-    review_seed: Literal[42]
-    audit_per_cell: Literal[5]
-    audit_max_cards: Literal[120]
-    primary_per_polarity: Literal[20]
-    # Post-audit stratum decisions ("collection|verdict"); empty until a human decides.
-    quarantined_cells: list[str]
 
     @model_validator(mode="after")
     def complete_matching(self) -> "ReleaseConfig":
@@ -84,18 +77,18 @@ def load_release_config(path: Path, *, root: Path | None = None) -> ReleaseConfi
 
 class ReleaseRecord(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
-    schema_version: Literal["2.2"] = "2.2"
+    schema_version: Literal["2.3"] = "2.3"
 
 
 class ReleaseQuery(ReleaseRecord):
-    """One eligible upstream-reviewed query; its verdict is upstream, not locally reviewed."""
+    """One eligible query; `label` is the upstream human annotation, never edited."""
 
     query_id: str
     artifact_id: str
     group_id: str
     code_identity_sha256: str
     model_input_sha256: str
-    upstream_verdict: Polarity
+    label: Polarity
     collection: str
     scope_kind: Literal["FILE", "CONTRACT", "FUNCTION"]
     scope_name: str
@@ -104,6 +97,8 @@ class ReleaseQuery(ReleaseRecord):
     pragma_minor: str
     assessment_ids: list[str]
     qualifying_assessment_ids: list[str] = Field(min_length=1)
+    # Upstream vulnerable lines annotated on this exact artifact (PRESENT only).
+    vulnerable_lines: list[int] = Field(default_factory=list)
     match_role: Literal["case", "control"] | None = None
     match_partner: str | None = None
     match_level: int | None = None
@@ -113,10 +108,50 @@ class ReleaseQuery(ReleaseRecord):
         return tuple(getattr(self, name) for name in fields)
 
 
+class CohortQuery(ReleaseQuery):
+    """A final cohort row: the query plus its exact model input payload."""
+
+    check_id: Literal["REENTRANCY"]
+    definition: str
+    assumptions: list[str]
+    source: str
+
+
+class ExternalQuery(ReleaseRecord):
+    """A protected SmartBugs positive with independent lines; never trained on."""
+
+    query_id: str
+    artifact_id: str
+    group_id: str
+    model_input_sha256: str
+    label: Literal["PRESENT"]
+    scope_kind: Literal["FILE", "CONTRACT", "FUNCTION"]
+    scope_name: str
+    vulnerable_lines: list[int] = Field(min_length=1)
+    check_id: Literal["REENTRANCY"]
+    definition: str
+    assumptions: list[str]
+    source: str
+
+
 def pragma_minor(code: str) -> str:
     """First-pragma compiler screen; not a deployment date or EVM fork."""
     match = re.search(r"\bpragma\s+solidity\b[^;]*?(0\.\d+)", code)
     return match[1] if match else "unspecified"
+
+
+def exact_lines(query: CandidateQuery, assessments: dict[str, Assessment]) -> list[int]:
+    """Reviewed PRESENT lines on the representative artifact; never transferred."""
+    return sorted(
+        {
+            line
+            for aid in query.assessment_ids
+            if assessments[aid].artifact_id == query.artifact_id
+            and assessments[aid].evidence_tier == "UPSTREAM_REVIEWED"
+            and assessments[aid].native_verdict == "PRESENT"
+            for line in assessments[aid].native_lines
+        }
+    )
 
 
 def eligibility(
@@ -166,7 +201,7 @@ def eligibility(
                 group_id=query.group_id,
                 code_identity_sha256=query.code_identity_sha256,
                 model_input_sha256=query.model_input_sha256,
-                upstream_verdict=query.proposed_verdict,
+                label=query.proposed_verdict,
                 collection="+".join(sorted(query.original_collections)),
                 scope_kind=query.scope.kind,
                 scope_name=query.scope.name,
@@ -175,6 +210,9 @@ def eligibility(
                 pragma_minor=pragma_minor(codes[query.artifact_id]),
                 assessment_ids=sorted(query.assessment_ids),
                 qualifying_assessment_ids=sorted(a.assessment_id for a in qualifying),
+                vulnerable_lines=exact_lines(query, assessments)
+                if query.proposed_verdict == "PRESENT"
+                else [],
             )
         )
     return eligible, exclusions
@@ -192,7 +230,7 @@ def cap_group_queries(
     dropped: list[dict[str, str]] = []
     counts: Counter[tuple[str, str]] = Counter()
     for query in sorted(eligible, key=lambda q: digest([seed, q.query_id])):
-        key = (query.group_id, query.upstream_verdict)
+        key = (query.group_id, query.label)
         if counts[key] < cap:
             counts[key] += 1
             kept.append(query)
@@ -214,12 +252,10 @@ def matched_selection(
     def order(query: ReleaseQuery) -> str:
         return digest([seed, query.query_id])
 
-    by_verdict = {
-        v: sorted([q for q in eligible if q.upstream_verdict == v], key=order) for v in POLARITIES
-    }
-    minority: Polarity = min(POLARITIES, key=lambda v: (len(by_verdict[v]), v))
-    cases = by_verdict[minority]
-    controls = by_verdict["ABSENT" if minority == "PRESENT" else "PRESENT"]
+    by_label = {v: sorted([q for q in eligible if q.label == v], key=order) for v in POLARITIES}
+    minority: Polarity = min(POLARITIES, key=lambda v: (len(by_label[v]), v))
+    cases = by_label[minority]
+    controls = by_label["ABSENT" if minority == "PRESENT" else "PRESENT"]
     used: set[str] = set()
     group_use: Counter[str] = Counter()
     matched: dict[str, tuple[ReleaseQuery, int]] = {}
@@ -243,24 +279,15 @@ def matched_selection(
         if case.query_id not in matched:
             raise ValueError("Too few controls for 1:1 matching; the pool cannot be balanced")
         control, level = matched[case.query_id]
-        selected.append(
-            case.model_copy(
-                update={
-                    "match_role": "case",
-                    "match_partner": control.query_id,
-                    "match_level": level,
-                }
+        for query, role, partner in [
+            (case, "case", control.query_id),
+            (control, "control", case.query_id),
+        ]:
+            selected.append(
+                query.model_copy(
+                    update={"match_role": role, "match_partner": partner, "match_level": level}
+                )
             )
-        )
-        selected.append(
-            control.model_copy(
-                update={
-                    "match_role": "control",
-                    "match_partner": case.query_id,
-                    "match_level": level,
-                }
-            )
-        )
     surplus = [
         {
             "query_id": c.query_id,
@@ -277,8 +304,8 @@ def matched_selection(
 def support(queries: list[ReleaseQuery]) -> dict[str, dict[str, int]]:
     return {
         v: {
-            "queries": sum(q.upstream_verdict == v for q in queries),
-            "groups": len({q.group_id for q in queries if q.upstream_verdict == v}),
+            "queries": sum(q.label == v for q in queries),
+            "groups": len({q.group_id for q in queries if q.label == v}),
         }
         for v in POLARITIES
     }
@@ -287,8 +314,8 @@ def support(queries: list[ReleaseQuery]) -> dict[str, dict[str, int]]:
 def both_polarity_collections(queries: list[ReleaseQuery]) -> list[str]:
     seen: dict[str, set[str]] = defaultdict(set)
     for query in queries:
-        seen[query.collection].add(query.upstream_verdict)
-    return sorted(c for c, verdicts in seen.items() if len(verdicts) == 2)
+        seen[query.collection].add(query.label)
+    return sorted(c for c, labels in seen.items() if len(labels) == 2)
 
 
 def grouped_split(
@@ -296,13 +323,13 @@ def grouped_split(
 ) -> tuple[list[ReleaseQuery], list[dict[str, str]], int, list[dict[str, object]]]:
     """Split the eligible pool by group, then balance each partition by 1:1 matching.
 
-    Seven-fold StratifiedGroupKFold uses (collection, verdict) strata so every partition
+    Seven-fold StratifiedGroupKFold uses (collection, label) strata so every partition
     receives a proportional share of each collection. Matching inside a partition keeps
     every case and its control together without chaining groups across partitions.
     The first seed whose matched partitions pass the support/breadth gates is used.
     """
     ordered = sorted(eligible, key=lambda q: q.query_id)
-    strata = [f"{q.collection}|{q.upstream_verdict}" for q in ordered]
+    strata = [f"{q.collection}|{q.label}" for q in ordered]
     groups = [q.group_id for q in ordered]
     gates = config.min_groups_per_polarity.model_dump()
     attempts: list[dict[str, object]] = []
@@ -311,8 +338,8 @@ def grouped_split(
         assignment: dict[str, Partition] = {}
         for fold, (_, test) in enumerate(folds.split(ordered, strata, groups)):
             partition: Partition = (
-                "heldout"
-                if fold == config.heldout_fold
+                "test"
+                if fold == config.test_fold
                 else "validation"
                 if fold == config.validation_fold
                 else "train"
@@ -340,93 +367,33 @@ def grouped_split(
             }
             for name in PARTITIONS
         }
-        # The held-out fold must also offer enough distinct groups per polarity for the
-        # reviewed primary target, since that queue allows one query per group/polarity.
         passed = all(
             summary[name]["selected"][v]["groups"] >= gates[name]
             and summary[name]["both_polarity_collections"]
             for name in PARTITIONS
             for v in POLARITIES
-        ) and all(
-            summary["heldout"]["selected"][v]["groups"] >= config.heldout_review_target_groups
-            for v in POLARITIES
         )
         attempts.append({"seed": seed, "passed": passed, "partitions": summary})
         if passed:
             return sorted(selected, key=lambda q: q.query_id), surplus, seed, attempts
-    raise ValueError("No split seed satisfies the provisional support and breadth gates")
+    raise ValueError("No split seed satisfies the support and breadth gates")
 
 
-def audit_queue(train: list[ReleaseQuery], config: ReleaseConfig) -> list[dict[str, object]]:
-    """Training-label audit: up to N unique groups per collection/verdict cell."""
-    seed = config.review_seed
-    cells: dict[tuple[str, str], list[ReleaseQuery]] = defaultdict(list)
-    for query in sorted(train, key=lambda q: digest([seed, q.query_id])):
-        cell = cells[query.collection, query.upstream_verdict]
-        if all(q.group_id != query.group_id for q in cell) and len(cell) < config.audit_per_cell:
-            cell.append(query)
-    selected: list[tuple[tuple[str, str], ReleaseQuery]] = []
-    for slot in range(config.audit_per_cell):
-        for cell in sorted(cells):
-            if slot < len(cells[cell]) and len(selected) < config.audit_max_cards:
-                selected.append((cell, cells[cell][slot]))
-    # Present cards in a seeded order that does not reveal the cell/verdict sequence.
-    presentation = sorted(selected, key=lambda item: digest([seed, "audit", item[1].query_id]))
-    rank = {q.query_id: i for i, (_, q) in enumerate(presentation, start=1)}
+def smartbugs_external(
+    queries: list[CandidateQuery], assessments: dict[str, Assessment], sources: dict[str, str]
+) -> list[CandidateQuery]:
+    """Protected positives with native SmartBugs support and lines on the exact artifact."""
     return [
-        {
-            "queue": "training_audit",
-            "selection_order": i,
-            "presentation_order": rank[query.query_id],
-            "query_id": query.query_id,
-            "input_sha256": query.model_input_sha256,
-            "group_id": query.group_id,
-            "cell": {"collection": cell[0], "upstream_verdict": cell[1]},
-        }
-        for i, (cell, query) in enumerate(selected, start=1)
-    ]
-
-
-def primary_queue(heldout: list[ReleaseQuery], config: ReleaseConfig) -> list[dict[str, object]]:
-    """Ordered held-out review queue: collection round-robin, one query per group/polarity."""
-    seed = config.review_seed
-    queues: dict[str, list[ReleaseQuery]] = {}
-    for verdict in POLARITIES:
-        cells: dict[str, list[ReleaseQuery]] = defaultdict(list)
-        for query in sorted(heldout, key=lambda q: digest([seed, q.query_id])):
-            if query.upstream_verdict == verdict:
-                cells[query.collection].append(query)
-        ordered: list[ReleaseQuery] = []
-        groups: set[str] = set()
-        depth = max((len(rows) for rows in cells.values()), default=0)
-        for slot in range(depth):
-            for collection in sorted(cells):
-                rows = cells[collection]
-                if slot < len(rows) and rows[slot].group_id not in groups:
-                    groups.add(rows[slot].group_id)
-                    ordered.append(rows[slot])
-        queues[verdict] = ordered
-    # A seeded interleave keeps each polarity's order but hides the polarity sequence.
-    rng = random.Random(seed)
-    cursor = dict.fromkeys(POLARITIES, 0)
-    presentation: list[tuple[str, int, ReleaseQuery]] = []
-    while any(cursor[v] < len(queues[v]) for v in POLARITIES):
-        open_queues = [v for v in POLARITIES if cursor[v] < len(queues[v])]
-        verdict = open_queues[0] if len(open_queues) == 1 else rng.choice(open_queues)
-        presentation.append((verdict, cursor[verdict] + 1, queues[verdict][cursor[verdict]]))
-        cursor[verdict] += 1
-    return [
-        {
-            "queue": "primary_test",
-            "presentation_order": i,
-            "polarity_queue": verdict,
-            "polarity_order": polarity_order,
-            "query_id": query.query_id,
-            "input_sha256": query.model_input_sha256,
-            "group_id": query.group_id,
-            "collection": query.collection,
-        }
-        for i, (verdict, polarity_order, query) in enumerate(presentation, start=1)
+        q
+        for q in sorted(queries, key=lambda q: q.query_id)
+        if q.role == "smartbugs_external"
+        and q.proposed_verdict == "PRESENT"
+        and any(
+            sources[assessments[a].artifact_id] == "smartbugs"
+            and assessments[a].native_verdict == "PRESENT"
+            for a in q.assessment_ids
+        )
+        and exact_lines(q, assessments)
     ]
 
 
@@ -435,19 +402,18 @@ def release_statistics(
     selected: list[ReleaseQuery],
     exclusions: list[dict[str, str]],
     external: Counter[str],
+    external_positives: int,
     seed: int,
     attempts: int,
-    audit: list[dict[str, object]],
-    primary: list[dict[str, object]],
 ) -> dict[str, object]:
     def cells(rows: list[ReleaseQuery], field: str) -> list[dict[str, object]]:
         counts: dict[tuple[str, str, str], list[ReleaseQuery]] = defaultdict(list)
         for q in rows:
-            counts[q.partition or "unassigned", q.upstream_verdict, getattr(q, field)].append(q)
+            counts[q.partition or "unassigned", q.label, getattr(q, field)].append(q)
         return [
             {
                 "partition": p,
-                "upstream_verdict": v,
+                "label": v,
                 field: value,
                 "queries": len(qs),
                 "groups": len({q.group_id for q in qs}),
@@ -456,7 +422,7 @@ def release_statistics(
         ]
 
     return {
-        "state": "provisional_split",
+        "state": "final",
         "eligible_pool": support(eligible),
         "eligible_by_collection": cells(eligible, "collection"),
         "selected": support(selected),
@@ -466,27 +432,20 @@ def release_statistics(
         "by_collection": cells(selected, "collection"),
         "by_scope": cells(selected, "scope_kind"),
         "by_pragma": cells(selected, "pragma_minor"),
+        "positives_with_vulnerable_lines": {
+            name: sum(q.partition == name and bool(q.vulnerable_lines) for q in selected)
+            for name in PARTITIONS
+        },
         "match_levels": dict(
             sorted(Counter(str(q.match_level) for q in selected if q.match_role == "case").items())
         ),
         "exclusion_reasons": dict(sorted(Counter(e["reason"] for e in exclusions).items())),
         "external_reservations": dict(sorted(external.items())),
+        "external_smartbugs_positives": external_positives,
         "split_seed": seed,
         "split_attempts": attempts,
-        "audit_queue_cards": len(audit),
-        "audit_queue_cells": dict(
-            sorted(
-                Counter(
-                    f"{row['cell']['collection']}|{row['cell']['upstream_verdict']}"
-                    for row in audit
-                ).items()
-            )
-        ),
-        "primary_queue": dict(sorted(Counter(str(r["polarity_queue"]) for r in primary).items())),
-        "human_reviews": 0,
-        "training_ready": False,
         "notes": [
-            "Verdicts are upstream-reviewed candidate labels, not local human decisions.",
+            "Labels are upstream human annotations (SWC-107 convention), not locally reviewed.",
             "Balancing is 1:1 matched sampling; surplus controls are excluded, not relabeled.",
             "Groups are the inventory components: a conservative superset of release edges.",
             "Pragma is a first-pragma compiler screen, not a deployment date or EVM fork.",
@@ -497,12 +456,10 @@ def release_statistics(
 def build_release(config: ReleaseConfig, root: Path) -> dict[str, object]:
     manifest = verify_manifest(config.inventory_dir)
     if manifest["dataset_content_sha256"] != config.inventory_content_sha256:
-        raise ValueError("Inventory content differs from the pinned v2.1 baseline")
-    output = config.output_dir
-    if (output / "dataset_freeze.json").exists():
-        raise ValueError("Refusing to overwrite a frozen release; choose a new output directory")
+        raise ValueError("Inventory content differs from the pinned inventory fingerprint")
     inventory = config.inventory_dir
     queries = read_records(inventory / "queries.parquet", CandidateQuery)
+    by_id = {q.query_id: q for q in queries}
     assessments = {
         a.assessment_id: a for a in read_records(inventory / "assessments.parquet", Assessment)
     }
@@ -511,6 +468,22 @@ def build_release(config: ReleaseConfig, root: Path) -> dict[str, object]:
     ).to_pylist()
     sources = {r["artifact_id"]: r["source"] for r in rows}
     codes = {r["artifact_id"]: r["code"] for r in rows}
+    taxonomy = json.loads((inventory / "taxonomy.json").read_text(encoding="utf-8"))
+    definition = taxonomy["checks"]["REENTRANCY"]["definition"]
+
+    def payload(query: CandidateQuery) -> dict[str, object]:
+        result = canonical_payload(
+            codes[query.artifact_id], query.check_id, definition, query.scope
+        )
+        if digest(result) != query.model_input_sha256:
+            raise ValueError(f"Stale model input: {query.query_id}")
+        return {
+            "check_id": result["check_id"],
+            "definition": result["definition"],
+            "assumptions": result["assumptions"],
+            "source": result["source"],
+        }
+
     external = Counter(q.role for q in queries if q.role != "development")
     eligible, exclusions = eligibility(queries, assessments, sources, codes, config)
     logger.info("Eligible upstream-reviewed development queries: %s", len(eligible))
@@ -520,10 +493,9 @@ def build_release(config: ReleaseConfig, root: Path) -> dict[str, object]:
     selected, surplus, seed, attempts = grouped_split(capped, config)
     exclusions += dropped + surplus
     logger.info("Split seed %s after %s attempt(s)", seed, len(attempts))
-    audit = audit_queue([q for q in selected if q.partition == "train"], config)
-    primary = primary_queue([q for q in selected if q.partition == "heldout"], config)
+    externals = smartbugs_external(queries, assessments, sources)
     stats = release_statistics(
-        eligible, selected, exclusions, external, seed, len(attempts), audit, primary
+        eligible, selected, exclusions, external, len(externals), seed, len(attempts)
     )
     # Surplus controls stay out of every cohort, but their groups keep the assignment.
     group_partitions = sorted(
@@ -532,10 +504,32 @@ def build_release(config: ReleaseConfig, root: Path) -> dict[str, object]:
     )
     if len({g for g, _ in group_partitions}) != len(group_partitions):
         raise ValueError("A group was assigned to more than one partition")
+    output = config.output_dir
     output.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix=".v2.2-release-", dir=output.parent) as temporary:
+    with tempfile.TemporaryDirectory(prefix=".release-", dir=output.parent) as temporary:
         stage = Path(temporary)
-        write_jsonl(stage / "release_queries.jsonl", [q.model_dump() for q in selected])
+        for name in PARTITIONS:
+            cohort = [
+                CohortQuery(**q.model_dump(), **payload(by_id[q.query_id]))
+                for q in selected
+                if q.partition == name
+            ]
+            write_records(stage / f"{name}.parquet", cohort, CohortQuery)
+        external_rows = [
+            ExternalQuery(
+                query_id=q.query_id,
+                artifact_id=q.artifact_id,
+                group_id=str(q.group_id),
+                model_input_sha256=q.model_input_sha256,
+                label="PRESENT",
+                scope_kind=q.scope.kind,
+                scope_name=q.scope.name,
+                vulnerable_lines=exact_lines(q, assessments),
+                **payload(q),
+            )
+            for q in externals
+        ]
+        write_records(stage / "external_smartbugs.parquet", external_rows, ExternalQuery)
         write_jsonl(
             stage / "eligible_pool.jsonl",
             [q.model_dump() for q in sorted(eligible, key=lambda q: q.query_id)],
@@ -549,28 +543,19 @@ def build_release(config: ReleaseConfig, root: Path) -> dict[str, object]:
             [{"group_id": g, "partition": p} for g, p in group_partitions],
         )
         write_json(stage / "split_attempts.json", attempts)
-        write_jsonl(stage / "review_queue_audit.jsonl", audit)
-        write_jsonl(stage / "review_queue_primary.jsonl", primary)
         write_json(stage / "release_statistics.json", stats)
         write_json(stage / "effective_release_config.json", portable_config(config))
         write_json(stage / "provenance.json", {"project": project_provenance(root)})
         files = {p.name: file_sha256(p) for p in sorted(stage.iterdir())}
         data_files = {k: v for k, v in files.items() if k != "provenance.json"}
         release_manifest = {
-            "spec_version": "2.2",
-            "state": "provisional_split",
-            "training_ready": False,
+            "spec_version": "2.3",
+            "state": "final",
             "inventory_content_sha256": config.inventory_content_sha256,
             "release_content_sha256": digest(data_files),
             "files": files,
             "split_seed": seed,
-            "blockers": [
-                "Human training-label audit is not complete.",
-                "Human review of the held-out primary queue is not complete.",
-                "Freeze has not rechecked support gates on reviewed labels.",
-            ],
-            "teacher_generation_run": False,
-            "training_run": False,
+            "counts": {name: stats["partitions"][name] for name in PARTITIONS},
         }
         write_json(stage / "release_manifest.json", release_manifest)
         output.mkdir(exist_ok=True)
@@ -584,15 +569,15 @@ def build_release(config: ReleaseConfig, root: Path) -> dict[str, object]:
 
 def portable_config(config: ReleaseConfig) -> dict[str, object]:
     effective = config.model_dump(mode="json")
-    effective["inventory_dir"] = "data/processed/reentrancy-v2.1"
-    effective["output_dir"] = "data/processed/reentrancy-v2.2"
+    effective["inventory_dir"] = "data/processed/inventory"
+    effective["output_dir"] = "data/processed/release"
     return effective
 
 
 def verify_release(directory: Path) -> dict[str, object]:
     manifest = json.loads((directory / "release_manifest.json").read_text(encoding="utf-8"))
-    if manifest.get("spec_version") != "2.2":
-        raise ValueError("Expected a v2.2 release manifest")
+    if manifest.get("spec_version") != "2.3":
+        raise ValueError("Expected a v2.3 release manifest")
     for name, checksum in manifest["files"].items():
         path = directory / name
         if Path(name).name != name or not path.is_file() or file_sha256(path) != checksum:

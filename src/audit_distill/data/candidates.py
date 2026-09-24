@@ -10,18 +10,19 @@ from audit_distill.data.line_numbers import render_line_numbers
 from audit_distill.data.records import Artifact, Assessment, CandidateQuery, Disagreement, Scope
 from audit_distill.data.scopes import digest, resolve_scope
 
-ASSUMPTIONS = ["Untrusted caller/callee; legitimate privileged principals are not compromised."]
+ASSUMPTIONS = [
+    "Any address that receives a call or ether may be a contract that runs arbitrary code."
+]
 
 
-def canonical_payload(
-    artifact: Artifact, check: str, definition: str, scope: Scope
-) -> dict[str, object]:
+def canonical_payload(code: str, check: str, definition: str, scope: Scope) -> dict[str, object]:
+    """The exact model input shared by teacher, student and all evaluation modes."""
     return {
         "check_id": check,
         "definition": definition,
         "scope": {"kind": scope.kind, "name": scope.name},
         "assumptions": ASSUMPTIONS,
-        "source": render_line_numbers(artifact.code),
+        "source": render_line_numbers(code),
     }
 
 
@@ -166,7 +167,7 @@ def candidates(
             if "forge_external" in roles
             else "development"
         )
-        payload = canonical_payload(artifact, check, definitions[check]["definition"], scope)
+        payload = canonical_payload(artifact.code, check, definitions[check]["definition"], scope)
         proposed = native[0] if len(native) == 1 else "UNKNOWN"
         if "ambiguous_check_mapping" in review or "unresolved_identity_disagreement" in review:
             proposed = "UNKNOWN"

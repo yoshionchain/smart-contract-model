@@ -1,4 +1,4 @@
-"""Strict SPEC v2.2 semantic report contract for the reentrancy-only experiment.
+"""Strict semantic report contract for the reentrancy-only experiment.
 
 The analysis field comes first so greedy decoding writes the code-grounded analysis
 before committing to a verdict. This module validates records; it never generates

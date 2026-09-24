@@ -17,11 +17,11 @@
     "source_artifacts": 31185,
     "training_ready_queries": 0
   },
-  "dataset_content_sha256": "2ba41c2d507e791b3a0d035e37cd0b579d9632864325be3efdd3be64f4049de9",
+  "dataset_content_sha256": "4d2adaaf371cf8a6509a4288b3cb52ad60b0191c9e2c090ecd69270019d72dc8",
   "human_label_validation": "PENDING",
   "mechanical_validation": "PASS",
-  "schema_version": "2.1",
-  "spec_version": "2.1",
+  "schema_version": "2.3",
+  "spec_version": "2.3",
   "split_support_gates": "NOT_RUN",
   "training_ready": false,
   "validated_file_count": 13

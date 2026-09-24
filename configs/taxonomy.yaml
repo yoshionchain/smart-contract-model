@@ -1,11 +1,11 @@
-schema_version: '2.1'
+schema_version: '2.3'
 status: candidate_mapping_registry
 # Candidate selectors only. Semantic compatibility and coverage require review.
 checks:
   REENTRANCY:
     family: REENTRANCY
     primary: true
-    definition: Can an untrusted external call enable re-entry that violates asset/accounting state invariants before the relevant operation is safely finalized?
+    definition: 'SWC-107 reentrancy: does this scope make an external call or ether transfer through which the recipient could re-enter the contract before its state updates are complete?'
 swc_candidates:
   '107': [REENTRANCY]
 category_candidates:

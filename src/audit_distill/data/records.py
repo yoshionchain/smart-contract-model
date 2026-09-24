@@ -11,7 +11,7 @@ Role = Literal["development", "smartbugs_external", "forge_external"]
 
 class Record(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
-    schema_version: Literal["2.1"] = "2.1"
+    schema_version: Literal["2.3"] = "2.3"
 
 
 class Artifact(Record):

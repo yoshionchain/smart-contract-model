@@ -1,10 +1,9 @@
-"""Build the reentrancy dataset stages without teacher generation or training."""
+"""Build the reentrancy dataset without teacher generation or training."""
 
 import argparse
 import logging
 from pathlib import Path
 
-from audit_distill.data.freeze import freeze
 from audit_distill.data.inventory import build_inventory
 from audit_distill.data.release import build_release, load_release_config
 from audit_distill.data.settings import load_data_config
@@ -15,14 +14,13 @@ def main() -> None:
     parser.add_argument("--config", type=Path, default=Path("configs/project.yaml"))
     parser.add_argument("--release-config", type=Path, default=Path("configs/release.yaml"))
     parser.add_argument("--output-dir", type=Path)
-    parser.add_argument("--reviews", type=Path, default=Path("data/reviews/reentrancy-v2.2.jsonl"))
     parser.add_argument(
         "--stage",
-        choices=["inventory", "split", "freeze"],
+        choices=["inventory", "release"],
         default="inventory",
         help=(
-            "inventory: v2.1 candidate baseline; split: v2.2 balanced split and review "
-            "queues; freeze: apply completed human reviews and write the frozen cohorts"
+            "inventory: candidates from all pinned sources (minutes); release: balanced "
+            "train/validation/test cohorts from the inventory (seconds)"
         ),
     )
     args = parser.parse_args()
@@ -37,11 +35,7 @@ def main() -> None:
             release = load_release_config(args.release_config)
             if args.output_dir:
                 release = release.model_copy(update={"output_dir": args.output_dir.resolve()})
-            root = args.release_config.resolve().parent.parent
-            if args.stage == "split":
-                build_release(release, root)
-            else:
-                freeze(release, args.reviews, root)
+            build_release(release, args.release_config.resolve().parent.parent)
     except (ValueError, OSError) as error:
         logging.error("Dataset build stopped: %s", error)
         raise SystemExit(1) from error

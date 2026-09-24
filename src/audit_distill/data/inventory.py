@@ -1,4 +1,4 @@
-"""Reproducible v2.1 reentrancy inventory, before semantic certification."""
+"""Reproducible reentrancy candidate inventory over all pinned sources."""
 
 import csv
 import json
@@ -113,12 +113,12 @@ def verify_manifest(directory: Path) -> dict[str, object]:
     """Verify an inventory's version, file hashes and content fingerprint."""
     manifest = json.loads((directory / "dataset_manifest.json").read_text(encoding="utf-8"))
     if (
-        manifest.get("spec_version") != "2.1"
-        or manifest.get("schema_version") != "2.1"
+        manifest.get("spec_version") != "2.3"
+        or manifest.get("schema_version") != "2.3"
         or manifest.get("active_checks") != ["REENTRANCY"]
         or manifest.get("state") != "inventory"
     ):
-        raise ValueError("Expected a v2.1 reentrancy inventory manifest")
+        raise ValueError("Expected a v2.3 reentrancy inventory manifest")
     for name, checksum in manifest["files"].items():
         path = directory / name
         if Path(name).name != name or not path.is_file() or file_sha256(path) != checksum:
@@ -284,7 +284,7 @@ def validate_foundation(
             ):
                 raise ValueError("Candidate support is for a different source identity")
         payload = canonical_payload(
-            artifact,
+            artifact.code,
             query.check_id,
             ledger.taxonomy["checks"][query.check_id]["definition"],
             query.scope,
@@ -370,7 +370,7 @@ def publish(
         effective = config.model_dump(mode="json")
         for name in effective["datasets"]:
             effective["datasets"][name]["path"] = f"data/raw/{name}"
-        effective["output_dir"] = "data/processed/reentrancy-v2.1"
+        effective["output_dir"] = "data/processed/inventory"
         effective["taxonomy_path"] = "configs/taxonomy.yaml"
         write_json(stage / "effective_config.json", effective)
         write_json(stage / "provenance.json", provenance)
@@ -394,7 +394,7 @@ def publish(
                     "training_ready_queries",
                 ]
             },
-            "next_stage": "v2.2 release (build_dataset.py --stage split), then human review",
+            "next_stage": "release (build_dataset.py --stage release)",
             "teacher_generation_run": False,
             "training_run": False,
         }

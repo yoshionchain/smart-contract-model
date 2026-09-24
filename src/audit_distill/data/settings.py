@@ -1,4 +1,4 @@
-"""Strict v2.1 reentrancy data-build settings, separate from retired v1 report/class models."""
+"""Strict reentrancy data-build settings (dataset version 2.3)."""
 
 from pathlib import Path
 from typing import Literal
@@ -17,8 +17,8 @@ class Source(Upstream):
 
 class DataConfig(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
-    spec_version: Literal["2.1"]
-    schema_version: Literal["2.1"]
+    spec_version: Literal["2.3"]
+    schema_version: Literal["2.3"]
     active_checks: list[Literal["REENTRANCY"]]
     seed: Literal[42]
     datasets: dict[str, Source]
@@ -37,7 +37,7 @@ class DataConfig(BaseModel):
     @model_validator(mode="after")
     def complete_sources(self) -> "DataConfig":
         if self.active_checks != ["REENTRANCY"]:
-            raise ValueError("SPEC v2.1 requires exactly one REENTRANCY check")
+            raise ValueError("Exactly one REENTRANCY check is active")
         expected = {"dappscan", "smartbugs", "scrubd", "salzano", "cgt", "scbench", "forge"}
         if set(self.datasets) != expected:
             raise ValueError("The seven SPEC v2 source snapshots must be explicit")
@@ -49,16 +49,18 @@ class DataConfig(BaseModel):
         return self
 
 
+# The check follows the SWC-107 labelling convention used by the source datasets.
 REENTRANCY_DEFINITION = (
-    "Can an untrusted external call enable re-entry that violates asset/accounting "
-    "state invariants before the relevant operation is safely finalized?"
+    "SWC-107 reentrancy: does this scope make an external call or ether transfer "
+    "through which the recipient could re-enter the contract before its state "
+    "updates are complete?"
 )
 
 
 def validate_taxonomy(taxonomy: dict[str, object]) -> None:
     """Fail closed on stale registries or silent changes to the locked task."""
-    if taxonomy.get("schema_version") != "2.1":
-        raise ValueError("Expected a v2.1 taxonomy registry")
+    if taxonomy.get("schema_version") != "2.3":
+        raise ValueError("Expected a v2.3 taxonomy registry")
     if taxonomy.get("checks") != {
         "REENTRANCY": {
             "family": "REENTRANCY",

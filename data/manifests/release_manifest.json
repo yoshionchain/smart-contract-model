@@ -1,0 +1,52 @@
+{
+  "counts": {
+    "test": {
+      "ABSENT": {
+        "groups": 27,
+        "queries": 27
+      },
+      "PRESENT": {
+        "groups": 22,
+        "queries": 27
+      }
+    },
+    "train": {
+      "ABSENT": {
+        "groups": 133,
+        "queries": 134
+      },
+      "PRESENT": {
+        "groups": 110,
+        "queries": 134
+      }
+    },
+    "validation": {
+      "ABSENT": {
+        "groups": 27,
+        "queries": 27
+      },
+      "PRESENT": {
+        "groups": 25,
+        "queries": 27
+      }
+    }
+  },
+  "files": {
+    "effective_release_config.json": "9a6771fb2cd91c752005ed2cd6420055f88d9f78d40c5b6f2ac246d24efe3f17",
+    "eligible_pool.jsonl": "4f49f256778bda084e5c4e9b639cc39bb6def377f40951ca4bcfe9c513ba977b",
+    "external_smartbugs.parquet": "16c38677f27ce13516880bbdebf1da24e89a66bd68d592694e561cf142b20863",
+    "provenance.json": "9d74db4099938c19e1e11f7df73040345c6a6271019ac8508b0d2a113f2f8e56",
+    "release_exclusions.jsonl": "2fd15fc6eb068670ca7c21e11df83eb951e2d21055d2f218cd86f692d7abfc4b",
+    "release_statistics.json": "4898a18f0dbcffc7ae73fe32a14045e7fd672ee274eb96d3248d145b97144b85",
+    "split_assignments.jsonl": "ae8734ba5e1015c7e09a7d88dcad7a1e3a604a777c57d3875eeb26b88b5cbf14",
+    "split_attempts.json": "bca5a15581c97ae38e5a99ae3a3fb60399984538bf72bddcb23cd9f1f3b63a57",
+    "test.parquet": "9b76ef1ad826c8f6636ce50809beb96cd09f17824b9f90d16cbd1adb1b37088d",
+    "train.parquet": "64bb56f3799b989bb540bc46f63082372d9c0fc1dd8171e1d2a618f6bf3128c8",
+    "validation.parquet": "c7f906f3e3966dccc7b84d5a49a15673fa562017ca3d2cd6f5ad14440846cb1c"
+  },
+  "inventory_content_sha256": "4d2adaaf371cf8a6509a4288b3cb52ad60b0191c9e2c090ecd69270019d72dc8",
+  "release_content_sha256": "53826b8f46997153b577a5e72e2b5f807b180a772bf4836fa9969c02e52eeeb0",
+  "spec_version": "2.3",
+  "split_seed": 42,
+  "state": "final"
+}

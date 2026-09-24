@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pytest>=8,<10", "jsonschema>=4.23,<5", "ruff>=0.11"]
+dev = ["ruff>=0.11"]
 
 [build-system]
 requires = ["hatchling"]
@@ -22,9 +22,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/audit_distill"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
 
 [tool.ruff]
 target-version = "py312"

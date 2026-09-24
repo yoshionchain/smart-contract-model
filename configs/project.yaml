@@ -1,5 +1,5 @@
-spec_version: '2.1'
-schema_version: '2.1'
+spec_version: '2.3'
+schema_version: '2.3'
 active_checks: [REENTRANCY]
 seed: 42
 datasets:
@@ -65,7 +65,7 @@ tokenizer:
   max_sequence_tokens: 8192
   max_report_tokens: 480
 taxonomy_path: configs/taxonomy.yaml
-output_dir: data/processed/reentrancy-v2.1
+output_dir: data/processed/inventory
 project_directory_aliases:
   consensys-pSTAKE Finance: consensys-pSTAKE_Finance
   consensys-Connext NXTP — Noncustodial Xchain Transfer Protocol: consensys-Connext_NXTP_Noncustodial_Xchain_Transfer_Protocol
