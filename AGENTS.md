@@ -2,10 +2,10 @@
 
 ## Project
 
-University NLP project: fine-tune a small code model (Qwen2.5-Coder-1.5B) to judge
-reentrancy in a given scope of real Solidity code and to write a grounded report with
-the analysis **before** the verdict. A label-blind teacher (GPT-5.6 via Codex CLI)
-writes the training reports. Deadline: 2026-09-30.
+University NLP project on rationale distillation: fine-tune a small model
+(Qwen3-4B-Instruct-2507) to judge reentrancy in a given scope of real Solidity code and
+to write a grounded analysis **before** its verdict. A label-blind teacher (GPT-6 Sol via
+Codex CLI) writes the training reports. Deadline: 2026-09-30.
 
 `SPEC.md` is the guideline and holds the decision log. It is not sacred: propose a
 change when it clearly improves the project, and record approved changes in its
@@ -17,7 +17,8 @@ Current state and next steps: `todo.md`.
 ## Layout
 
 - `src/audit_distill/data/` — ingestion, inventory, grouping, release (dataset build).
-- `src/audit_distill/scoped_reports.py`, `reports.py` — report schema and validation.
+- `src/audit_distill/scoped_reports.py` — report schema (`analysis`, `verdict`,
+  `location`), field orders, parsing and teacher acceptance.
 - `scripts/` — thin CLI entry points.
 - `configs/` — all settings (sources, taxonomy, release, training).
 - `schemas/audit_report.schema.json` — the report schema (export with
@@ -62,13 +63,15 @@ uv run python scripts/build_dataset.py --stage release
 
 ## Teacher (locked)
 
-- Codex CLI 0.154.0, `codex exec`, model `gpt-5.6`, reasoning `medium`, verbosity `low`,
+- Codex CLI 0.156.1, `codex exec`, model `gpt-6-sol`, reasoning `medium`, verbosity `low`,
   ChatGPT subscription only — no OpenAI API, no fallback model.
 - Ephemeral, read-only sandbox, no approvals, empty temp dir per call, tools/web/MCP
   and inherited instructions disabled, sentinel-file isolation preflight.
 - Label-blind: the teacher sees only the payload; a report is accepted only if its
-  verdict matches the upstream label. Rejected queries leave both SFT cohorts with
+  verdict matches the upstream label. Rejected queries leave all SFT cohorts with
   their matched partner.
+- The teacher runs on test data only once, for the ceiling row, after the prompt is
+  frozen and with separate approval; its test outputs never feed anything else.
 - Up to 5 queries per call, at most one retry for invalid output, resumable, usage
   logged.
 

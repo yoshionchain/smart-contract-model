@@ -1,11 +1,12 @@
 # Synthetic Audit Distillation
 
-A university NLP experiment: can a small code model (Qwen2.5-Coder-1.5B) learn to
-judge reentrancy in real Solidity code, and does training it to write a grounded
-analysis *before* its verdict help? A teacher model (GPT-5.6 via Codex CLI) analyses
-each training example without seeing its label; only reports whose verdict matches
-the human label are kept. The student is fine-tuned with QLoRA in two conditions
-(verdict only vs. analysis + verdict) and compared with the base model.
+A university NLP experiment in rationale distillation: does training a small model
+(Qwen3-4B-Instruct-2507) on a large model's explanations help it judge reentrancy in
+real Solidity code, and are its own explanations grounded? A teacher (GPT-6 Sol via
+Codex CLI) analyses each training example without seeing its label; only reports whose
+verdict matches the human label are kept. The student is fine-tuned with QLoRA on
+labels only, on analysis-then-verdict reports, and on the same reports verdict-first,
+and compared with the base model, lexical baselines and the teacher.
 
 **Status:** the dataset is built. Teacher generation, training and evaluation come
 next — see [todo.md](todo.md). [SPEC.md](SPEC.md) is the detailed guideline and
@@ -78,15 +79,16 @@ where possible. Details and rationale: SPEC.md Sections 6 and 17.
 
 ## The report format
 
-Report-SFT outputs one JSON object whose first field is the analysis:
+Reports are one JSON object; Report-SFT writes the analysis first:
 
 ```json
-{"analysis": "...", "verdict": "PRESENT", "severity": "HIGH",
- "location": {"start_line": 42, "end_line": 47, "function": "withdraw"},
- "exploit_scenario": "...", "recommendation": "..."}
+{"analysis": "Line 42 sends ether before line 47 updates the balance ...",
+ "verdict": "PRESENT",
+ "location": {"start_line": 42, "end_line": 47, "function": "withdraw"}}
 ```
 
-ABSENT reports use severity `NONE` and null location/exploit/recommendation.
+ABSENT reports have `"location": null`. The verdict-first ablation uses the same
+fields in the order `verdict, analysis, location`.
 `src/audit_distill/scoped_reports.py` validates reports strictly;
 [`schemas/audit_report.schema.json`](schemas/audit_report.schema.json) is its export.
 

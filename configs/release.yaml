@@ -1,7 +1,7 @@
 spec_version: '2.3'
 # The release is derived from the mechanically validated inventory, pinned by fingerprint.
 inventory_dir: data/processed/inventory
-inventory_content_sha256: 4d2adaaf371cf8a6509a4288b3cb52ad60b0191c9e2c090ecd69270019d72dc8
+inventory_content_sha256: fa194859dea99012c3903d8436fd5adf63bc48e962b994d05160d9f98c933815
 output_dir: data/processed/release
 seed: 42
 # Documented stratum-level coverage for native "no findings" negatives. A source is

@@ -17,7 +17,7 @@ class Upstream(ConfigModel):
 
 
 class TokenizerConfig(ConfigModel):
-    model_id: Literal["Qwen/Qwen2.5-Coder-1.5B-Instruct"]
+    model_id: Literal["Qwen/Qwen3-4B-Instruct-2507"]
     revision: str = Field(pattern=r"^[0-9a-f]{40}$")
     max_code_tokens: Literal[6000]
     max_sequence_tokens: Literal[8192]

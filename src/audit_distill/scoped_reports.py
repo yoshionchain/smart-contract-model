@@ -1,16 +1,21 @@
-"""Strict semantic report contract for the reentrancy-only experiment.
+"""Strict report contract: analysis, verdict and location, in a fixed field order.
 
-The analysis field comes first so greedy decoding writes the code-grounded analysis
-before committing to a verdict. This module validates records; it never generates
-explanations or invokes a model.
+Report-SFT writes the analysis before the verdict (`analysis_first`); the order
+ablation trains on the same reports with the verdict first (`verdict_first`).
+This module validates and serializes reports; it never generates them.
 """
 
 import json
+from collections.abc import Callable
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, model_validator
 
-Text = Annotated[str, Field(min_length=1, max_length=900, pattern=r"\S")]
+Order = Literal["analysis_first", "verdict_first"]
+ORDERS: dict[Order, tuple[str, str, str]] = {
+    "analysis_first": ("analysis", "verdict", "location"),
+    "verdict_first": ("verdict", "analysis", "location"),
+}
 Analysis = Annotated[str, Field(min_length=1, max_length=1200, pattern=r"\S")]
 
 
@@ -31,33 +36,30 @@ class ScopedReport(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     analysis: Analysis
     verdict: Literal["PRESENT", "ABSENT"]
-    severity: Literal["NONE", "LOW", "MEDIUM", "HIGH", "CRITICAL"]
     location: Location | None
-    exploit_scenario: Text | None
-    recommendation: Text | None
 
     @model_validator(mode="after")
     def semantics(self, info: ValidationInfo) -> "ScopedReport":
-        if self.verdict == "ABSENT":
-            if self.severity != "NONE" or any(
-                value is not None
-                for value in (self.location, self.exploit_scenario, self.recommendation)
-            ):
-                raise ValueError("ABSENT requires NONE severity and null positive-only fields")
-        elif self.severity == "NONE" or any(
-            value is None for value in (self.location, self.exploit_scenario, self.recommendation)
-        ):
-            raise ValueError("PRESENT requires positive severity, location, exploit and mitigation")
+        if (self.verdict == "PRESENT") != (self.location is not None):
+            raise ValueError("PRESENT requires a location; ABSENT requires null")
         context = info.context or {}
         if self.location and "line_count" in context:
             if self.location.end_line > context["line_count"]:
                 raise ValueError("Location exceeds supplied source line count")
-        if "verdict" in context and self.verdict != context["verdict"]:
-            raise ValueError("Report differs from the known reference verdict")
         return self
 
 
-def parse_report(raw: str, *, line_count: int) -> ScopedReport:
+def canonical_json(report: ScopedReport, order: Order) -> str:
+    """Compact UTF-8 JSON in the condition's field order: the exact training target."""
+    data = report.model_dump()
+    return json.dumps(
+        {key: data[key] for key in ORDERS[order]}, ensure_ascii=False, separators=(",", ":")
+    )
+
+
+def parse_report(raw: str, *, line_count: int, order: Order) -> ScopedReport:
+    """Strict parse of a model output; any deviation makes the prediction INVALID."""
+
     def unique_keys(pairs: list[tuple[str, object]]) -> dict[str, object]:
         result: dict[str, object] = {}
         for key, value in pairs:
@@ -66,34 +68,41 @@ def parse_report(raw: str, *, line_count: int) -> ScopedReport:
             result[key] = value
         return result
 
-    return ScopedReport.model_validate(
-        json.loads(raw, object_pairs_hook=unique_keys), context={"line_count": line_count}
-    )
+    data = json.loads(raw, object_pairs_hook=unique_keys)
+    if not isinstance(data, dict) or tuple(data) != ORDERS[order]:
+        raise ValueError(f"Report fields must be exactly {ORDERS[order]} in that order")
+    return ScopedReport.model_validate(data, context={"line_count": line_count})
+
+
+def accept_teacher_report(
+    payload: dict[str, object],
+    *,
+    label: Literal["PRESENT", "ABSENT"],
+    line_count: int,
+    count_tokens: Callable[[str], int],
+    max_tokens: int,
+) -> ScopedReport:
+    """Accept a label-blind teacher report only if valid, in budget and agreeing.
+
+    Use the pinned student tokenizer without special tokens. Never repair or truncate.
+    """
+    report = ScopedReport.model_validate(payload, context={"line_count": line_count})
+    if report.verdict != label:
+        raise ValueError("Teacher verdict disagrees with the upstream label")
+    tokens = count_tokens(canonical_json(report, "analysis_first"))
+    if tokens > max_tokens:
+        raise ValueError(f"Teacher report has {tokens} tokens; limit {max_tokens}")
+    return report
 
 
 def report_schema() -> dict[str, object]:
     schema = ScopedReport.model_json_schema()
     schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
-    text = {"type": "string", "minLength": 1, "maxLength": 900, "pattern": r"\S"}
     schema["allOf"] = [
         {
             "if": {"properties": {"verdict": {"const": "ABSENT"}}},
-            "then": {
-                "properties": {
-                    "severity": {"const": "NONE"},
-                    "location": {"type": "null"},
-                    "exploit_scenario": {"type": "null"},
-                    "recommendation": {"type": "null"},
-                }
-            },
-            "else": {
-                "properties": {
-                    "severity": {"enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]},
-                    "location": {"$ref": "#/$defs/Location"},
-                    "exploit_scenario": text,
-                    "recommendation": text,
-                }
-            },
+            "then": {"properties": {"location": {"type": "null"}}},
+            "else": {"properties": {"location": {"$ref": "#/$defs/Location"}}},
         }
     ]
     return schema

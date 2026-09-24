@@ -10,29 +10,39 @@ project; record every approved change in the decision log (Section 17).
 
 ## 1. Goal and research questions
 
-Can a small code model learn to judge reentrancy in a given scope of real Solidity
-code, and does training it to write a grounded analysis **before** its verdict help?
-Code and labels are real and traceable to published human annotations. The teacher
-writes explanatory supervision only; it never creates code or changes labels.
+This is **rationale distillation** for a code-understanding task: does training a
+small language model on a large model's natural-language explanations help it judge
+reentrancy in a given scope of real Solidity code, and are its own explanations
+grounded? Code and labels are real and traceable to published human annotations. The
+teacher writes explanations only; it never creates code or changes labels. Related
+work: Distilling Step-by-Step (Hsieh et al. 2023), Ho et al. 2023, Magister et al.
+2023, e-SNLI (Camburu et al. 2018), explanation faithfulness (Jacovi & Goldberg 2020;
+Wiegreffe & Marasović 2021).
 
-- **RQ1:** Does report-supervised fine-tuning (Report-SFT) improve verdicts over the
-  unchanged model with the same output format (Base-Report)?
-- **RQ2:** Does writing an analysis before the verdict (Report-SFT) beat verdict-only
-  fine-tuning (Label-SFT), and how do both compare with simple lexical baselines?
-  Completion-token exposure differs between conditions; report it. This is not an
-  equal-token ablation.
-- **RQ3:** Are generated reports schema-valid, localized to annotated lines, and
-  grounded in the code (human-rated)? Agreement with teacher text is not correctness.
+- **RQ1 (main) — Do rationales help?** Does fine-tuning on teacher analyses followed by
+  the verdict (Report-SFT) improve verdicts over fine-tuning on labels alone
+  (Label-SFT)? Floors: the base model and lexical baselines; ceiling: the teacher.
+  **Order ablation:** the same reports with the verdict first (Report-SFT-VF) separate
+  "reasoning before deciding" from "extra training signal".
+- **RQ2 — Are the student's rationales grounded and faithful?** Do cited line numbers
+  exist and hit annotated vulnerable lines, does the location hit them, and does the
+  analysis support the model's own verdict (automatic metrics + blinded human rating)?
+  Agreement with teacher text is not correctness.
+- **RQ3 — Do the LLM and the human annotators agree?** How often does the label-blind
+  teacher agree with the upstream SWC-107 labels on train/validation, per collection
+  and label, and what kinds of cases does it reject?
 
-Hypotheses (directional; negative or mixed results are valid): H1 Label-SFT > Base-Label;
-H2 Report-SFT > Base-Report on verdicts and validity; H3 open: analysis-first may help
-by reasoning before deciding or hurt when a flawed analysis propagates; H4 Report-SFT
-> Base-Report on human-rated grounding. One seed and limited groups restrict claims
-about small differences.
+Hypotheses (directional; negative or mixed results are valid): H1 all SFT conditions
+beat their base-model format; H2 Report-SFT ≥ Label-SFT; H3 open: analysis-first may
+beat verdict-first by reasoning before deciding, or lose when a flawed analysis
+propagates; H4 Report-SFT analyses are better grounded than Base-Report analyses.
+Completion-token exposure differs between Label-SFT and the report conditions (not
+between the two report orders); report it. One seed and limited groups restrict
+claims about small differences.
 
 **Out of scope:** other vulnerability classes, generated/injected code, scanner votes
-as gold, LLM relabeling of test data, patch-based negatives, RAG, agents, extra
-student architectures, hyperparameter sweeps, deployment, BLEU/ROUGE as correctness.
+as gold, LLM relabeling of any data, patch-based negatives, RAG, agents, extra student
+architectures, hyperparameter sweeps, deployment, BLEU/ROUGE as correctness.
 
 ## 2. Terms
 
@@ -42,9 +52,10 @@ student architectures, hyperparameter sweeps, deployment, BLEU/ROUGE as correctn
   unsupported evidence) stays in the evidence ledger and is never a target or a negative.
 - **Group:** connected component of known project/deployment/clone links; the unit of
   splitting and uncertainty. Unknown ancestry is not proof of independent projects.
-- **Teacher:** GPT-5.6 Sol via Codex CLI. **Student:** Qwen2.5-Coder-1.5B-Instruct.
-  **Label-SFT / Report-SFT:** its two adapters. **Base-Label / Base-Report:** the
-  unchanged model with the two output prompts.
+- **Teacher:** GPT-6 Sol via Codex CLI. **Student:** Qwen3-4B-Instruct-2507.
+  **Label-SFT / Report-SFT / Report-SFT-VF:** its three adapters (verdict only;
+  analysis-first report; the same reports verdict-first). **Base-Label / Base-Report:**
+  the unchanged model with the verdict and report prompts.
 
 ## 3. The check
 
@@ -113,12 +124,12 @@ exploitability reading (decision log, 2026-09-24).
   never guessed. Query identity = lexical identity + scope tokens + check + assumptions;
   duplicate support coalesces into one query; distinct scopes in one file are kept and
   always share a group.
-- **Budgets** (pinned tokenizer `Qwen/Qwen2.5-Coder-1.5B-Instruct` @
-  `2e1fd397ee46e1388853d2af2c993145b0f1098a`, no special tokens): numbered source
+- **Budgets** (pinned tokenizer `Qwen/Qwen3-4B-Instruct-2507` @
+  `cdbee75f17c01a7cc42f958dc650907174af0554`, no special tokens): numbered source
   ≤ **6000** tokens (longer sources are excluded and counted, never truncated); full
   chat sequence ≤ **8192** in both conditions; teacher report ≤ **480** tokens as
-  canonical JSON (schema order, UTF-8, compact separators); inference allows **512**
-  new tokens for reports and **16** for verdicts.
+  canonical JSON (UTF-8, compact separators); inference allows **512** new tokens for
+  reports and **16** for verdicts.
 - **Records** are typed (Pydantic), persisted as Parquet/JSONL, never in a database.
 
 ## 6. Labels, grouping and the dataset
@@ -173,12 +184,12 @@ PRESENT; ~72% of code is Solidity 0.4; balanced metrics do not reflect prevalenc
 
 ## 7. Teacher
 
-**Locked settings:** Codex CLI **0.154.0** (`codex exec`), model `gpt-5.6` (GPT-5.6 Sol),
+**Locked settings:** Codex CLI **0.156.1** (`codex exec`), model `gpt-6-sol` (GPT-6 Sol),
 reasoning effort `medium`, verbosity `low`, ChatGPT-subscription auth, no OpenAI API and
 no fallback model. Equivalent invocation:
 
 ```bash
-codex exec --model gpt-5.6 -c model_reasoning_effort="medium" -c model_verbosity="low" \
+codex exec --model gpt-6-sol -c model_reasoning_effort="medium" -c model_verbosity="low" \
   --ephemeral --sandbox read-only --ask-for-approval never --ignore-user-config \
   --ignore-rules --output-schema <batch-schema.json> --json -o <output.json> -
 ```
@@ -190,13 +201,13 @@ outside the allowed view are unreadable; if the CLI cannot enforce this, stop an
 report. Reject any invocation whose event log shows tool use.
 
 **Label-blind generation:** the teacher receives only opaque IDs, the payload and the
-annotation rules — **not the label**. It writes the full report (analysis first, then
-its own verdict). A report is accepted only if it is schema-valid, in bounds, within
+annotation rules — **not the label**. It writes the full report (analysis, then its own
+verdict, then the location). A report is accepted only if it is schema-valid, in bounds, within
 480 tokens, used no tools, and its verdict **equals the upstream label**. A
 disagreement is terminal (no retry), is counted as a label-noise estimate per
 collection and label, and never changes a label. The teacher may also return
 UNSUPPORTED with `INSUFFICIENT_CONTEXT` or `UNRESOLVED_ASSUMPTIONS`. Any rejected
-training/validation query leaves both SFT cohorts **together with its matched
+training/validation query leaves all SFT cohorts **together with its matched
 partner**, keeping the cohorts balanced. The accepted cohort is teacher-agreeable and
 may be easier; report and discuss this selection.
 
@@ -221,43 +232,51 @@ invocations and token estimates.
 production run, show the exact command and expected usage and wait for approval.
 **Pilot:** up to 3 training queries per label (≤ 6, seed 42, distinct groups preferred,
 ≤ 2 invocations); inspect every output, then freeze prompts in `configs/prompts/`.
-Generate only train and validation; never test or external data. Prompt development
-uses training data only.
+Generate training reports only for train and validation. Prompt development uses
+training data only. **Teacher ceiling:** after the prompt is frozen, run the teacher
+once, label-blind, on the test set (54 queries, ≤ 11 invocations, separately approved);
+its verdicts and reports are used only for the ceiling row and never feed training,
+prompts or any other decision.
 
 ## 8. Report schema
 
-`schemas/audit_report.schema.json`; field order is part of the protocol.
+`schemas/audit_report.schema.json`; `src/audit_distill/scoped_reports.py` validates.
 
 ```json
 {"analysis": "Line 42 sends ether with call.value before line 47 zeroes the balance ...",
- "verdict": "PRESENT", "severity": "HIGH",
- "location": {"start_line": 42, "end_line": 47, "function": "withdraw"},
- "exploit_scenario": "...", "recommendation": "..."}
+ "verdict": "PRESENT",
+ "location": {"start_line": 42, "end_line": 47, "function": "withdraw"}}
 ```
 
 - `analysis` (≤ 1,200 chars): external calls → state changes around them → guards or
   ordering → conclusion in the last sentence, citing line numbers. ABSENT analyses
   stay within the check and scope.
-- `verdict`: PRESENT or ABSENT. `severity`: LOW–CRITICAL for PRESENT, `NONE` for ABSENT.
+- `verdict`: PRESENT or ABSENT.
 - `location`: PRESENT needs `1 ≤ start ≤ end ≤ line count` and a function name or null;
-  ABSENT needs null. `exploit_scenario`, `recommendation`: ≤ 900 chars for PRESENT,
-  null for ABSENT.
+  ABSENT needs null.
+- **Field order is part of the protocol:** `analysis, verdict, location` for the teacher,
+  Report-SFT and Base-Report; `verdict, analysis, location` for Report-SFT-VF. Parsing
+  requires exactly the condition's order.
 - Strict types, all fields required, no extra fields, duplicate keys rejected, no coercion.
 
 ## 9. Student and training
 
-**Student:** `Qwen/Qwen2.5-Coder-1.5B-Instruct` @ `2e1fd397ee46e1388853d2af2c993145b0f1098a`
-(small, code-tuned, Apache-2.0, fits QLoRA on Colab). Do not replace it unless unusable.
+**Student:** `Qwen/Qwen3-4B-Instruct-2507` @ `cdbee75f17c01a7cc42f958dc650907174af0554`
+(text-only, non-thinking, Apache-2.0, 256K context, standard Qwen3 architecture; small
+next to the teacher but able to write a coherent analysis). Do not replace it unless
+unusable (e.g. it cannot train at 8192 tokens on the Colab GPU).
 
 | Weights | Target | Evaluation modes |
 | --- | --- | --- |
 | Base | none | Base-Label, Base-Report |
 | Label-SFT | `PRESENT` or `ABSENT` | verdict |
-| Report-SFT | full report (analysis first) | structured report |
+| Report-SFT | report, analysis first | report |
+| Report-SFT-VF | the same reports, verdict first | report (verdict-first order) |
 
-Both adapters use the same accepted train/validation IDs, order, seed, epochs and QLoRA
-settings, with loss on assistant tokens only. Prompts `student_label_v2.3.txt` and
-`student_report_v2.3.txt` share the identical payload; no per-dataset variants.
+All adapters use the same accepted train/validation IDs, order, seed, epochs and QLoRA
+settings, with loss on assistant tokens only. Prompts `student_label_v2.3.txt`,
+`student_report_v2.3.txt` and `student_report_vf_v2.3.txt` share the identical payload;
+the two report prompts differ only in the stated field order.
 
 **QLoRA (locked, `configs/training.yaml`):** 4-bit NF4 with double quantization; LoRA
 r 16, alpha 32, dropout 0.05, bias none, targets q/k/v/o/gate/up/down_proj; lr 2e-4;
@@ -287,29 +306,37 @@ versions with `colab download`. No notebook-only logic. Real GPU jobs need appro
   collection majority, (scope, pragma) majority, TF-IDF (identifier/operator 1–2-grams
   of the scoped code) + logistic regression with fixed settings.
 - **Slices:** collection, scope kind, pragma, including within-SCRUBD.
+- **Modes on the same test IDs:** Base-Label, Base-Report, Label-SFT, Report-SFT,
+  Report-SFT-VF, the baselines above and the teacher ceiling.
 - **Uncertainty:** paired cluster bootstrap over test groups, identical draws for all
   modes, seed 4242, 2,000 valid replicates (≤ 20,000 draws; discard draws missing a
-  label). Percentile 95% intervals for scores and for Report-SFT − Base-Report,
-  Label-SFT − Base-Label, Report-SFT − Label-SFT. Too few valid draws → report it.
+  label). Percentile 95% intervals for scores and for Report-SFT − Label-SFT (RQ1),
+  Report-SFT − Report-SFT-VF (order), Report-SFT − Base-Report and
+  Label-SFT − Base-Label. Too few valid draws → report it.
 - **Validity:** valid-JSON and full-schema rates over all queries.
+- **Grounding (RQ2, automatic):** share of line numbers cited in analyses that exist;
+  share of annotated positives whose analysis cites an annotated line.
 - **Localization** (test positives with lines, and SmartBugs): hit = valid PRESENT
   report whose interval contains an annotated line; denominator = all such positives.
   Also span fraction and annotated-line precision over valid in-bounds reports.
   Teacher lines and function bounds are never gold.
-- **Cohorts:** test (primary; all four modes on the same IDs) and SmartBugs external
-  (positive-only: recall, validity, localization). FORGE: reported as unavailable.
-  Test data never tunes prompts, preprocessing or training.
+- **Agreement (RQ3):** teacher–label agreement on train/validation by collection and
+  label, with the disagreement and UNSUPPORTED counts.
+- **Cohorts:** test (primary) and SmartBugs external (positive-only: recall, validity,
+  localization). FORGE: reported as unavailable. Test data never tunes prompts,
+  preprocessing or training.
 
 ## 11. Human report evaluation
 
 Blinded comparison of Base-Report vs Report-SFT on up to 25 test queries (round-robin
 PRESENT then ABSENT, seed 42, distinct groups preferred). Random A/B order per query
 (seed 42), model key hidden until rating ends; show the input, gold label and both raw
-outputs; keep failures. Ratings 0–2: grounding (all queries); exploit plausibility,
-mitigation and severity (gold positives only; a wrong ABSENT scores 0). On negatives
-also record false vulnerability or global-security claims. Report per-criterion means,
-denominators and paired grounding preference. One rater (the author) is acceptable; no
-LLM judge. Optionally spot-check ~10 accepted teacher reports for grounding.
+outputs; keep failures. Per output: **grounding** 0–2 (0 contradicted/generic/missing,
+1 partly grounded, 2 technically grounded in this code and scope) and **consistency**
+yes/no (the analysis supports the output's own verdict); on gold negatives also record
+false vulnerability or global-security claims. Report per-criterion means, denominators
+and paired grounding preference. One rater (the author) is acceptable; no LLM judge.
+Optionally spot-check ~10 accepted teacher reports for grounding.
 
 ## 12. Error analysis and paper
 
@@ -322,9 +349,9 @@ LLM judge. Optionally spot-check ~10 accepted teacher reports for grounding.
 - Tables: dataset flow with every exclusion, composition (split × collection × scope ×
   pragma), results for all modes with intervals and baselines, report validity/
   localization/human ratings, resources (tokens, teacher usage, steps, GPU time).
-- **Allowed claims (if supported):** report supervision changes scoped reentrancy
-  verdicts/report behavior on this corpus; QLoRA adapts this model; measured transfer to
-  SmartBugs. **Never claim:** exhaustive detection, ABSENT = secure, independent projects
+- **Allowed claims (if supported):** rationale supervision (and its position) changes
+  scoped reentrancy verdicts/report behavior on this corpus; QLoRA adapts this model;
+  measured teacher–annotator agreement; measured transfer to SmartBugs. **Never claim:** exhaustive detection, ABSENT = secure, independent projects
   from different addresses, teacher text as gold, locally reviewed labels, powered small
   improvements, general vulnerability competence, modern exploitability, production
   readiness, or reentrancy as the most common current attack.
@@ -358,7 +385,7 @@ uv run python scripts/generate_teacher.py --split train --pilot --dry-run
 uv run python scripts/generate_teacher.py --split train --pilot        # after approval
 uv run python scripts/generate_teacher.py --split {train,validation}   # after approval
 uv run python scripts/build_student_dataset.py
-uv run python scripts/train.py --condition {label,report}              # Colab, after approval
+uv run python scripts/train.py --condition {label,report,report-vf}    # Colab, after approval
 uv run python scripts/evaluate.py
 uv run python scripts/build_human_eval.py && uv run python scripts/score_human_eval.py
 uv run python scripts/make_paper_assets.py
@@ -367,13 +394,14 @@ uv run python scripts/make_paper_assets.py
 ## 14. Phases
 
 1. Foundation · 2. Dataset **(done)** · 3. Teacher (mocks + dry run, approved pilot,
-approved production) · 4. Student formatting (`shared_cohort.json`: identical accepted
-IDs, both sequences ≤ 8192, gates rechecked) · 5. Training (approved Colab jobs) ·
-6. Evaluation · 7. Human report evaluation · 8. Paper and reproducibility.
+approved production, approved test ceiling) · 4. Student formatting
+(`shared_cohort.json`: identical accepted IDs, all three sequences ≤ 8192, gates
+rechecked) · 5. Training (three approved Colab jobs) · 6. Evaluation · 7. Human report
+evaluation · 8. Paper and reproducibility.
 
 Do not skip a failed earlier gate. Done means: documented commands reproduce the
 experiment, the release is hashed, teacher generation is isolated/resumable/auditable,
-both SFT conditions train through the same Colab workflow, all four modes are evaluated
+all SFT conditions train through the same Colab workflow, all modes are evaluated
 deterministically, human ratings are blinded, tables come from real files, and the paper
 fits eight pages with only supported claims.
 
@@ -383,9 +411,9 @@ fits eight pages with only supported claims.
 real source + upstream human labels (SWC-107 convention)
         -> leakage groups -> eligibility -> grouped split -> 1:1 matched cohorts
         -> train/validation: label-blind teacher, keep agreeing reports (pairwise)
-        -> Label-SFT and Report-SFT on identical accepted IDs
-        -> test: Base-Label, Base-Report, Label-SFT, Report-SFT + baselines
-        -> macro-F1 with group intervals, validity, localization, blinded human rating
+        -> Label-SFT, Report-SFT, Report-SFT-VF on identical accepted IDs
+        -> test: base modes, three adapters, baselines, teacher ceiling
+        -> macro-F1 with group intervals, grounding, localization, agreement, human rating
 ```
 
 ## 16. Configuration
@@ -400,6 +428,18 @@ or GPU work.
 ## 17. Decision log
 
 Decided by the project owner before any teacher call, training run or model result.
+
+- **2026-09-24 · Leaner report, newer models, NLP framing.** The report is only
+  `analysis`, `verdict`, `location`: severity, exploit scenario and recommendation were
+  subjective, unevaluated, came after the verdict and widened the token gap. Teacher is
+  now GPT-6 Sol (`gpt-6-sol`, medium; released September 2026, about half the price of
+  GPT-5.6 Sol) with the installed Codex CLI 0.156.1. Student is Qwen3-4B-Instruct-2507:
+  the 1.5B coder model would likely fail the zero-shot format and be too weak to benefit
+  from reasoning; Qwen3.5 small models were rejected as multimodal with a new
+  architecture needing unreleased `transformers`. The RQs are reframed as rationale
+  distillation, grounding/faithfulness and teacher–annotator agreement, with a
+  one-time teacher ceiling on test and a verdict-first order ablation (third adapter,
+  no extra teacher calls).
 
 - **2026-09-24 · Label-blind teacher.** The teacher judges without the label; only
   agreeing reports train (pairwise removal keeps balance). A label-aware teacher tends to

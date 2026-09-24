@@ -40,28 +40,8 @@
     {
       "else": {
         "properties": {
-          "exploit_scenario": {
-            "maxLength": 900,
-            "minLength": 1,
-            "pattern": "\\S",
-            "type": "string"
-          },
           "location": {
             "$ref": "#/$defs/Location"
-          },
-          "recommendation": {
-            "maxLength": 900,
-            "minLength": 1,
-            "pattern": "\\S",
-            "type": "string"
-          },
-          "severity": {
-            "enum": [
-              "LOW",
-              "MEDIUM",
-              "HIGH",
-              "CRITICAL"
-            ]
           }
         }
       },
@@ -74,17 +54,8 @@
       },
       "then": {
         "properties": {
-          "exploit_scenario": {
-            "type": "null"
-          },
           "location": {
             "type": "null"
-          },
-          "recommendation": {
-            "type": "null"
-          },
-          "severity": {
-            "const": "NONE"
           }
         }
       }
@@ -98,20 +69,6 @@
       "title": "Analysis",
       "type": "string"
     },
-    "exploit_scenario": {
-      "anyOf": [
-        {
-          "maxLength": 900,
-          "minLength": 1,
-          "pattern": "\\S",
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "title": "Exploit Scenario"
-    },
     "location": {
       "anyOf": [
         {
@@ -121,31 +78,6 @@
           "type": "null"
         }
       ]
-    },
-    "recommendation": {
-      "anyOf": [
-        {
-          "maxLength": 900,
-          "minLength": 1,
-          "pattern": "\\S",
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "title": "Recommendation"
-    },
-    "severity": {
-      "enum": [
-        "NONE",
-        "LOW",
-        "MEDIUM",
-        "HIGH",
-        "CRITICAL"
-      ],
-      "title": "Severity",
-      "type": "string"
     },
     "verdict": {
       "enum": [
@@ -159,10 +91,7 @@
   "required": [
     "analysis",
     "verdict",
-    "severity",
-    "location",
-    "exploit_scenario",
-    "recommendation"
+    "location"
   ],
   "title": "ScopedReport",
   "type": "object"
