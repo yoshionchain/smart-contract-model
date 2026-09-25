@@ -7,7 +7,7 @@ This module validates and serializes reports; it never generates them.
 
 import json
 from collections.abc import Callable
-from typing import Annotated, Literal
+from typing import Annotated, Literal, get_args
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, model_validator
 
@@ -57,42 +57,84 @@ def canonical_json(report: ScopedReport, order: Order) -> str:
     )
 
 
+def unique_keys(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    """`json.loads` hook that rejects duplicate keys instead of keeping the last one."""
+    result: dict[str, object] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
 def parse_report(raw: str, *, line_count: int, order: Order) -> ScopedReport:
     """Strict parse of a model output; any deviation makes the prediction INVALID."""
-
-    def unique_keys(pairs: list[tuple[str, object]]) -> dict[str, object]:
-        result: dict[str, object] = {}
-        for key, value in pairs:
-            if key in result:
-                raise ValueError(f"Duplicate JSON key: {key}")
-            result[key] = value
-        return result
-
     data = json.loads(raw, object_pairs_hook=unique_keys)
     if not isinstance(data, dict) or tuple(data) != ORDERS[order]:
         raise ValueError(f"Report fields must be exactly {ORDERS[order]} in that order")
     return ScopedReport.model_validate(data, context={"line_count": line_count})
 
 
-def accept_teacher_report(
-    payload: dict[str, object],
+def validate_teacher_report(
+    payload: object,
     *,
-    label: Literal["PRESENT", "ABSENT"],
     line_count: int,
     count_tokens: Callable[[str], int],
     max_tokens: int,
 ) -> ScopedReport:
-    """Accept a label-blind teacher report only if valid, in budget and agreeing.
+    """Mechanical, label-blind check of a teacher report: schema, bounds and token budget.
 
     Use the pinned student tokenizer without special tokens. Never repair or truncate.
+    The verdict is compared with the label only after this check passes.
     """
     report = ScopedReport.model_validate(payload, context={"line_count": line_count})
-    if report.verdict != label:
-        raise ValueError("Teacher verdict disagrees with the upstream label")
     tokens = count_tokens(canonical_json(report, "analysis_first"))
     if tokens > max_tokens:
         raise ValueError(f"Teacher report has {tokens} tokens; limit {max_tokens}")
     return report
+
+
+ReasonCode = Literal["INSUFFICIENT_CONTEXT", "UNRESOLVED_ASSUMPTIONS"]
+
+
+def teacher_schema() -> dict[str, object]:
+    """Teacher answer schema, strict-mode compatible (all keys required, no extras).
+
+    Key order is generation order: the teacher writes its analysis before the verdict.
+    Length and line bounds are checked afterwards by `validate_teacher_report`.
+    """
+
+    def strict(properties: dict[str, object]) -> dict[str, object]:
+        return {
+            "type": "object",
+            "additionalProperties": False,
+            "required": list(properties),
+            "properties": properties,
+        }
+
+    location = strict(
+        {
+            "start_line": {"type": "integer"},
+            "end_line": {"type": "integer"},
+            "function": {"type": ["string", "null"]},
+        }
+    )
+    report = strict(
+        {
+            "analysis": {"type": "string"},
+            "verdict": {"type": "string", "enum": ["PRESENT", "ABSENT"]},
+            "location": {"anyOf": [{"type": "null"}, location]},
+        }
+    )
+    return strict(
+        {
+            "status": {"type": "string", "enum": ["OK", "UNSUPPORTED"]},
+            "report": {"anyOf": [{"type": "null"}, report]},
+            "reason_code": {
+                "anyOf": [{"type": "null"}, {"type": "string", "enum": list(get_args(ReasonCode))}]
+            },
+        }
+    )
 
 
 def report_schema() -> dict[str, object]:

@@ -17,11 +17,14 @@ Current state and next steps: `todo.md`.
 ## Layout
 
 - `src/audit_distill/data/` — ingestion, inventory, grouping, release (dataset build).
-- `src/audit_distill/scoped_reports.py` — report schema (`analysis`, `verdict`,
-  `location`), field orders, parsing and teacher acceptance.
+- `src/audit_distill/teacher/` — isolated Codex runner (`codex.py`) and label-blind
+  generation (`generate.py`); settings in `configs/teacher.yaml`, prompt in
+  `configs/prompts/`.
+- `src/audit_distill/scoped_reports.py` — report and teacher answer schemas, field
+  orders, strict parsing and label-blind report validation.
 - `scripts/` — thin CLI entry points.
 - `configs/` — all settings (sources, taxonomy, release, training).
-- `schemas/audit_report.schema.json` — the report schema (export with
+- `schemas/` — report and teacher answer schemas (export with
   `uv run python -m audit_distill.data.schema`).
 - `data/manifests/` — small committed build manifests and statistics.
 - `data/raw/`, `data/processed/`, `runs/` — local only, gitignored.
@@ -35,7 +38,11 @@ uv run python scripts/fetch_data.py
 HF_HUB_OFFLINE=1 uv run python scripts/build_dataset.py --stage inventory
 uv run python scripts/validate_dataset.py
 uv run python scripts/build_dataset.py --stage release
+HF_HUB_OFFLINE=1 uv run python scripts/generate_teacher.py --split train --pilot --dry-run
 ```
+
+`--dry-run` never calls the model. Without it, `generate_teacher.py` spends Codex
+allowance: run it only after approval (see Resource gates).
 
 ## How to work
 
@@ -65,15 +72,15 @@ uv run python scripts/build_dataset.py --stage release
 
 - Codex CLI 0.156.1, `codex exec`, model `gpt-6-sol`, reasoning `medium`, verbosity `low`,
   ChatGPT subscription only — no OpenAI API, no fallback model.
-- Ephemeral, read-only sandbox, no approvals, empty temp dir per call, tools/web/MCP
-  and inherited instructions disabled, sentinel-file isolation preflight.
+- Private `CODEX_HOME` (login copy only), ephemeral, read-only sandbox, no approvals,
+  empty temp dir per call, tools/web/MCP and inherited instructions disabled, offline
+  `prompt-input` preflight; any tool event rejects the call.
 - Label-blind: the teacher sees only the payload; a report is accepted only if its
   verdict matches the upstream label. Rejected queries leave all SFT cohorts with
   their matched partner.
 - The teacher runs on test data only once, for the ceiling row, after the prompt is
   frozen and with separate approval; its test outputs never feed anything else.
-- Up to 5 queries per call, at most one retry for invalid output, resumable, usage
-  logged.
+- One query per call, at most one retry for invalid output, resumable, usage logged.
 
 ## Resource gates
 

@@ -8,8 +8,9 @@ verdict matches the human label are kept. The student is fine-tuned with QLoRA o
 labels only, on analysis-then-verdict reports, and on the same reports verdict-first,
 and compared with the base model, lexical baselines and the teacher.
 
-**Status:** the dataset is built. Teacher generation, training and evaluation come
-next — see [todo.md](todo.md). [SPEC.md](SPEC.md) is the detailed guideline and
+**Status:** the dataset is built and the teacher runner is ready (checked with mocks and
+dry runs; no teacher call yet). The pilot, training and evaluation come next — see
+[todo.md](todo.md). [SPEC.md](SPEC.md) is the detailed guideline and
 holds the decision log.
 
 ## Setup
@@ -47,6 +48,25 @@ uv run python scripts/build_dataset.py --stage release
 Raw and processed data stay local (gitignored). Small manifests and statistics are
 committed in [`data/manifests/`](data/manifests/). Both build stages reproduce their
 content fingerprints byte-for-byte.
+
+## Teacher reports
+
+```bash
+HF_HUB_OFFLINE=1 uv run python scripts/generate_teacher.py --split train --pilot --dry-run
+uv run python scripts/generate_teacher.py --split train --pilot     # uses Codex allowance
+uv run python scripts/generate_teacher.py --split train             # and --split validation
+uv run python scripts/generate_teacher.py --split test --ceiling    # once, for the ceiling row
+```
+
+The teacher is GPT-6 Sol through Codex CLI 0.156.1 on a ChatGPT login (no API key;
+[`configs/teacher.yaml`](configs/teacher.yaml)). Each call shows it one example, exactly as
+the student sees it, and never the label, in a private Codex home and an empty directory
+with all tools off. `--dry-run` makes no model call: it checks the CLI, login and
+isolation, writes every prompt to `runs/teacher/<run>/dry-run/` and estimates usage.
+Real runs append every call and report to `runs/teacher/<run>/` and resume after an
+interruption or a subscription limit. A report is kept only if it is valid, within 480
+tokens and agrees with the human label; `usage.json` has the agreement per collection
+and label.
 
 ## Dataset
 

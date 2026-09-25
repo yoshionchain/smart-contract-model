@@ -186,22 +186,32 @@ PRESENT; ~72% of code is Solidity 0.4; balanced metrics do not reflect prevalenc
 
 **Locked settings:** Codex CLI **0.156.1** (`codex exec`), model `gpt-6-sol` (GPT-6 Sol),
 reasoning effort `medium`, verbosity `low`, ChatGPT-subscription auth, no OpenAI API and
-no fallback model. Equivalent invocation:
+no fallback model. Settings in `configs/teacher.yaml`, prompt in
+`configs/prompts/teacher_v1.txt`, answer schema `schemas/teacher_answer.schema.json`;
+runner in `src/audit_distill/teacher/`. The core of each call:
 
 ```bash
-codex exec --model gpt-6-sol -c model_reasoning_effort="medium" -c model_verbosity="low" \
-  --ephemeral --sandbox read-only --ask-for-approval never --ignore-user-config \
-  --ignore-rules --output-schema <batch-schema.json> --json -o <output.json> -
+CODEX_HOME=<private home> codex exec -c model="gpt-6-sol" -c model_reasoning_effort="medium" \
+  -c model_verbosity="low" <isolation overrides> --ephemeral --sandbox read-only \
+  --skip-git-repo-check --ignore-user-config --ignore-rules --json \
+  --output-schema schemas/teacher_answer.schema.json --output-last-message <file> --cd <empty dir> -
 ```
 
-**Isolation:** run in a new empty temp directory with the task on stdin; disable shell/
-file tools, web search, MCP, skills, subagents and inherited instructions; restrict the
-filesystem view. Before the pilot, a local preflight must show that sentinel files
-outside the allowed view are unreadable; if the CLI cannot enforce this, stop and
-report. Reject any invocation whose event log shows tool use.
+**Isolation:** each run uses a private, empty `CODEX_HOME` holding only a copy of the
+ChatGPT login (a refreshed login is copied back), so no global AGENTS.md, skills,
+plugins, memories, rules or MCP servers load. Each call runs in a new empty directory
+with the task on stdin; shell/exec, apps, plugins, browser, image, memory, sub-agent and
+other tool features are disabled, web search is off, and environment, permission,
+collaboration and skill instructions are not injected. The environment passed to Codex
+has no API key. **Preflight (no model call):** `codex debug prompt-input` renders the
+exact model-visible context with sentinel `AGENTS.md` files around the working directory;
+it must contain no sentinel and nothing but the task, apart from two fixed Codex
+multi-agent notes that no setting removes (recorded in `run.json`). Any tool or
+sub-agent event in a call's log, or a file written to its directory, rejects the call.
+The CLI version and a ChatGPT login are checked before every run.
 
-**Label-blind generation:** the teacher receives only opaque IDs, the payload and the
-annotation rules — **not the label**. It writes the full report (analysis, then its own
+**Label-blind generation:** each call shows the teacher exactly one payload (what the
+student sees) and the annotation rules — **not the label**. It writes the full report (analysis, then its own
 verdict, then the location). A report is accepted only if it is schema-valid, in bounds, within
 480 tokens, used no tools, and its verdict **equals the upstream label**. A
 disagreement is terminal (no retry), is counted as a label-noise estimate per
@@ -211,32 +221,39 @@ training/validation query leaves all SFT cohorts **together with its matched
 partner**, keeping the cohorts balanced. The accepted cohort is teacher-agreeable and
 may be easier; report and discuss this selection.
 
-**Batching and resumability:** up to 5 queries per invocation, concurrency 1, at most 2
-attempts (one retry only for mechanically invalid/missing outputs). A transport schema
-wraps `{"annotations": [{"sample_id", "status": "OK"|"UNSUPPORTED", "report", "reason_code"}]}`;
-every requested ID exactly once. Validate the ID map first, then each report, so one
-bad item does not discard the others; malformed JSON or duplicate IDs invalidate the
-batch. Queries sharing a source may reference one source table. Cache identity: model
-input hash, definition hash, teacher settings, prompt hash, schema hashes, CLI/
-isolation version. Persist every valid item immediately; stop cleanly when the
-subscription is exhausted.
+**One query per call and resumability:** one query per invocation, concurrency 1, so
+every judgment is independent and made from the student's own view. The answer schema
+(strict: every key required, no extras; key order is generation order) is
+`{"status": "OK"|"UNSUPPORTED", "report", "reason_code"}`. Malformed JSON or duplicate
+keys make the answer invalid. It is checked mechanically first and label-blind (schema,
+line bounds, ≤ 480 tokens); only then is its verdict compared with the label. Only
+mechanically invalid, missing or tool-rejected output is retried, once; a call that
+fails before any answer (network, login) or hits the subscription limit stops the run
+without using an attempt. Every call and result is appended to JSONL immediately; a run
+directory refuses to resume under different settings (prompt, schema, model, CLI,
+isolation, tokenizer, release).
 
-**Records and usage:** append-only JSONL per item (IDs, input hash, report or reason,
-versions, attempts, validation result, timestamps, usage) and
-`runs/teacher/<run-id>/usage.json` (CLI version, invocations, retries, accepted/
-disagreeing/unsupported/rejected counts, input/cached/output/reasoning tokens; missing
-usage is null, not zero). A zero-call dry run shows counts by label/collection, batches,
-invocations and token estimates.
+**Records and usage:** `runs/teacher/<run>/` (`pilot`, `train`, `validation`,
+`test-ceiling`) holds `run.json` (settings and their digest, query IDs, preflight,
+provenance), append-only `items.jsonl` (per attempt: IDs, label, input hash, status
+accepted/disagreed/unsupported/invalid, verdict, report, reason, error, tokens),
+`invocations.jsonl` (query, attempt, prompt hash, usage, tool items, errors, duration),
+raw event logs in `events/`, and `usage.json` (status counts, agreement per collection
+and label, complete matched pairs, input/cached/output/reasoning tokens; calls without
+usage are counted, not zeroed). `--dry-run` makes no model call: it runs the preflight,
+writes every prompt to `dry-run/` and reports counts, the invocation
+ceiling and token estimates (extrapolated from the pilot once it exists).
 
 **Resource gate:** no teacher call during builds or dry runs. Before the pilot and each
 production run, show the exact command and expected usage and wait for approval.
-**Pilot:** up to 3 training queries per label (≤ 6, seed 42, distinct groups preferred,
-≤ 2 invocations); inspect every output, then freeze prompts in `configs/prompts/`.
-Generate training reports only for train and validation. Prompt development uses
-training data only. **Teacher ceiling:** after the prompt is frozen, run the teacher
-once, label-blind, on the test set (54 queries, ≤ 11 invocations, separately approved);
-its verdicts and reports are used only for the ceiling row and never feed training,
-prompts or any other decision.
+**Pilot:** 3 training queries per label (seed 42, distinct groups, spread over
+collections; 6 invocations plus at most 6 retries); inspect every output, then
+freeze the prompt (a changed prompt gets a new file name, `teacher_v2.txt`, and the pilot
+is rerun). Generate training reports only for train and validation. Prompt development
+uses training data only. **Teacher ceiling:** after the prompt is frozen, run the teacher
+once, label-blind, on the test set (54 queries, 54 invocations plus retries, separately
+approved, `--ceiling`); its verdicts and reports are used only for the ceiling row and
+never feed training, prompts or any other decision.
 
 ## 8. Report schema
 
@@ -369,7 +386,7 @@ Optionally spot-check ~10 accepted teacher reports for grounding.
   `runs/label-sft/`, `runs/report-sft/`, `runs/eval/`. Raw data, processed data, weights,
   checkpoints and secrets are gitignored; small manifests (`data/manifests/`), configs,
   prompts, schemas, metrics and paper source are committed.
-- Code: typed modules under `src/audit_distill/` (`data/`, later `teacher/`,
+- Code: typed modules under `src/audit_distill/` (`data/`, `teacher/`, later
   `training/`, `evaluation/`), thin scripts, YAML configs, `uv`, Python 3.12, standard
   logging with progress bars. No database, service or framework layers.
 - Secrets: Codex uses the user's ChatGPT login; no `OPENAI_API_KEY`. Any `HF_TOKEN`
@@ -380,10 +397,11 @@ uv run python scripts/fetch_data.py
 uv run python scripts/build_dataset.py --stage inventory
 uv run python scripts/validate_dataset.py
 uv run python scripts/build_dataset.py --stage release
-# planned
-uv run python scripts/generate_teacher.py --split train --pilot --dry-run
+uv run python scripts/generate_teacher.py --split train --pilot --dry-run  # no model call
 uv run python scripts/generate_teacher.py --split train --pilot        # after approval
 uv run python scripts/generate_teacher.py --split {train,validation}   # after approval
+uv run python scripts/generate_teacher.py --split test --ceiling       # after approval
+# planned
 uv run python scripts/build_student_dataset.py
 uv run python scripts/train.py --condition {label,report,report-vf}    # Colab, after approval
 uv run python scripts/evaluate.py
@@ -421,7 +439,8 @@ real source + upstream human labels (SWC-107 convention)
 `configs/project.yaml` (pins, paths, tokenizer/budgets, grouping thresholds),
 `configs/taxonomy.yaml` (check definition and candidate mappings: SWC-107, `RE`,
 `reentrancy`; no-finding negatives need confirmed coverage), `configs/release.yaml`
-(eligibility, cap, matching, split, gates), `configs/training.yaml` (QLoRA). Unknown
+(eligibility, cap, matching, split, gates), `configs/teacher.yaml` (teacher, retries,
+pilot), `configs/training.yaml` (QLoRA). Unknown
 fields and incompatible versions are rejected; builds and dry runs never start teacher
 or GPU work.
 
@@ -429,6 +448,16 @@ or GPU work.
 
 Decided by the project owner before any teacher call, training run or model result.
 
+- **2026-09-25 · One query per teacher call** instead of batches of five: the teacher
+  sees exactly the student's input, judgments are independent (no anchoring or
+  cross-references between examples), and a bad answer affects only itself. Batching
+  would have saved little: 245 of 268 training queries have distinct sources.
+- **2026-09-25 · Teacher runner.** Codex 0.156.1 cannot hide the filesystem from its
+  tools and always loads `$CODEX_HOME/AGENTS.md`, so isolation is a private `CODEX_HOME`,
+  disabled tools, an offline `prompt-input` preflight and rejection of any tool event,
+  instead of an unreadable-sentinel test. Overlength reports count as mechanically
+  invalid (retried once, label-blind); calls that fail before any answer stop the run
+  without using an attempt.
 - **2026-09-24 · Leaner report, newer models, NLP framing.** The report is only
   `analysis`, `verdict`, `location`: severity, exploit scenario and recommendation were
   subjective, unevaluated, came after the verdict and widened the token gap. Teacher is

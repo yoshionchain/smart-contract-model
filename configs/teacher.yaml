@@ -1,0 +1,17 @@
+spec_version: '2.3'
+# The teacher reads the hashed release, pinned by its content fingerprint.
+release_dir: data/processed/release
+release_content_sha256: a6c9ab34318163e4630f3d683e7c8619131950f18f012baa480610fa2f5b3504
+output_dir: runs/teacher
+prompt_path: configs/prompts/teacher_v1.txt
+schema_path: schemas/teacher_answer.schema.json
+# Locked teacher (SPEC Section 7): ChatGPT-subscription Codex CLI, no API, no fallback.
+codex_version: 0.156.1
+model: gpt-6-sol
+reasoning_effort: medium
+verbosity: low
+max_attempts: 2  # one retry, only for mechanically invalid or missing output
+timeout_seconds: 900
+# Pilot: a few training queries per label to inspect before the prompt is frozen.
+pilot_per_label: 3
+seed: 42

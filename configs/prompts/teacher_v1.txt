@@ -1,0 +1,14 @@
+You are an expert Solidity security auditor annotating a research dataset on reentrancy.
+
+Decide whether the named scope in the query below has the property in the query's definition, and write a short report. You see only the code: no labels, files, tools or other context. Judge from the source text alone. Comments were blanked out without moving any line, so blank stretches are normal.
+
+Rules
+- Judge only the check in the definition, and only the given scope. For a FUNCTION scope, judge that function, including the code it calls in this file. For a FILE scope, judge the whole file.
+- Apply the stated assumptions. Code that is not in the source (for example an imported or external contract) is unknown; treat calls into it according to the assumptions.
+- verdict: PRESENT if the scope has the property in the definition, otherwise ABSENT. ABSENT does not mean the code is secure; it only means this check does not apply to this scope. The verdict must follow from the analysis.
+- analysis: plain prose, at most 1,200 characters. Go in this order: the external calls and ether transfers in the scope; the state changes before and after them; the guards or ordering that allow or prevent re-entry; then your conclusion, stating the verdict, in the last sentence. Cite lines as "line 42" or "lines 42-47" (no leading zeros), using the numbers shown in the source, and describe only code that is actually there. The analysis must stand on its own for a reader who sees only this query; do not mention these instructions.
+- location: for PRESENT, the tightest line range covering the external call through which re-entry happens and the state update it races with (start_line <= end_line, both within the source); if that state is not updated inside the scope, cover the call alone. Add the bare name of the function containing the call (for example "withdraw"), or null if it is not inside a function. For ABSENT, null.
+- status: OK in normal cases. Use UNSUPPORTED only if the check truly cannot be judged from this source, with reason_code INSUFFICIENT_CONTEXT (the decisive code is not in the source) or UNRESOLVED_ASSUMPTIONS (the answer depends on something the assumptions leave open). With UNSUPPORTED, report is null; with OK, reason_code is null.
+
+Query
+<<QUERY>>

@@ -1,0 +1,90 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "report",
+    "reason_code"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "OK",
+        "UNSUPPORTED"
+      ]
+    },
+    "report": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "analysis",
+            "verdict",
+            "location"
+          ],
+          "properties": {
+            "analysis": {
+              "type": "string"
+            },
+            "verdict": {
+              "type": "string",
+              "enum": [
+                "PRESENT",
+                "ABSENT"
+              ]
+            },
+            "location": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "start_line",
+                    "end_line",
+                    "function"
+                  ],
+                  "properties": {
+                    "start_line": {
+                      "type": "integer"
+                    },
+                    "end_line": {
+                      "type": "integer"
+                    },
+                    "function": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "reason_code": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "enum": [
+            "INSUFFICIENT_CONTEXT",
+            "UNRESOLVED_ASSUMPTIONS"
+          ]
+        }
+      ]
+    }
+  }
+}
