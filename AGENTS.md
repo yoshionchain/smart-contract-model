@@ -3,7 +3,7 @@
 ## Project
 
 University NLP project on rationale distillation: fine-tune a small model
-(Qwen3-4B-Instruct-2507) to judge reentrancy in a given scope of real Solidity code and
+(Qwen3-4B-Instruct-2507) to judge whether a real Solidity contract is reentrant and
 to write a grounded analysis **before** its verdict. A label-blind teacher (GPT-6 Sol via
 Codex CLI) writes the training reports. Deadline: 2026-09-30.
 
@@ -16,14 +16,15 @@ Current state and next steps: `todo.md`.
 
 ## Layout
 
-- `src/audit_distill/data/` — ingestion, inventory, grouping, release (dataset build).
+- `src/audit_distill/data/` — fetch, comment blanking, grouping, split and balance
+  (dataset build from the pinned Ca' Foscari benchmark).
 - `src/audit_distill/teacher/` — isolated Codex runner (`codex.py`) and label-blind
   generation (`generate.py`); settings in `configs/teacher.yaml`, prompt in
   `configs/prompts/`.
 - `src/audit_distill/scoped_reports.py` — report and teacher answer schemas, field
   orders, strict parsing and label-blind report validation.
 - `scripts/` — thin CLI entry points.
-- `configs/` — all settings (sources, taxonomy, release, training).
+- `configs/` — all settings (`data.yaml`, `teacher.yaml`, `training.yaml`, prompts).
 - `schemas/` — report and teacher answer schemas (export with
   `uv run python -m audit_distill.data.schema`).
 - `data/manifests/` — small committed build manifests and statistics.
@@ -35,9 +36,7 @@ Current state and next steps: `todo.md`.
 uv sync --locked
 uv run ruff check src scripts
 uv run python scripts/fetch_data.py
-HF_HUB_OFFLINE=1 uv run python scripts/build_dataset.py --stage inventory
-uv run python scripts/validate_dataset.py
-uv run python scripts/build_dataset.py --stage release
+HF_HUB_OFFLINE=1 uv run python scripts/build_dataset.py
 HF_HUB_OFFLINE=1 uv run python scripts/generate_teacher.py --split train --pilot --dry-run
 ```
 
@@ -56,12 +55,12 @@ allowance: run it only after approval (see Resource gates).
 
 ## Research rules
 
-- Labels are upstream human annotations used as-is (SWC-107 convention). Never
-  relabel, never present them as locally reviewed, and never count assistant checks
-  as human validation.
-- UNKNOWN, missing labels, tool silence and other weaknesses' labels are never ABSENT.
-  A negative function is never lifted to a whole file. ABSENT never means secure.
-- No project, hash, clone group or SmartBugs-related code may cross splits.
+- Labels are the benchmark's expert labels under its written definition, used as-is.
+  Never relabel, never present them as locally reviewed, and never count assistant
+  checks as human validation. ABSENT never means secure.
+- Never mix sources with different labelling conventions (why v2.3 was abandoned).
+- Exclude, never keep or edit, contracts whose code reveals the label (bug-injection
+  artifacts); no clone group or scenario family may cross splits.
 - Comments are blanked without moving lines; line numbers must stay exact.
 - Overlength sources are excluded and counted, never truncated.
 - Test data never tunes prompts, preprocessing, splits or training.
@@ -76,7 +75,7 @@ allowance: run it only after approval (see Resource gates).
   empty temp dir per call, tools/web/MCP and inherited instructions disabled, offline
   `prompt-input` preflight; any tool event rejects the call.
 - Label-blind: the teacher sees only the payload; a report is accepted only if its
-  verdict matches the upstream label. Rejected queries leave all SFT cohorts with
+  verdict matches the benchmark label. Rejected queries leave all SFT cohorts with
   their matched partner.
 - The teacher runs on test data only once, for the ceiling row, after the prompt is
   frozen and with separate approval; its test outputs never feed anything else.

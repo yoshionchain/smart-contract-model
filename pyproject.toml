@@ -10,7 +10,6 @@ dependencies = [
   "scikit-learn>=1.6,<2",
   "transformers>=4.51,<5",
   "tqdm>=4.67,<5",
-  "openpyxl>=3.1,<4",
 ]
 
 [dependency-groups]

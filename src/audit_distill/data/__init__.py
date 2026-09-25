@@ -1,1 +1,1 @@
-"""Deterministic data preparation; no model generation or training."""
+"""Deterministic dataset build from the pinned benchmark; no model generation or training."""

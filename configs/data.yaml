@@ -1,0 +1,53 @@
+version: '3.0'
+# One source with one labelling protocol: the expert-verified Ca' Foscari reentrancy
+# benchmarks (Ressi et al., "Reentrancy Detection in the Age of LLMs", DSN 2026).
+source:
+  repository: https://github.com/ca-foscari-reentrancy-research-group/reentrancy-detection-llms
+  revision: d7c9496121931cff7c55b2047d18fb048fefe2cb
+  path: data/raw/reentrancy-benchmarks
+  sparse_paths:
+  - benchmarks/aggregated-benchmark/src
+  - benchmarks/RSD/src
+tokenizer:
+  model_id: Qwen/Qwen3-4B-Instruct-2507
+  revision: cdbee75f17c01a7cc42f958dc650907174af0554
+  max_code_tokens: 6000
+  max_sequence_tokens: 8192
+  max_report_tokens: 480
+output_dir: data/processed/release
+manifest_dir: data/manifests
+# The check follows the benchmark's operational definition and labelling procedure.
+check_id: REENTRANCY
+definition: >-
+  Reentrancy: the contract makes an external call to code an attacker may control;
+  after that call returns, it performs a state update that depends on the attacker's
+  interaction; and by re-entering the contract during the call, the attacker can drive
+  it to a final state that no sequence of the same calls without re-entry could reach.
+assumptions:
+- Any address an untrusted caller can supply or influence, and any contract whose code is not in the source (such as a token), may run attacker code.
+- transfer and send forward only 2,300 gas and cannot be used to re-enter.
+- State updates are writes to storage and delegatecalls; events, require, assert and revert are not.
+- Read-only reentrancy counts when another contract can read inconsistent state through a view function during the call.
+# Bug-injection tools leave artifacts that reveal the label (SolidiFI names such as
+# `bug_re_ent27`; HuangGai's inserted `x.call.value(1)("")`), so injected contracts are
+# excluded. Injected contracts carry the tool suffix in their upstream file name.
+excluded_origins: [hg]
+label_leak_pattern: _re_ent
+# Leakage groups: exact skeletons and near clones (whole files), RSD scenario families.
+near_clone_min_tokens: 100
+near_clone_length_ratio: 0.8
+near_clone_jaccard: 0.85
+seed: 42
+# Balanced 1:1 within each partition and collection; Solidity version first.
+match_levels:
+- [pragma_minor]
+- []
+folds: 8
+test_folds: [0, 1]
+validation_folds: [2]
+split_seed_first: 42
+split_seed_last: 1041
+min_groups_per_polarity:
+  train: 30
+  validation: 5
+  test: 10

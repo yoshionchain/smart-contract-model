@@ -1,103 +1,62 @@
-"""Strict reentrancy data-build settings (dataset version 2.3)."""
+"""Strict data-build settings (dataset version 3.0)."""
 
 from pathlib import Path
 from typing import Literal
 
 import yaml
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import Field, model_validator
 
-from audit_distill.config import TokenizerConfig, Upstream
-from audit_distill.data.records import Role
+from audit_distill.config import ConfigModel, TokenizerConfig, Upstream
 
 
 class Source(Upstream):
     sparse_paths: list[str]
-    role: Role
 
 
-class DataConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-    spec_version: Literal["2.3"]
-    schema_version: Literal["2.3"]
-    active_checks: list[Literal["REENTRANCY"]]
-    seed: Literal[42]
-    datasets: dict[str, Source]
+class Gates(ConfigModel):
+    train: int = Field(ge=1)
+    validation: int = Field(ge=1)
+    test: int = Field(ge=1)
+
+
+class DataConfig(ConfigModel):
+    version: Literal["3.0"]
+    source: Source
     tokenizer: TokenizerConfig
-    taxonomy_path: Path
     output_dir: Path
-    project_directory_aliases: dict[str, str]
-    scope_version: Literal["lexical_declarations_v1"]
-    skeleton_version: Literal["solidity_skeleton_v2"]
-    function_clone_min_tokens: Literal[50]
-    near_clone_min_tokens: Literal[100]
-    near_clone_length_ratio: Literal[0.8]
-    near_clone_jaccard: Literal[0.85]
-    cgt_original_collections: list[str]
+    manifest_dir: Path
+    check_id: Literal["REENTRANCY"]
+    definition: str
+    assumptions: list[str] = Field(min_length=1)
+    excluded_origins: list[str]
+    label_leak_pattern: str
+    near_clone_min_tokens: int
+    near_clone_length_ratio: float
+    near_clone_jaccard: float
+    seed: int
+    match_levels: list[list[Literal["pragma_minor"]]]
+    folds: int = Field(ge=3)
+    test_folds: list[int]
+    validation_folds: list[int]
+    split_seed_first: int
+    split_seed_last: int
+    min_groups_per_polarity: Gates
 
     @model_validator(mode="after")
-    def complete_sources(self) -> "DataConfig":
-        if self.active_checks != ["REENTRANCY"]:
-            raise ValueError("Exactly one REENTRANCY check is active")
-        expected = {"dappscan", "smartbugs", "scrubd", "salzano", "cgt", "scbench", "forge"}
-        if set(self.datasets) != expected:
-            raise ValueError("The seven SPEC v2 source snapshots must be explicit")
-        roles = {k: s.role for k, s in self.datasets.items()}
-        if roles != {
-            k: f"{k}_external" if k in {"smartbugs", "forge"} else "development" for k in expected
-        }:
-            raise ValueError("Protected external source roles cannot be reassigned")
+    def consistent(self) -> "DataConfig":
+        if not self.match_levels or self.match_levels[-1] != []:
+            raise ValueError("Matching must end with the catch-all level []")
+        held_out = self.test_folds + self.validation_folds
+        if len(set(held_out)) != len(held_out) or not all(0 <= f < self.folds for f in held_out):
+            raise ValueError("Test and validation folds must be distinct, valid fold numbers")
         return self
 
 
-# The check follows the SWC-107 labelling convention used by the source datasets.
-REENTRANCY_DEFINITION = (
-    "SWC-107 reentrancy: does this scope make an external call or ether transfer "
-    "through which the recipient could re-enter the contract before its state "
-    "updates are complete?"
-)
-
-
-def validate_taxonomy(taxonomy: dict[str, object]) -> None:
-    """Fail closed on stale registries or silent changes to the locked task."""
-    if taxonomy.get("schema_version") != "2.3":
-        raise ValueError("Expected a v2.3 taxonomy registry")
-    if taxonomy.get("checks") != {
-        "REENTRANCY": {
-            "family": "REENTRANCY",
-            "primary": True,
-            "definition": REENTRANCY_DEFINITION,
-        }
-    }:
-        raise ValueError("Taxonomy must contain the exact locked REENTRANCY definition only")
-    expected = {
-        "swc_candidates": {"107": ["REENTRANCY"]},
-        "category_candidates": {"reentrancy": ["REENTRANCY"]},
-        "native_candidates": {
-            "scrubd:RE": ["REENTRANCY"],
-            "scbench:Reentrancy": ["REENTRANCY"],
-        },
-        "negative_rules": {
-            "missing": "UNKNOWN",
-            "no_findings": "coverage_review_required",
-            "native_negative": "same_property_and_scope_only",
-            "non_target_to_reentrancy": "forbidden",
-        },
-    }
-    for table, mapping in expected.items():
-        if taxonomy.get(table) != mapping:
-            raise ValueError(f"Invalid reentrancy candidate mapping: {table}")
-
-
-def load_data_config(path: Path, *, root: Path | None = None) -> DataConfig:
-    root = (root or path.resolve().parent.parent).resolve()
-    config = DataConfig.model_validate(yaml.safe_load(path.read_text(encoding="utf-8")))
-    return config.model_copy(
-        update={
-            "datasets": {
-                k: v.model_copy(update={"path": (root / v.path).resolve()})
-                for k, v in config.datasets.items()
-            },
-            "output_dir": (root / config.output_dir).resolve(),
-            "taxonomy_path": (root / config.taxonomy_path).resolve(),
-        }
-    )
+def load_data_config(path: Path) -> DataConfig:
+    """Load the config; relative paths are resolved against the repository root."""
+    root = path.resolve().parent.parent
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    data["source"]["path"] = root / data["source"]["path"]
+    for key in ("output_dir", "manifest_dir"):
+        data[key] = root / data[key]
+    return DataConfig.model_validate(data)

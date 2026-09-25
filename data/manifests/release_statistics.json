@@ -1,632 +1,116 @@
 {
-  "by_collection": [
-    {
-      "collection": "SCRUBD-CD",
-      "groups": 21,
-      "label": "ABSENT",
-      "partition": "test",
-      "queries": 21
-    },
-    {
-      "collection": "scbench",
-      "groups": 1,
-      "label": "ABSENT",
-      "partition": "test",
-      "queries": 1
-    },
-    {
-      "collection": "smartbugs_results",
-      "groups": 4,
-      "label": "ABSENT",
-      "partition": "test",
-      "queries": 4
-    },
-    {
-      "collection": "zeus_vulnerable",
-      "groups": 1,
-      "label": "ABSENT",
-      "partition": "test",
-      "queries": 1
-    },
-    {
-      "collection": "SCRUBD-CD",
-      "groups": 8,
-      "label": "PRESENT",
-      "partition": "test",
-      "queries": 11
-    },
-    {
-      "collection": "dappscan",
-      "groups": 8,
-      "label": "PRESENT",
-      "partition": "test",
-      "queries": 10
-    },
-    {
-      "collection": "scbench",
-      "groups": 1,
-      "label": "PRESENT",
-      "partition": "test",
-      "queries": 1
-    },
-    {
-      "collection": "smartbugs_results",
-      "groups": 4,
-      "label": "PRESENT",
-      "partition": "test",
-      "queries": 4
-    },
-    {
-      "collection": "zeus_vulnerable",
-      "groups": 1,
-      "label": "PRESENT",
-      "partition": "test",
-      "queries": 1
-    },
-    {
-      "collection": "SCRUBD-CD",
-      "groups": 100,
-      "label": "ABSENT",
-      "partition": "train",
-      "queries": 101
-    },
-    {
-      "collection": "scbench",
-      "groups": 8,
-      "label": "ABSENT",
-      "partition": "train",
-      "queries": 8
-    },
-    {
-      "collection": "smartbugs_results",
-      "groups": 20,
-      "label": "ABSENT",
-      "partition": "train",
-      "queries": 20
-    },
-    {
-      "collection": "zeus_vulnerable",
-      "groups": 5,
-      "label": "ABSENT",
-      "partition": "train",
-      "queries": 5
-    },
-    {
-      "collection": "SCRUBD-CD",
-      "groups": 40,
-      "label": "PRESENT",
-      "partition": "train",
-      "queries": 53
-    },
-    {
-      "collection": "dappscan",
-      "groups": 40,
-      "label": "PRESENT",
-      "partition": "train",
-      "queries": 49
-    },
-    {
-      "collection": "scbench",
-      "groups": 7,
-      "label": "PRESENT",
-      "partition": "train",
-      "queries": 7
-    },
-    {
-      "collection": "smartbugs_results",
-      "groups": 20,
-      "label": "PRESENT",
-      "partition": "train",
-      "queries": 20
-    },
-    {
-      "collection": "zeus_vulnerable",
-      "groups": 4,
-      "label": "PRESENT",
-      "partition": "train",
-      "queries": 5
-    },
-    {
-      "collection": "SCRUBD-CD",
-      "groups": 21,
-      "label": "ABSENT",
-      "partition": "validation",
-      "queries": 21
-    },
-    {
-      "collection": "scbench",
-      "groups": 1,
-      "label": "ABSENT",
-      "partition": "validation",
-      "queries": 1
-    },
-    {
-      "collection": "smartbugs_results",
-      "groups": 4,
-      "label": "ABSENT",
-      "partition": "validation",
-      "queries": 4
-    },
-    {
-      "collection": "zeus_vulnerable",
-      "groups": 1,
-      "label": "ABSENT",
-      "partition": "validation",
-      "queries": 1
-    },
-    {
-      "collection": "SCRUBD-CD",
-      "groups": 10,
-      "label": "PRESENT",
-      "partition": "validation",
-      "queries": 11
-    },
-    {
-      "collection": "dappscan",
-      "groups": 9,
-      "label": "PRESENT",
-      "partition": "validation",
-      "queries": 10
-    },
-    {
-      "collection": "scbench",
-      "groups": 1,
-      "label": "PRESENT",
-      "partition": "validation",
-      "queries": 1
-    },
-    {
-      "collection": "smartbugs_results",
-      "groups": 4,
-      "label": "PRESENT",
-      "partition": "validation",
-      "queries": 4
-    },
-    {
-      "collection": "zeus_vulnerable",
-      "groups": 1,
-      "label": "PRESENT",
-      "partition": "validation",
-      "queries": 1
-    }
-  ],
-  "by_pragma": [
-    {
-      "groups": 24,
-      "label": "ABSENT",
-      "partition": "test",
-      "pragma_minor": "0.4",
-      "queries": 24
-    },
-    {
-      "groups": 2,
-      "label": "ABSENT",
-      "partition": "test",
-      "pragma_minor": "0.5",
-      "queries": 2
-    },
-    {
-      "groups": 1,
-      "label": "ABSENT",
-      "partition": "test",
-      "pragma_minor": "0.8",
-      "queries": 1
-    },
-    {
-      "groups": 13,
-      "label": "PRESENT",
-      "partition": "test",
-      "pragma_minor": "0.4",
-      "queries": 16
-    },
-    {
-      "groups": 2,
-      "label": "PRESENT",
-      "partition": "test",
-      "pragma_minor": "0.5",
-      "queries": 3
-    },
-    {
-      "groups": 2,
-      "label": "PRESENT",
-      "partition": "test",
-      "pragma_minor": "0.6",
-      "queries": 3
-    },
-    {
-      "groups": 1,
-      "label": "PRESENT",
-      "partition": "test",
-      "pragma_minor": "0.7",
-      "queries": 1
-    },
-    {
-      "groups": 3,
-      "label": "PRESENT",
-      "partition": "test",
-      "pragma_minor": "0.8",
-      "queries": 3
-    },
-    {
-      "groups": 1,
-      "label": "PRESENT",
-      "partition": "test",
-      "pragma_minor": "unspecified",
-      "queries": 1
-    },
-    {
-      "groups": 103,
-      "label": "ABSENT",
-      "partition": "train",
-      "pragma_minor": "0.4",
-      "queries": 103
-    },
-    {
-      "groups": 14,
-      "label": "ABSENT",
-      "partition": "train",
-      "pragma_minor": "0.5",
-      "queries": 14
-    },
-    {
-      "groups": 2,
-      "label": "ABSENT",
-      "partition": "train",
-      "pragma_minor": "0.6",
-      "queries": 2
-    },
-    {
-      "groups": 12,
-      "label": "ABSENT",
-      "partition": "train",
-      "pragma_minor": "0.8",
-      "queries": 13
-    },
-    {
-      "groups": 2,
-      "label": "ABSENT",
-      "partition": "train",
-      "pragma_minor": "unspecified",
-      "queries": 2
-    },
-    {
-      "groups": 67,
-      "label": "PRESENT",
-      "partition": "train",
-      "pragma_minor": "0.4",
-      "queries": 81
-    },
-    {
-      "groups": 11,
-      "label": "PRESENT",
-      "partition": "train",
-      "pragma_minor": "0.5",
-      "queries": 12
-    },
-    {
-      "groups": 18,
-      "label": "PRESENT",
-      "partition": "train",
-      "pragma_minor": "0.6",
-      "queries": 22
-    },
-    {
-      "groups": 2,
-      "label": "PRESENT",
-      "partition": "train",
-      "pragma_minor": "0.7",
-      "queries": 4
-    },
-    {
-      "groups": 10,
-      "label": "PRESENT",
-      "partition": "train",
-      "pragma_minor": "0.8",
-      "queries": 13
-    },
-    {
-      "groups": 2,
-      "label": "PRESENT",
-      "partition": "train",
-      "pragma_minor": "unspecified",
-      "queries": 2
-    },
-    {
-      "groups": 27,
-      "label": "ABSENT",
-      "partition": "validation",
-      "pragma_minor": "0.4",
-      "queries": 27
-    },
-    {
-      "groups": 17,
-      "label": "PRESENT",
-      "partition": "validation",
-      "pragma_minor": "0.4",
-      "queries": 18
-    },
-    {
-      "groups": 1,
-      "label": "PRESENT",
-      "partition": "validation",
-      "pragma_minor": "0.5",
-      "queries": 2
-    },
-    {
-      "groups": 3,
-      "label": "PRESENT",
-      "partition": "validation",
-      "pragma_minor": "0.6",
-      "queries": 3
-    },
-    {
-      "groups": 2,
-      "label": "PRESENT",
-      "partition": "validation",
-      "pragma_minor": "0.7",
-      "queries": 2
-    },
-    {
-      "groups": 2,
-      "label": "PRESENT",
-      "partition": "validation",
-      "pragma_minor": "0.8",
-      "queries": 2
-    }
-  ],
-  "by_scope": [
-    {
-      "groups": 6,
-      "label": "ABSENT",
-      "partition": "test",
-      "queries": 6,
-      "scope_kind": "FILE"
-    },
-    {
-      "groups": 21,
-      "label": "ABSENT",
-      "partition": "test",
-      "queries": 21,
-      "scope_kind": "FUNCTION"
-    },
-    {
-      "groups": 6,
-      "label": "PRESENT",
-      "partition": "test",
-      "queries": 6,
-      "scope_kind": "FILE"
-    },
-    {
-      "groups": 16,
-      "label": "PRESENT",
-      "partition": "test",
-      "queries": 21,
-      "scope_kind": "FUNCTION"
-    },
-    {
-      "groups": 33,
-      "label": "ABSENT",
-      "partition": "train",
-      "queries": 33,
-      "scope_kind": "FILE"
-    },
-    {
-      "groups": 100,
-      "label": "ABSENT",
-      "partition": "train",
-      "queries": 101,
-      "scope_kind": "FUNCTION"
-    },
-    {
-      "groups": 32,
-      "label": "PRESENT",
-      "partition": "train",
-      "queries": 33,
-      "scope_kind": "FILE"
-    },
-    {
-      "groups": 79,
-      "label": "PRESENT",
-      "partition": "train",
-      "queries": 101,
-      "scope_kind": "FUNCTION"
-    },
-    {
-      "groups": 6,
-      "label": "ABSENT",
-      "partition": "validation",
-      "queries": 6,
-      "scope_kind": "FILE"
-    },
-    {
-      "groups": 21,
-      "label": "ABSENT",
-      "partition": "validation",
-      "queries": 21,
-      "scope_kind": "FUNCTION"
-    },
-    {
-      "groups": 6,
-      "label": "PRESENT",
-      "partition": "validation",
-      "queries": 6,
-      "scope_kind": "FILE"
-    },
-    {
-      "groups": 19,
-      "label": "PRESENT",
-      "partition": "validation",
-      "queries": 21,
-      "scope_kind": "FUNCTION"
-    }
-  ],
-  "eligible_by_collection": [
-    {
-      "collection": "SCRUBD-CD",
-      "groups": 155,
-      "label": "ABSENT",
-      "partition": "unassigned",
-      "queries": 243
-    },
-    {
-      "collection": "scbench",
-      "groups": 37,
-      "label": "ABSENT",
-      "partition": "unassigned",
-      "queries": 40
-    },
-    {
-      "collection": "smartbugs_results",
-      "groups": 289,
-      "label": "ABSENT",
-      "partition": "unassigned",
-      "queries": 352
-    },
-    {
-      "collection": "smartbugs_results+zeus_safe",
-      "groups": 1,
-      "label": "ABSENT",
-      "partition": "unassigned",
-      "queries": 1
-    },
-    {
-      "collection": "smartbugs_results+zeus_vulnerable",
-      "groups": 1,
-      "label": "ABSENT",
-      "partition": "unassigned",
-      "queries": 1
-    },
-    {
-      "collection": "zeus_safe",
-      "groups": 147,
-      "label": "ABSENT",
-      "partition": "unassigned",
-      "queries": 164
-    },
-    {
-      "collection": "zeus_vulnerable",
-      "groups": 30,
-      "label": "ABSENT",
-      "partition": "unassigned",
-      "queries": 35
-    },
-    {
-      "collection": "SCRUBD-CD",
-      "groups": 58,
-      "label": "PRESENT",
-      "partition": "unassigned",
-      "queries": 92
-    },
-    {
-      "collection": "dappscan",
-      "groups": 57,
-      "label": "PRESENT",
-      "partition": "unassigned",
-      "queries": 89
-    },
-    {
-      "collection": "scbench",
-      "groups": 9,
-      "label": "PRESENT",
-      "partition": "unassigned",
-      "queries": 9
-    },
-    {
-      "collection": "smartbugs_results",
-      "groups": 28,
-      "label": "PRESENT",
-      "partition": "unassigned",
-      "queries": 28
-    },
-    {
-      "collection": "zeus_vulnerable",
-      "groups": 6,
-      "label": "PRESENT",
-      "partition": "unassigned",
-      "queries": 7
-    }
-  ],
-  "eligible_pool": {
-    "ABSENT": {
-      "groups": 653,
-      "queries": 836
-    },
-    "PRESENT": {
-      "groups": 157,
-      "queries": 225
+  "exclusions": {
+    "balancing_surplus": {
+      "aggregated|ABSENT": 231,
+      "rsd|ABSENT": 2,
+      "rsd|PRESENT": 3
+    },
+    "bug_injection_tool": {
+      "aggregated|ABSENT": 1,
+      "aggregated|PRESENT": 20
+    },
+    "duplicate": {
+      "aggregated|ABSENT": 11,
+      "aggregated|PRESENT": 1,
+      "rsd|ABSENT": 2
+    },
+    "label_leaking_identifiers": {
+      "aggregated|PRESENT": 31
+    },
+    "overlength_source": {
+      "aggregated|ABSENT": 12,
+      "aggregated|PRESENT": 11
     }
   },
-  "exclusion_reasons": {
-    "balancing_surplus": 606,
-    "group_query_cap": 79,
-    "unknown_or_disputed": 186,
-    "unverified_evidence_only": 1154
-  },
-  "external_reservations": {
-    "forge_external": 27,
-    "smartbugs_external": 151
-  },
-  "external_smartbugs_positives": 30,
+  "groups": 231,
   "match_levels": {
     "0": 118,
-    "1": 1,
-    "2": 29,
-    "3": 40
+    "1": 7
   },
-  "notes": [
-    "Labels are upstream human annotations (SWC-107 convention), not locally reviewed.",
-    "Balancing is 1:1 matched sampling; surplus controls are excluded, not relabeled.",
-    "Groups are the inventory components: a conservative superset of release edges.",
-    "Pragma is a first-pragma compiler screen, not a deployment date or EVM fork."
-  ],
   "partitions": {
     "test": {
-      "ABSENT": {
-        "groups": 27,
-        "queries": 27
+      "groups": {
+        "ABSENT": 13,
+        "PRESENT": 24
       },
-      "PRESENT": {
-        "groups": 22,
-        "queries": 27
+      "queries": {
+        "aggregated": {
+          "ABSENT": 14,
+          "PRESENT": 14
+        },
+        "rsd": {
+          "ABSENT": 16,
+          "PRESENT": 16
+        }
       }
     },
     "train": {
-      "ABSENT": {
-        "groups": 133,
-        "queries": 134
+      "groups": {
+        "ABSENT": 64,
+        "PRESENT": 41
       },
-      "PRESENT": {
-        "groups": 110,
-        "queries": 134
+      "queries": {
+        "aggregated": {
+          "ABSENT": 36,
+          "PRESENT": 36
+        },
+        "rsd": {
+          "ABSENT": 43,
+          "PRESENT": 43
+        }
       }
     },
     "validation": {
-      "ABSENT": {
-        "groups": 27,
-        "queries": 27
+      "groups": {
+        "ABSENT": 13,
+        "PRESENT": 10
       },
-      "PRESENT": {
-        "groups": 25,
-        "queries": 27
+      "queries": {
+        "aggregated": {
+          "ABSENT": 7,
+          "PRESENT": 7
+        },
+        "rsd": {
+          "ABSENT": 9,
+          "PRESENT": 9
+        }
       }
     }
   },
-  "positives_with_vulnerable_lines": {
-    "test": 13,
-    "train": 62,
-    "validation": 9
-  },
-  "selected": {
+  "pragma_by_label": {
     "ABSENT": {
-      "groups": 187,
-      "queries": 188
+      "0.4": 56,
+      "0.5": 1,
+      "0.8": 68
     },
     "PRESENT": {
-      "groups": 157,
-      "queries": 188
+      "0.4": 49,
+      "0.5": 3,
+      "0.6": 5,
+      "0.8": 68
     }
+  },
+  "source": {
+    "commit": "d7c9496121931cff7c55b2047d18fb048fefe2cb",
+    "repository": "https://github.com/ca-foscari-reentrancy-research-group/reentrancy-detection-llms"
   },
   "split_attempts": 1,
   "split_seed": 42,
-  "state": "final"
+  "usable_before_balancing": {
+    "groups": {
+      "ABSENT": 190,
+      "PRESENT": 75
+    },
+    "queries": {
+      "aggregated": {
+        "ABSENT": 288,
+        "PRESENT": 57
+      },
+      "rsd": {
+        "ABSENT": 70,
+        "PRESENT": 71
+      }
+    }
+  },
+  "version": "3.0"
 }

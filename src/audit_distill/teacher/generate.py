@@ -24,8 +24,7 @@ from tqdm import tqdm
 
 from audit_distill.config import ConfigModel, TokenizerConfig
 from audit_distill.data.release import verify_release
-from audit_distill.data.scopes import digest
-from audit_distill.provenance import file_sha256, project_provenance, write_json
+from audit_distill.provenance import digest, file_sha256, project_provenance, write_json
 from audit_distill.scoped_reports import (
     ReasonCode,
     canonical_json,
@@ -51,7 +50,7 @@ USAGE_KEYS = ("input_tokens", "cached_input_tokens", "output_tokens", "reasoning
 
 
 class TeacherConfig(ConfigModel):
-    spec_version: Literal["2.3"]
+    version: Literal["3.0"]
     release_dir: Path
     release_content_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     output_dir: Path
@@ -80,8 +79,8 @@ def load_teacher_config(path: Path, root: Path) -> tuple[TeacherConfig, Tokenize
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     for key in ("release_dir", "output_dir", "prompt_path", "schema_path"):
         data[key] = root / data[key]
-    project = yaml.safe_load((root / "configs/project.yaml").read_text(encoding="utf-8"))
-    return TeacherConfig.model_validate(data), TokenizerConfig.model_validate(project["tokenizer"])
+    dataset = yaml.safe_load((root / "configs/data.yaml").read_text(encoding="utf-8"))
+    return TeacherConfig.model_validate(data), TokenizerConfig.model_validate(dataset["tokenizer"])
 
 
 class TeacherQuery(BaseModel):

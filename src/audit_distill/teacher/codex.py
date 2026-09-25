@@ -59,8 +59,6 @@ ISOLATION_CONFIG = (
     "include_permissions_instructions=false",
     "include_collaboration_mode_instructions=false",
     "include_apps_instructions=false",
-    "include_skills_usage_instructions=false",
-    "include_plugin_usage_instructions=false",
 )
 MESSAGE_ITEMS = {"agent_message", "reasoning"}
 USAGE_KEYS = ("input_tokens", "cached_input_tokens", "output_tokens", "reasoning_output_tokens")

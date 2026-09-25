@@ -2,43 +2,40 @@
 
 Work down this list. [SPEC.md](SPEC.md) is the detailed guideline; its decision log records why things are the way they are. Commands described as *planned* are not implemented yet. Deadline: September 30, 2026, 23:59.
 
-## 1. Dataset (done)
+## 1. Dataset (done, v3.0)
 
-- [x] Fetch the seven pinned sources and build the candidate inventory with leakage groups and mechanical validation.
-- [x] Build the final release: upstream-reviewed labels under the SWC-107 convention, group cap, grouped split, 1:1 matched balancing. 134/134 train, 27/27 validation, 27/27 test, 30 SmartBugs external positives. See the README's dataset section.
+- [x] Switch to the expert-verified Ca' Foscari benchmarks (one definition): exclude bug-injected and overlength contracts, de-duplicate, group clones and RSD scenario families, grouped split, 1:1 balance per partition and collection. 79/79 train, 16/16 validation, 30/30 test; reproducible (`data/manifests/`).
+- [x] Keep the v2.3 mixed-source teacher result for the paper (`data/manifests/teacher_v2.3_mixed_sources.json`: 62% agreement; SCRUBD and SmartBugs-wild conventions conflict).
 
-## 2. Generate and audit teacher supervision (Phase 3)
+## 2. Teacher supervision
 
-- [x] **Implemented and checked with mocks:** label-blind prompt (`configs/prompts/teacher_v1.txt`), isolated Codex runner (private `CODEX_HOME`, all tools off, offline `prompt-input` preflight, tool events reject a call), strict answer schema, one query per call, one retry for mechanically invalid output only, pairwise acceptance data, resumable JSONL records, usage log, zero-call dry run. Mock checks covered malformed answers, duplicate keys, extra fields, timeouts, disagreements, UNSUPPORTED, out-of-bounds and over-budget reports, tool use, limits, no-answer failures, stale run directories, the invocation cap and the test guard. The exec command was parse-checked with no login (401, nothing billed).
-- [ ] **Approval required for the real pilot:** `uv run python scripts/generate_teacher.py --split train --pilot --max-invocations 12` — 6 training queries (3 per label, dry run lists them), 6 calls plus at most 6 retries. Inspect every output, then freeze the prompt using training data only (a changed prompt gets a new file and the pilot is rerun).
-- [ ] **Approval required for each production run:** show the exact train/validation commands and dry-run usage estimate, then wait for approval. Generate only train/validation; preserve valid partial work; report agreement/disagreement rates per collection and label (the label-noise estimate); no test or external data in production runs.
-- [ ] **Approval required for the teacher ceiling:** after the prompt is frozen, run the teacher once, label-blind, on the 54 test queries (54 calls plus retries). Its outputs are only the ceiling row.
-- [ ] **Optional (~10 reports):** spot-check accepted teacher reports for grounding and correct lines, without removing reports from the cohort.
+- [x] Runner implemented and checked with mocks, dry runs and a real v2.3 pilot and production run (isolation, retries, resumability and usage logging work; 322/322 calls valid).
+- [ ] **Approval required for the v3.0 pilot:** `uv run python scripts/generate_teacher.py --split train --pilot --max-invocations 12` — 6 training contracts (3 per label, both collections), prompt `teacher_v2.txt`. Inspect every output; revise the prompt only for format or grounding problems, using training data only, then freeze it.
+- [ ] **Approval required for production:** train (158 calls) and validation (32 calls). Report agreement per collection and label; pairwise removal on train.
+- [ ] **Approval required for the teacher ceiling:** after freezing, run once, label-blind, on the 60 test contracts (`--ceiling`). Outputs only feed the ceiling row and RQ3 test agreement.
 
 ## 3. Build the matched student dataset (Phase 4)
 
-- [ ] **Implement:** canonical chat formatting and assistant-only loss for Label-SFT, Report-SFT (analysis first) and Report-SFT-VF (same reports, verdict first). Enforce the 6,000-token source budget, 480-token report target, and 8,192-token complete-sequence limit with the pinned tokenizer/template; exclude rather than truncate overlength examples.
-- [ ] **Freeze:** identical sorted accepted train/validation IDs for all three conditions in `shared_cohort.json`; reject unsupported/invalid/overlength items (with their matched partners) from all. Recheck train/validation polarity-group and source-breadth gates and report acceptance bias. Stop if a gate fails.
+- [ ] **Implement:** canonical chat formatting and assistant-only loss for Label-SFT, Report-SFT (analysis first) and Report-SFT-VF (same reports, verdict first). Enforce the 6,000-token source budget, 480-token report target and 8,192-token sequence limit with the pinned tokenizer/template; exclude rather than truncate.
+- [ ] **Freeze:** identical sorted accepted train IDs for all three conditions in `shared_cohort.json` (rejected queries leave with their matched partner). Recheck the train group gate and report acceptance bias. Validation keeps all 32 queries for checkpoint selection.
 
 ## 4. Train the student conditions (Phase 5)
 
-- [ ] **Implement and smoke-test:** normal Python QLoRA modules and a documented Google Colab CLI workflow using the exact model, adapters, hyperparameters and seeds in SPEC, with per-epoch greedy validation macro-F1 checkpoint selection. Save effective configs, tokenizer/prompt hashes, logs, and adapters.
-- [ ] **Approval required for real Colab jobs:** show the exact commands, runtime/resources, dataset and cohort hashes, and expected outputs. Run the three SFT conditions only after explicit approval; check first that Qwen3-4B trains at 8,192 tokens on the chosen GPU. Keep Base as the unchanged model.
+- [ ] **Implement and smoke-test:** Python QLoRA modules and a documented Google Colab CLI workflow with the exact model, hyperparameters and seed in SPEC, with per-epoch greedy validation macro-F1 checkpoint selection. Save effective configs, tokenizer/prompt hashes, logs and adapters.
+- [ ] **Approval required for real Colab jobs:** show commands, runtime/resources, dataset and cohort hashes; check first that Qwen3-4B trains at 8,192 tokens on the chosen GPU. Then run the three SFT conditions. Keep Base as the unchanged model.
 
 ## 5. Evaluate without tuning on held-out data (Phase 6)
 
-- [ ] **Implement and run:** the (scope, pragma) majority and TF-IDF logistic-regression baselines fitted on train only, plus the collection-majority baseline.
-- [ ] **Implement and run:** deterministic Base-Label, Base-Report, Label-SFT, Report-SFT and Report-SFT-VF inference on the same test IDs, next to the baselines and the teacher ceiling. Report binary PRESENT/ABSENT macro-F1, positive precision/recall, invalid-output/schema rates, paired group-bootstrap uncertainty (Report-SFT − Label-SFT, Report-SFT − Report-SFT-VF, each − its base format), cited-line grounding, teacher–label agreement per collection, and raw predictions. Invalid outputs count as misses under SPEC rules.
-- [ ] **Implement and run:** the SmartBugs external view separately. Score localization only against upstream line annotations on the exact file (13 test and 30 SmartBugs positives), never teacher lines or function bounds as gold. Export denominator-aware metrics and error strata; do not retune from test results.
+- [ ] **Implement and run:** baselines fitted on train only (constant, collection majority, Solidity-version majority, TF-IDF logistic regression).
+- [ ] **Implement and run:** deterministic Base-Label, Base-Report, Label-SFT, Report-SFT and Report-SFT-VF inference on the 60 test contracts, next to the baselines and the teacher ceiling. Macro-F1, PRESENT precision/recall, invalid rates, paired group-bootstrap intervals (Report-SFT − Label-SFT, Report-SFT − Report-SFT-VF, each − its base format), slices by collection and version, grounding/faithfulness (cited lines exist and are code; the conclusion states the report's own verdict), teacher–label agreement, raw predictions.
 
-## 6. Human report comparison (Phase 7)
+## 6. Optional human rating (Phase 7)
 
-- [ ] **Implement:** select up to 25 test queries and produce randomized, blinded paired Base-Report/Report-SFT cards with a hidden key and the SPEC rubric (grounding 0–2, consistency with own verdict).
-- [ ] **Human reviewer:** rate the blinded cards before unblinding. Then score with actual ratings, denominators, paired comparisons, and any documented second-rater agreement.
+- [ ] Only if time allows: blinded Base-Report vs Report-SFT cards on up to 20 test contracts, rated for grounding and consistency.
 
 ## 7. Paper and reproducibility (Phase 8)
 
-- [ ] Generate only real dataset, resource, metric, uncertainty, and human-rating tables/figures. Write the ACL paper within the SPEC page limit, frame it as rationale distillation; explain scoped ABSENT, unverified upstream labels under the SWC-107 convention, source concentration, compiler-era limits, incomplete ancestry, teacher noise, and public-pretraining exposure.
-- [ ] Bring README commands and outputs into sync with the finished CLI. Verify a fresh `uv sync --locked`, Ruff, deterministic build and artifact-hash checks, and documented end-to-end reproduction. Do not present missing runs as results.
+- [ ] Generate only real dataset, resource, metric, uncertainty and agreement tables/figures. Write the ACL paper within the page limit, framed as rationale distillation; explain the v2.3 → v3.0 label-convention finding, the single-definition benchmark, bug-injection exclusions, the small test set, teacher selection and pretraining exposure.
+- [ ] Bring README commands and outputs into sync with the finished CLI. Verify a fresh `uv sync --locked`, Ruff, deterministic build and artifact-hash checks, and end-to-end reproduction. Do not present missing runs as results.
 
-**Immediate next step:** approve and run the teacher pilot (6 training queries, ≤ 12 Codex calls), then inspect the reports.
+**Immediate next step:** approve the v3.0 teacher pilot (6 training contracts, ≤ 12 Codex calls), then inspect the reports.

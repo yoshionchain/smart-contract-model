@@ -1,0 +1,136 @@
+{
+  "note": "Label-blind GPT-6 Sol (teacher_v1, SWC-107 definition) on the v2.3 mixed-source release; superseded by v3.0. Kept for the paper's motivation (source convention conflict).",
+  "runs": {
+    "train": {
+      "agreement_rate": 0.6254681647940075,
+      "by_collection_label": {
+        "SCRUBD-CD": {
+          "ABSENT": {
+            "accepted": 39,
+            "disagreed": 62
+          },
+          "PRESENT": {
+            "accepted": 49,
+            "disagreed": 4
+          }
+        },
+        "dappscan": {
+          "PRESENT": {
+            "accepted": 32,
+            "disagreed": 16,
+            "unsupported": 1
+          }
+        },
+        "scbench": {
+          "ABSENT": {
+            "accepted": 6,
+            "disagreed": 2
+          },
+          "PRESENT": {
+            "accepted": 6,
+            "disagreed": 1
+          }
+        },
+        "smartbugs_results": {
+          "ABSENT": {
+            "accepted": 20
+          },
+          "PRESENT": {
+            "accepted": 7,
+            "disagreed": 13
+          }
+        },
+        "zeus_vulnerable": {
+          "ABSENT": {
+            "accepted": 3,
+            "disagreed": 2
+          },
+          "PRESENT": {
+            "accepted": 5
+          }
+        }
+      },
+      "complete_pairs": 48,
+      "matched_pairs_in_run": 134,
+      "queries": 268,
+      "settings_key": "dae8e51ab86e6629bf8140a1576168f44e7d8ea26a6e60398556a6d3c68ee754",
+      "status_counts": {
+        "accepted": 167,
+        "disagreed": 100,
+        "invalid": 0,
+        "pending": 0,
+        "unsupported": 1
+      },
+      "tokens": {
+        "cached_input_tokens": 1579776,
+        "input_tokens": 2660406,
+        "output_tokens": 122713,
+        "reasoning_output_tokens": 81170
+      }
+    },
+    "validation": {
+      "agreement_rate": 0.5283018867924528,
+      "by_collection_label": {
+        "SCRUBD-CD": {
+          "ABSENT": {
+            "accepted": 6,
+            "disagreed": 15
+          },
+          "PRESENT": {
+            "accepted": 11
+          }
+        },
+        "dappscan": {
+          "PRESENT": {
+            "accepted": 4,
+            "disagreed": 5,
+            "unsupported": 1
+          }
+        },
+        "scbench": {
+          "ABSENT": {
+            "disagreed": 1
+          },
+          "PRESENT": {
+            "accepted": 1
+          }
+        },
+        "smartbugs_results": {
+          "ABSENT": {
+            "accepted": 2,
+            "disagreed": 2
+          },
+          "PRESENT": {
+            "accepted": 3,
+            "disagreed": 1
+          }
+        },
+        "zeus_vulnerable": {
+          "ABSENT": {
+            "accepted": 1
+          },
+          "PRESENT": {
+            "disagreed": 1
+          }
+        }
+      },
+      "complete_pairs": 6,
+      "matched_pairs_in_run": 27,
+      "queries": 54,
+      "settings_key": "dae8e51ab86e6629bf8140a1576168f44e7d8ea26a6e60398556a6d3c68ee754",
+      "status_counts": {
+        "accepted": 28,
+        "disagreed": 25,
+        "invalid": 0,
+        "pending": 0,
+        "unsupported": 1
+      },
+      "tokens": {
+        "cached_input_tokens": 345984,
+        "input_tokens": 522593,
+        "output_tokens": 31183,
+        "reasoning_output_tokens": 22875
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-"""Fetch the revisions pinned in configs/project.yaml."""
+"""Fetch the benchmark revision pinned in configs/data.yaml."""
 
 from audit_distill.data.fetch import main
 

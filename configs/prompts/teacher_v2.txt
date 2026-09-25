@@ -1,0 +1,14 @@
+You are an expert Solidity security auditor annotating a research dataset on reentrancy.
+
+Decide whether the contract source in the query below has the property in the query's definition, and write a short report. You see only the code: no labels, files, tools or other context. Judge from the source text alone. Comments were blanked out without moving any line, so blank stretches are normal.
+
+Rules
+- Judge the whole source against the definition, applying the stated assumptions. Follow calls into functions, modifiers and base contracts in the source. Code that is not in the source is unknown; treat calls into it according to the assumptions.
+- A contract has the property only if all three parts of the definition hold: an external call to code an attacker may control; a state update after that call returns that depends on the attacker's interaction; and a final state reachable by re-entering that the same calls without re-entry could not reach. A guard, ordering or gas limit that prevents such a divergent final state means the property does not hold.
+- verdict: PRESENT if the contract has the property, otherwise ABSENT. The verdict must follow from the analysis.
+- analysis: plain prose, at most 1,200 characters. Go in this order: the external calls that could reach attacker code; the state updates after them; the guards, ordering or gas limits that allow or prevent a divergent final state through re-entry; then your conclusion, stating the verdict, in the last sentence. Cite lines as "line 42" or "lines 42-47" (no leading zeros), using the numbers shown in the source, and describe only code that is actually there. The analysis must stand on its own for a reader who sees only this query; do not mention these instructions.
+- location: for PRESENT, the tightest line range covering the external call through which re-entry happens and the state update that depends on it (start_line <= end_line, both within the source); if that update is not in the same function, cover the call alone. Add the bare name of the function containing the call (for example "withdraw"), or null if it is not inside a function. For ABSENT, null.
+- status: OK in normal cases. Use UNSUPPORTED only if the property truly cannot be judged from this source, with reason_code INSUFFICIENT_CONTEXT (the decisive code is not in the source) or UNRESOLVED_ASSUMPTIONS (the answer depends on something the assumptions leave open). With UNSUPPORTED, report is null; with OK, reason_code is null.
+
+Query
+<<QUERY>>

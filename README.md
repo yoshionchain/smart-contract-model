@@ -1,17 +1,17 @@
 # Synthetic Audit Distillation
 
 A university NLP experiment in rationale distillation: does training a small model
-(Qwen3-4B-Instruct-2507) on a large model's explanations help it judge reentrancy in
-real Solidity code, and are its own explanations grounded? A teacher (GPT-6 Sol via
-Codex CLI) analyses each training example without seeing its label; only reports whose
-verdict matches the human label are kept. The student is fine-tuned with QLoRA on
-labels only, on analysis-then-verdict reports, and on the same reports verdict-first,
-and compared with the base model, lexical baselines and the teacher.
+(Qwen3-4B-Instruct-2507) on a large model's explanations help it judge whether a real
+Solidity contract is reentrant, and are its own explanations grounded? A teacher
+(GPT-6 Sol via Codex CLI) analyses each training contract without seeing its label;
+only reports whose verdict matches the expert label are kept. The student is
+fine-tuned with QLoRA on labels only, on analysis-then-verdict reports, and on the
+same reports verdict-first, and compared with the base model, lexical baselines and
+the teacher.
 
-**Status:** the dataset is built and the teacher runner is ready (checked with mocks and
-dry runs; no teacher call yet). The pilot, training and evaluation come next — see
-[todo.md](todo.md). [SPEC.md](SPEC.md) is the detailed guideline and
-holds the decision log.
+**Status:** the v3.0 dataset is built and the teacher runner is ready; the teacher
+pilot is next — see [todo.md](todo.md). [SPEC.md](SPEC.md) is the detailed guideline
+and holds the decision log.
 
 ## Setup
 
@@ -25,29 +25,49 @@ uv run ruff check src scripts
 ## Build the dataset
 
 ```bash
-uv run python scripts/fetch_data.py                               # pinned sources
-HF_HUB_OFFLINE=1 uv run python scripts/build_dataset.py --stage inventory
-uv run python scripts/validate_dataset.py
-uv run python scripts/build_dataset.py --stage release
+uv run python scripts/fetch_data.py                      # pinned benchmark revision
+HF_HUB_OFFLINE=1 uv run python scripts/build_dataset.py  # about a minute
 ```
 
-- `fetch_data.py` clones the seven pinned upstream snapshots into `data/raw/`
-  (see [`configs/project.yaml`](configs/project.yaml)). It refuses dirty checkouts
-  and revision mismatches.
-- `inventory` (a few minutes) reads every source, blanks comments, resolves scopes,
-  records every native judgment and builds leakage groups in
-  `data/processed/inventory/`. It needs the pinned tokenizer; drop
-  `HF_HUB_OFFLINE=1` on the first run to download it (no model weights).
-- `validate_dataset.py` re-checks the inventory mechanically.
-- `release` (seconds; [`configs/release.yaml`](configs/release.yaml)) selects
-  upstream-reviewed labels, splits by group and balances each split by matched
-  sampling. It writes `train`/`validation`/`test.parquet` and
-  `external_smartbugs.parquet` to `data/processed/release/`, each row with its exact
-  model input.
+- `fetch_data.py` clones the pinned benchmark into `data/raw/` and refuses dirty
+  checkouts and revision mismatches.
+- `build_dataset.py` ([`configs/data.yaml`](configs/data.yaml)) blanks comments,
+  numbers lines, applies the exclusions, groups clones and scenario families, splits
+  by group and balances each split. It writes `train`/`validation`/`test.parquet` to
+  `data/processed/release/`, each row with its exact model input. It needs the pinned
+  tokenizer; drop `HF_HUB_OFFLINE=1` on the first run to download it (no weights).
 
-Raw and processed data stay local (gitignored). Small manifests and statistics are
-committed in [`data/manifests/`](data/manifests/). Both build stages reproduce their
-content fingerprints byte-for-byte.
+Raw and processed data stay local (gitignored). The manifest and statistics are
+committed in [`data/manifests/`](data/manifests/); the build reproduces its content
+fingerprint byte-for-byte.
+
+## Dataset
+
+Each example is one whole contract, its comment-blanked source with numbered lines,
+and a PRESENT/ABSENT label from the [Ca' Foscari reentrancy benchmarks](https://github.com/ca-foscari-reentrancy-research-group/reentrancy-detection-llms)
+(Ressi et al., *Reentrancy Detection in the Age of LLMs*, DSN 2026). Three experts
+labelled every contract under one operational definition: *an external call to code an
+attacker may control, a state update after it that depends on the attacker, and a
+final state reachable by re-entering that the same calls without re-entry could not
+reach.* The same definition and its assumptions are shown to every model.
+
+| Split | PRESENT | ABSENT | Groups (P / A) |
+| --- | ---: | ---: | ---: |
+| Train | 79 | 79 | 41 / 64 |
+| Validation | 16 | 16 | 10 / 13 |
+| Test | 30 | 30 | 24 / 13 |
+
+| Collection | Pairs (train / val / test) | Content |
+| --- | ---: | --- |
+| Aggregated Benchmark | 36 / 7 / 14 | Real deployed contracts, mostly Solidity 0.4 |
+| RSD | 43 / 9 / 16 | Handcrafted Solidity 0.8 scenarios in reentrant/safe variants |
+
+Excluded and counted: bug-injected contracts whose artifacts reveal the label
+(SolidiFI `bug_re_ent…` names, HuangGai's inserted calls), sources over 6,000 tokens,
+duplicates, and surplus safe contracts after balancing. A group joins exact clones, near
+clones and RSD scenario families; no group spans two splits. Each split is balanced
+1:1 within each collection, matching Solidity versions where possible. Details:
+SPEC.md Sections 4–6 and 17.
 
 ## Teacher reports
 
@@ -59,43 +79,14 @@ uv run python scripts/generate_teacher.py --split test --ceiling    # once, for 
 ```
 
 The teacher is GPT-6 Sol through Codex CLI 0.156.1 on a ChatGPT login (no API key;
-[`configs/teacher.yaml`](configs/teacher.yaml)). Each call shows it one example, exactly as
-the student sees it, and never the label, in a private Codex home and an empty directory
-with all tools off. `--dry-run` makes no model call: it checks the CLI, login and
-isolation, writes every prompt to `runs/teacher/<run>/dry-run/` and estimates usage.
+[`configs/teacher.yaml`](configs/teacher.yaml)). Each call shows it one contract, exactly
+as the student sees it, and never the label, in a private Codex home and an empty
+directory with all tools off. `--dry-run` makes no model call: it checks the CLI, login
+and isolation, writes every prompt to `runs/teacher/<run>/dry-run/` and estimates usage.
 Real runs append every call and report to `runs/teacher/<run>/` and resume after an
 interruption or a subscription limit. A report is kept only if it is valid, within 480
-tokens and agrees with the human label; `usage.json` has the agreement per collection
+tokens and agrees with the expert label; `usage.json` has the agreement per collection
 and label.
-
-## Dataset
-
-Each example is one scope (a function or a whole file) of a real contract, the full
-comment-blanked source with numbered lines, and a PRESENT/ABSENT label from published
-human annotations, following their SWC-107 convention: *does this scope make an
-external call or ether transfer through which the recipient could re-enter the
-contract before its state updates are complete?*
-
-| Split | PRESENT | ABSENT | Groups (P / A) | Positives with line annotations |
-| --- | ---: | ---: | ---: | ---: |
-| Train | 134 | 134 | 110 / 133 | 62 |
-| Validation | 27 | 27 | 25 / 27 | 9 |
-| Test | 27 | 27 | 22 / 27 | 13 |
-| SmartBugs external | 30 | — | — | 30 |
-
-| Collection | PRESENT | ABSENT |
-| --- | ---: | ---: |
-| SCRUBD-CD (function scope) | 75 | 143 |
-| DAppSCAN audited projects (positives only) | 69 | 0 |
-| Salzano: SmartBugs-wild sample / ZEUS set (file scope) | 35 | 35 |
-| ScBench (file scope) | 9 | 10 |
-
-A group is a project with its known copies and clones; no group spans two splits,
-and anything related to SmartBugs stays out of development. Only labels with a
-documented human annotation protocol are used (CGT's tool-derived labels are not);
-at most 3 examples per group and label are kept; every PRESENT example is matched
-1:1 with an ABSENT one from the same collection, scope kind and Solidity version
-where possible. Details and rationale: SPEC.md Sections 6 and 17.
 
 ## The report format
 
@@ -114,10 +105,11 @@ fields in the order `verdict, analysis, location`.
 
 ## Limitations
 
-- Labels are upstream human annotations under the broad SWC-107 convention and were
-  not re-reviewed locally; a spot check found about a third doubtful under a strict
-  exploitability reading. The teacher's disagreement rate gives a second estimate.
-- ABSENT means "not this reentrancy pattern in this scope", never "secure".
-- Mostly older Solidity (0.4); DAppSCAN contributes positives only; balanced test
-  metrics do not reflect real-world prevalence.
+- One benchmark and one definition of reentrancy; ABSENT means "not reentrant by this
+  definition", never "secure".
+- A small test set (60 contracts, 30 pairs); RSD contracts are handcrafted and short,
+  and the real contracts are mostly old Solidity 0.4.
 - Only reentrancy is studied; results do not show general vulnerability detection.
+- An earlier mixed-source dataset (v2.3) was abandoned because its sources labelled
+  reentrancy by conflicting conventions; the teacher agreed with only 62% of its labels
+  ([`data/manifests/teacher_v2.3_mixed_sources.json`](data/manifests/teacher_v2.3_mixed_sources.json)).

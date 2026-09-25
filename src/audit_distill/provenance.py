@@ -16,6 +16,13 @@ def file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def digest(value: object) -> str:
+    """Deterministic SHA-256 of a JSON value (sorted keys, compact, UTF-8)."""
+    return hashlib.sha256(
+        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+
+
 def project_provenance(root: Path) -> dict[str, object]:
     try:
         commit: str | None = subprocess.check_output(
@@ -30,6 +37,7 @@ def project_provenance(root: Path) -> dict[str, object]:
             *root.glob("src/**/*.py"),
             *root.glob("scripts/*.py"),
             *root.glob("configs/**/*.yaml"),
+            *root.glob("configs/prompts/*.txt"),
             *root.glob("schemas/**/*.json"),
             root / "pyproject.toml",
             root / "uv.lock",

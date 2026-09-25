@@ -1,52 +1,66 @@
 {
   "counts": {
     "test": {
-      "ABSENT": {
-        "groups": 27,
-        "queries": 27
+      "groups": {
+        "ABSENT": 13,
+        "PRESENT": 24
       },
-      "PRESENT": {
-        "groups": 22,
-        "queries": 27
+      "queries": {
+        "aggregated": {
+          "ABSENT": 14,
+          "PRESENT": 14
+        },
+        "rsd": {
+          "ABSENT": 16,
+          "PRESENT": 16
+        }
       }
     },
     "train": {
-      "ABSENT": {
-        "groups": 133,
-        "queries": 134
+      "groups": {
+        "ABSENT": 64,
+        "PRESENT": 41
       },
-      "PRESENT": {
-        "groups": 110,
-        "queries": 134
+      "queries": {
+        "aggregated": {
+          "ABSENT": 36,
+          "PRESENT": 36
+        },
+        "rsd": {
+          "ABSENT": 43,
+          "PRESENT": 43
+        }
       }
     },
     "validation": {
-      "ABSENT": {
-        "groups": 27,
-        "queries": 27
+      "groups": {
+        "ABSENT": 13,
+        "PRESENT": 10
       },
-      "PRESENT": {
-        "groups": 25,
-        "queries": 27
+      "queries": {
+        "aggregated": {
+          "ABSENT": 7,
+          "PRESENT": 7
+        },
+        "rsd": {
+          "ABSENT": 9,
+          "PRESENT": 9
+        }
       }
     }
   },
   "files": {
-    "effective_release_config.json": "551663faebcf30cc82f1bac82ec6675244ccbe29b4852eb281c92f4a9e3d8092",
-    "eligible_pool.jsonl": "4f49f256778bda084e5c4e9b639cc39bb6def377f40951ca4bcfe9c513ba977b",
-    "external_smartbugs.parquet": "16c38677f27ce13516880bbdebf1da24e89a66bd68d592694e561cf142b20863",
-    "provenance.json": "fb789b4fa5a13f463b23d1eac5ee05f6832ed3a9ccb5e15db9871fd866cc356b",
-    "release_exclusions.jsonl": "2fd15fc6eb068670ca7c21e11df83eb951e2d21055d2f218cd86f692d7abfc4b",
-    "release_statistics.json": "4898a18f0dbcffc7ae73fe32a14045e7fd672ee274eb96d3248d145b97144b85",
-    "split_assignments.jsonl": "ae8734ba5e1015c7e09a7d88dcad7a1e3a604a777c57d3875eeb26b88b5cbf14",
-    "split_attempts.json": "bca5a15581c97ae38e5a99ae3a3fb60399984538bf72bddcb23cd9f1f3b63a57",
-    "test.parquet": "9b76ef1ad826c8f6636ce50809beb96cd09f17824b9f90d16cbd1adb1b37088d",
-    "train.parquet": "64bb56f3799b989bb540bc46f63082372d9c0fc1dd8171e1d2a618f6bf3128c8",
-    "validation.parquet": "c7f906f3e3966dccc7b84d5a49a15673fa562017ca3d2cd6f5ad14440846cb1c"
+    "effective_config.json": "d0f07d5587f603724d8052e4860e66c1ceea52174be30b8b0eeef697ccc7a284",
+    "exclusions.jsonl": "4f18b1e9d0f00bbb467e8bc3bbcea9c410bc18100d0449f61e5f244e37598f63",
+    "group_edges.jsonl": "2f008fbc79abc97a5758c38f92c2a6f49850d011ecc1e79a29590e16aad0e8b0",
+    "provenance.json": "70292ca40f474b61d66f04a0fcd3c75b0132cadd5f5037a6631ec61d8c7da5f6",
+    "release_statistics.json": "91ebd2cfa4522170a9e0ed334e715a93d08ce71748dc45cbd49ceeb3718921ae",
+    "split_attempts.json": "d2d26261145cacd9ec1f7e11c779c03d5939e75a4664aab8178317409d5f0bd3",
+    "test.parquet": "f8a7447d75f613b3a659da54f51bed6b117451ce3a4094d7c3c421252de29aa6",
+    "train.parquet": "569d0ba27fe8a86d426d28301392c054522a949a037d37def808fc845cd8b17a",
+    "validation.parquet": "34fdd23d2d9941f87b13e9a0bf3459e96d0e12cc27bde8d4c488b9798b42fec8"
   },
-  "inventory_content_sha256": "fa194859dea99012c3903d8436fd5adf63bc48e962b994d05160d9f98c933815",
-  "release_content_sha256": "a6c9ab34318163e4630f3d683e7c8619131950f18f012baa480610fa2f5b3504",
-  "spec_version": "2.3",
+  "release_content_sha256": "8f420d26ea008e2cccf716fcd127a95ccad40e6a12c12a6f4a994c1cb80742ae",
   "split_seed": 42,
-  "state": "final"
+  "version": "3.0"
 }
