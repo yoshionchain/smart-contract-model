@@ -1,7 +1,7 @@
 version: '3.0'
 # The teacher reads the hashed release, pinned by its content fingerprint.
 release_dir: data/processed/release
-release_content_sha256: 8f420d26ea008e2cccf716fcd127a95ccad40e6a12c12a6f4a994c1cb80742ae
+release_content_sha256: 7349c0431fc895a89be8450eed4b6113944fc26f0951d8034c7d0fc68ef0ac03
 output_dir: runs/teacher
 prompt_path: configs/prompts/teacher_v2.txt
 schema_path: schemas/teacher_answer.schema.json

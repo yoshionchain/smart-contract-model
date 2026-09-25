@@ -112,7 +112,7 @@ def near_clone_pairs(
 
 def group_contracts(
     codes: dict[str, str],
-    families: dict[str, str],
+    families: dict[str, list[str]],
     *,
     min_tokens: int,
     jaccard: float,
@@ -120,8 +120,8 @@ def group_contracts(
 ) -> tuple[dict[str, str], list[dict[str, object]]]:
     """Group IDs per contract key; contracts sharing a family, skeleton or near clone join.
 
-    `codes` maps a contract key to comment-blanked source; `families` maps keys to a
-    declared family (e.g. an RSD scenario). Returns the group map and the union edges.
+    `codes` maps a contract key to comment-blanked source; `families` maps keys to their
+    declared families (e.g. RSD scenarios). Returns the group map and the union edges.
     """
     components = Components(set(codes))
     edges: list[dict[str, object]] = []
@@ -134,8 +134,8 @@ def group_contracts(
     first: dict[str, str] = {}
     units: list[Unit] = []
     for key in sorted(codes):
-        if key in families:
-            connect(key, first.setdefault(f"family:{families[key]}", key), "declared_family")
+        for family in families.get(key, []):
+            connect(key, first.setdefault(f"family:{family}", key), "declared_family")
         norm = skeleton(solidity_tokens(codes[key]))
         connect(key, first.setdefault(f"skeleton:{digest(norm)}", key), "exact_skeleton")
         if len(norm) >= min_tokens:

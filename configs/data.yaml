@@ -27,7 +27,7 @@ assumptions:
 - Any address an untrusted caller can supply or influence, and any contract whose code is not in the source (such as a token), may run attacker code.
 - transfer and send forward only 2,300 gas and cannot be used to re-enter.
 - State updates are writes to storage and delegatecalls; events, require, assert and revert are not.
-- Read-only reentrancy counts when another contract can read inconsistent state through a view function during the call.
+- Read-only reentrancy counts only when other code in the source relies on a view function that returns inconsistent state during the call; the automatic getters of public variables alone do not.
 # Bug-injection tools leave artifacts that reveal the label (SolidiFI names such as
 # `bug_re_ent27`; HuangGai's inserted `x.call.value(1)("")`), so injected contracts are
 # excluded. Injected contracts carry the tool suffix in their upstream file name.

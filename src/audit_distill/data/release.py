@@ -47,7 +47,10 @@ PRAGMA = re.compile(r"pragma\s+solidity\s*[^;\d]*(\d+)\.(\d+)")
 
 
 class Row(BaseModel):
-    """One release query: a whole contract, its expert label and its exact model input."""
+    """One release query: a whole contract, its expert label and its exact model input.
+
+    `query_id` is the code identity, so rewording the definition never reshuffles the split.
+    """
 
     model_config = ConfigDict(extra="forbid")
     version: Literal["3.0"] = "3.0"
@@ -102,11 +105,10 @@ def benchmark_files(root: Path) -> list[tuple[Path, Collection, Polarity, str]]:
 
 def read_benchmark(
     config: DataConfig, count_tokens: Callable[[str], int]
-) -> tuple[list[Row], dict[str, str], list[dict[str, str]]]:
+) -> tuple[list[Row], dict[str, list[str]], list[dict[str, str]]]:
     """Rows, RSD families by query and exclusions (never relabelled)."""
     root = config.source.path
     rows: list[Row] = []
-    families: dict[str, str] = {}
     exclusions: list[dict[str, str]] = []
     leak = re.compile(re.escape(config.label_leak_pattern))
     for path, collection, label, origin in tqdm(benchmark_files(root), desc="Contracts"):
@@ -132,10 +134,10 @@ def read_benchmark(
         payload = model_input(config.check_id, config.definition, config.assumptions, source)
         pragma = PRAGMA.search(code)
         row = Row(
-            query_id=digest(payload),
+            query_id=identity,  # stable when the definition or assumptions are reworded
             path=relative,
             collection=collection,
-            origin=origin if collection == "aggregated" else "rsd",
+            origin=origin,  # aggregated: cgt/rs/rs_pool; RSD: scenario family
             code_identity_sha256=identity,
             model_input_sha256=digest(payload),
             label=label,
@@ -147,13 +149,12 @@ def read_benchmark(
             source=source,
         )
         rows.append(row)
-        if collection == "rsd":
-            families[row.query_id] = origin
     # Identical code once: conflicting labels exclude every copy, agreeing ones keep one.
     by_identity: dict[str, list[Row]] = defaultdict(list)
     for row in rows:
         by_identity[row.code_identity_sha256].append(row)
     kept: list[Row] = []
+    families: dict[str, list[str]] = {}
     for copies in by_identity.values():
         copies.sort(key=lambda r: r.path)
         if len({r.label for r in copies}) > 1:
@@ -161,6 +162,11 @@ def read_benchmark(
         else:
             reason, keep = "duplicate", copies[:1]
         kept += keep
+        # A contract shared by several RSD scenarios links all of their families.
+        for row in keep:
+            names = sorted({r.origin for r in copies if r.collection == "rsd"})
+            if names:
+                families[row.query_id] = names
         for row in copies[len(keep) :]:
             exclusions.append(
                 {

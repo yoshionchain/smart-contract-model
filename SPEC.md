@@ -73,8 +73,10 @@ Assumptions: (1) any address an untrusted caller can supply or influence, and an
 contract whose code is not in the source (such as a token), may run attacker code;
 (2) `transfer` and `send` forward only 2,300 gas and cannot be used to re-enter;
 (3) state updates are writes to storage and delegatecalls; events, `require`, `assert`
-and `revert` are not; (4) read-only reentrancy counts when another contract can read
-inconsistent state through a view function during the call.
+and `revert` are not; (4) read-only reentrancy counts only when other code in the
+source relies on a view function that returns inconsistent state during the call; the
+automatic getters of public variables alone do not (as in the benchmark's read-only
+scenarios, whose safe variants guard only the views other code uses).
 
 Guards (mutexes, ordering) matter only through the third condition: re-entry must be
 able to reach a divergent final state. A `nonReentrant` name is not proof of protection.
@@ -109,8 +111,9 @@ stays local (gitignored).
 - **Input payload** (identical for every model and condition): `check_id`, definition,
   scope (always the whole file), assumptions and the complete numbered source. It never
   contains file names, paths, origins, labels or collection names.
-- **Hashes:** `model_input_sha256` = SHA-256 of the canonical payload (also the query
-  ID); `code_identity_sha256` = lexical token identity. Hashes never rewrite input.
+- **Hashes:** `model_input_sha256` = SHA-256 of the canonical payload;
+  `code_identity_sha256` = lexical token identity, also the query ID (so rewording the
+  definition never reshuffles the split). Hashes never rewrite input.
 - **Budgets** (pinned tokenizer `Qwen/Qwen3-4B-Instruct-2507` @
   `cdbee75f17c01a7cc42f958dc650907174af0554`, no special tokens): numbered source
   ≤ **6000** tokens (longer sources are excluded, never truncated); full chat sequence
@@ -123,7 +126,8 @@ stays local (gitignored).
 `build_dataset.py` (settings in `configs/data.yaml`):
 
 1. Read both collections; apply the exclusions of Section 4 and de-duplicate.
-2. **Groups** (union-find): RSD scenario family (file name without `_ree1`/`_safe1`),
+2. **Groups** (union-find): RSD scenario family (file name without `_ree1`/`_safe1`; a
+   contract duplicated across families links all of them),
    exact full-source token skeleton (identifiers alpha-renamed, literals typed, pragmas
    ignored), near clones (≥ 100 skeleton tokens, length ratio ≥ 0.8, token 5-gram
    Jaccard ≥ 0.85, exact). No group crosses partitions.
@@ -137,9 +141,9 @@ stays local (gitignored).
    both labels of both collections in every partition. Feasibility minimums, not a
    power calculation; never pick seeds after seeing model results.
 
-Result (release `8f420d26…`): **train 79/79, validation 16/16, test 30/30** (PRESENT /
-ABSENT; aggregated 36/7/14 pairs, RSD 43/9/16 pairs); 118 of 125 pairs share the
-Solidity version. Remaining cues to report: RSD is all Solidity 0.8 and short;
+Result (release `7349c043…`): **train 78/78, validation 17/17, test 30/30** (PRESENT /
+ABSENT; aggregated 35/8/14 pairs, RSD 43/9/16 pairs; 231 groups); 119 of 125 pairs
+share the Solidity version. Remaining cues to report: RSD is all Solidity 0.8 and short;
 aggregated contracts are mostly 0.4; within aggregated, safe contracts come mostly
 from the ReentrancyStudy pool and reentrant ones from CGT/ReentrancyStudy positives.
 The build is deterministic; `release_manifest.json` hashes every output.
@@ -259,7 +263,7 @@ r 16, alpha 32, dropout 0.05, bias none, targets q/k/v/o/gate/up/down_proj; lr 2
 else FP16; `paged_adamw_8bit`. Expected updates `3 × ceil(N_train / 4)`; log the actual
 count. No sweeps; a numerical-stability fix must be minimal and documented.
 
-**Checkpoint selection:** after each epoch, greedy-decode **all 32 validation queries**
+**Checkpoint selection:** after each epoch, greedy-decode **all 34 validation queries**
 and keep the best validation macro-F1 against the benchmark labels (verdicts only, so
 validation needs no teacher reports; INVALID counts as wrong; ties: lower loss, then
 earlier epoch). Validation teacher reports only add to RQ3.
@@ -380,7 +384,7 @@ expert-labelled contracts (one definition) -> exclusions -> groups -> grouped sp
         -> 1:1 balance per partition and collection
         -> train: label-blind teacher, keep agreeing reports (pairwise)
         -> Label-SFT, Report-SFT, Report-SFT-VF on identical accepted IDs
-        -> validation (all 32): checkpoint selection on verdicts
+        -> validation (all 34): checkpoint selection on verdicts
         -> test (60): base modes, three adapters, baselines, teacher ceiling
         -> macro-F1 with group intervals, grounding/faithfulness, agreement
 ```
@@ -396,6 +400,19 @@ versions are rejected; builds and dry runs never start teacher or GPU work.
 
 Decided by the project owner before any training run or model result.
 
+- **2026-09-25 · Read-only wording fixed; teacher rerun.** The first v3.0 teacher run
+  agreed with 93.7% of train labels (148/158; 138 train examples after pairwise
+  removal). Four of its ten train disagreements flagged safe RSD variants only because
+  an automatic public getter exposes a stale value during a guarded call; the
+  benchmark's read-only scenarios show that only views other code relies on count, so
+  assumption 4 was narrowed (training evidence only). Seven were plausible edge-case
+  attacks on safe contracts (kept as filtering), one a teacher error (static calls in
+  0.4.24). Three validation delegatecall scenarios were answered ABSENT/UNSUPPORTED;
+  left unchanged because prompts are developed on training data only (RQ3 finding).
+  Query IDs became code identities; the one-time split change this caused is by rule,
+  not chosen by results. A contract duplicated across two RSD families now links both
+  families (previously one family link could be lost). The first run is kept locally in
+  `runs/teacher-v3.0-first/`.
 - **2026-09-25 · Switch to one expert-verified benchmark (v3.0).** The v2.3 teacher run
   (GPT-6 Sol, label-blind, 322 calls) agreed with the mixed-source labels only 62%
   (train PRESENT 74%, ABSENT 51%): the sources contradict each other. SCRUBD's own

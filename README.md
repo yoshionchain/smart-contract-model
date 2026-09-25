@@ -53,13 +53,13 @@ reach.* The same definition and its assumptions are shown to every model.
 
 | Split | PRESENT | ABSENT | Groups (P / A) |
 | --- | ---: | ---: | ---: |
-| Train | 79 | 79 | 41 / 64 |
-| Validation | 16 | 16 | 10 / 13 |
+| Train | 78 | 78 | 41 / 63 |
+| Validation | 17 | 17 | 10 / 14 |
 | Test | 30 | 30 | 24 / 13 |
 
 | Collection | Pairs (train / val / test) | Content |
 | --- | ---: | --- |
-| Aggregated Benchmark | 36 / 7 / 14 | Real deployed contracts, mostly Solidity 0.4 |
+| Aggregated Benchmark | 35 / 8 / 14 | Real deployed contracts, mostly Solidity 0.4 |
 | RSD | 43 / 9 / 16 | Handcrafted Solidity 0.8 scenarios in reentrant/safe variants |
 
 Excluded and counted: bug-injected contracts whose artifacts reveal the label
