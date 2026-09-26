@@ -2,7 +2,7 @@ version: '3.0'
 base_model: Qwen/Qwen3-4B-Instruct-2507
 model_revision: cdbee75f17c01a7cc42f958dc650907174af0554
 student_config: configs/student.yaml
-output_dir: runs
+output_dir: runs/run2-multi
 max_seq_length: 8192
 # LoRA on the BF16 base model (locked, SPEC Section 9; H100, no quantization).
 lora_r: 16
@@ -11,7 +11,7 @@ lora_dropout: 0.05
 lora_bias: none
 lora_targets: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
 learning_rate: 0.0002
-num_train_epochs: 3
+num_train_epochs: 6
 per_device_train_batch_size: 1
 gradient_accumulation_steps: 4
 weight_decay: 0.01

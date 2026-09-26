@@ -24,6 +24,8 @@ Work down this list. [SPEC.md](SPEC.md) is the detailed guideline; its decision 
 - [x] **Implemented and smoke-tested:** `scripts/train.py` (BF16 LoRA via TRL/PEFT, completion-only loss, per-epoch adapters, post-training validation macro-F1 selection, full run records) and `scripts/colab.py` (H100 VM, bundle upload, locked `uv` env, detached job, status, fetch, stop). CPU smoke run passes; TRL tokenization matches all 420 train records and the loss covers only the answers.
 - [x] **First training run (2026-09-26):** A100-40GB (H100 not available to the account), BF16 LoRA, commit `c530723`, ~5 min per condition (105 steps). Validation macro-F1 of the selected epochs: Label-SFT 0.911 (epoch 3), Report-SFT 0.647 (epoch 3), Report-SFT-VF 0.728 (epoch 2).
 
+- [ ] **Run 2 (approved 2026-09-26):** 6 epochs for all conditions plus Multi-SFT (decision log), outputs in `runs/run2-multi/` and `results/run2-multi/`.
+
 ## 5. Evaluate without tuning on held-out data (Phase 6)
 
 - [x] **Implemented and checked:** `scripts/predict.py` (GPU; all five modes, strict parsing, raw outputs kept; CPU smoke passes) and `scripts/evaluate.py` (baselines fitted on train, teacher ceiling, macro-F1 and slices, paired group bootstrap, grounding/faithfulness; mechanically checked on synthetic inputs outside `results/`).
@@ -38,4 +40,4 @@ Work down this list. [SPEC.md](SPEC.md) is the detailed guideline; its decision 
 - [ ] Generate only real dataset, resource, metric, uncertainty and agreement tables/figures. Write the ACL paper within the page limit, framed as rationale distillation; explain the v2.3 → v3.0 label-convention finding, the single-definition benchmark, bug-injection exclusions, the small test set, teacher selection and pretraining exposure.
 - [ ] Bring README commands and outputs into sync with the finished CLI. Verify a fresh `uv sync --locked`, Ruff, deterministic build and artifact-hash checks, and end-to-end reproduction. Do not present missing runs as results.
 
-**Immediate next step:** decide whether to keep the first run as the primary result or add a pre-declared follow-up run (see the latest summary), then the paper.
+**Immediate next step:** run 2 on Colab (6 epochs, four conditions including Multi-SFT), evaluate, then the paper.

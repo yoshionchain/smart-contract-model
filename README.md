@@ -118,7 +118,8 @@ uv run python scripts/evaluate.py          # baselines, teacher ceiling, metrics
 ```
 
 LoRA settings (BF16 base, no quantization) are in [`configs/training.yaml`](configs/training.yaml). Each condition
-trains on the same 140 contracts; after training, every epoch's adapter answers all 34
+trains on the same 140 contracts (Multi-SFT on each contract twice, as a label and a
+report task); after training, every epoch's adapter answers all 34
 validation contracts and the best validation macro-F1 is kept. The `--smoke` run uses a
 tiny random model only to exercise the code; it is never a result.
 

@@ -23,7 +23,9 @@ Wiegreffe & Marasović 2021), reentrancy benchmarks (Ressi et al. 2026).
   the verdict (Report-SFT) improve verdicts over fine-tuning on labels alone
   (Label-SFT)? Floors: the base model and lexical baselines; ceiling: the teacher.
   **Order ablation:** the same reports with the verdict first (Report-SFT-VF) separate
-  "reasoning before deciding" from "extra training signal".
+  "reasoning before deciding" from "extra training signal". **Multi-task (run 2):**
+  training on both the label and the report of each contract (Multi-SFT, Distilling
+  Step-by-Step) and answering in label mode tests rationales as auxiliary signal.
 - **RQ2 — Are the student's rationales grounded and faithful?** Do cited line numbers
   exist and point at code, and does the analysis support the model's own verdict
   (automatic metrics; optional blinded human rating)? Agreement with teacher text is
@@ -55,8 +57,8 @@ hyperparameter sweeps, deployment, BLEU/ROUGE as correctness.
 - **Group:** contracts connected by an exact token skeleton, a near clone or an RSD
   scenario family; the unit of splitting and uncertainty.
 - **Teacher:** GPT-6 Sol via Codex CLI. **Student:** Qwen3-4B-Instruct-2507.
-  **Label-SFT / Report-SFT / Report-SFT-VF:** its three adapters (verdict only;
-  analysis-first report; the same reports verdict-first). **Base-Label / Base-Report:**
+  **Label-SFT / Report-SFT / Report-SFT-VF / Multi-SFT:** its adapters (verdict only;
+  analysis-first report; the same reports verdict-first; both label and report tasks). **Base-Label / Base-Report:**
   the unchanged model with the verdict and report prompts.
 
 ## 3. The check
@@ -250,6 +252,7 @@ replace it unless unusable (e.g. it cannot train at 8192 tokens on the Colab GPU
 | Label-SFT | `PRESENT` or `ABSENT` | verdict |
 | Report-SFT | report, analysis first | report |
 | Report-SFT-VF | the same reports, verdict first | report (verdict-first order) |
+| Multi-SFT (run 2) | each contract twice: label and analysis-first report | verdict (primary), report |
 
 All adapters use the same accepted train IDs, order, seed, epochs and LoRA settings,
 with loss on assistant tokens only. System prompts `student_label_v3.txt`,
@@ -265,7 +268,7 @@ condition).
 
 **LoRA (locked, `configs/training.yaml`):** BF16 base model without quantization (H100);
 LoRA r 16, alpha 32, dropout 0.05, bias none, targets q/k/v/o/gate/up/down_proj (adapter
-weights kept in FP32 by PEFT); lr 2e-4; 3 epochs; batch 1 × grad-accum 4; weight decay
+weights kept in FP32 by PEFT); lr 2e-4; 6 epochs (run 1: 3); batch 1 × grad-accum 4; weight decay
 0.01; warmup 0.05; cosine; max grad norm 1.0; gradient checkpointing; no packing; seed 42;
 max length 8192; BF16 autocast; `adamw_torch_fused`. Expected updates
 `3 × ceil(N_train / 4)`; log the actual count. No sweeps; a numerical-stability fix must
@@ -304,13 +307,18 @@ releases the VM. No notebook-only logic. Real GPU jobs need approval.
   version majority, TF-IDF (identifier/operator 1–2-grams) + logistic regression with
   fixed settings.
 - **Slices:** collection (aggregated vs RSD), Solidity version, RSD scenario family.
+  Results are reported per collection as the main view: RSD (handcrafted minimal pairs,
+  unlikely in pretraining) is the hard subset where base models are at chance; the real
+  contracts are mostly textbook patterns that even TF-IDF largely solves.
 - **Modes on the same test IDs:** Base-Label, Base-Report, Label-SFT, Report-SFT,
-  Report-SFT-VF, the baselines above and the teacher ceiling.
+  Report-SFT-VF, Multi-SFT (label and report mode), the baselines above and the teacher
+  ceiling.
 - **Uncertainty:** paired cluster bootstrap over test groups, identical draws for all
   modes, seed 4242, 2,000 valid replicates (≤ 20,000 draws; discard draws missing a
   label). Percentile 95% intervals for scores and for Report-SFT − Label-SFT (RQ1),
-  Report-SFT − Report-SFT-VF (order), Report-SFT − Base-Report and
-  Label-SFT − Base-Label. Too few valid draws → report it.
+  Report-SFT − Report-SFT-VF (order), Report-SFT − Base-Report,
+  Label-SFT − Base-Label, Multi-SFT − Label-SFT and Multi-SFT (report) − Report-SFT,
+  overall and within each collection. Too few valid draws → report it.
 - **Validity:** valid-JSON and full-schema rates over all queries.
 - **Grounding and faithfulness (RQ2, automatic):** share of cited line numbers that
   exist and point at non-blank code; share of reports whose last analysis sentence
@@ -411,7 +419,7 @@ expert-labelled contracts (one definition) -> exclusions -> groups -> grouped sp
         -> train: label-blind teacher, keep agreeing reports (pairwise)
         -> Label-SFT, Report-SFT, Report-SFT-VF on identical accepted IDs
         -> validation (all 34): checkpoint selection on verdicts
-        -> test (60): base modes, three adapters, baselines, teacher ceiling
+        -> test (60): base modes, four adapters, baselines, teacher ceiling
         -> macro-F1 with group intervals, grounding/faithfulness, agreement
 ```
 
@@ -427,6 +435,18 @@ versions are rejected; builds and dry runs never start teacher or GPU work.
 
 Decided by the project owner before any training run or model result.
 
+- **2026-09-26 · Follow-up protocol (run 2), declared before running it.** Run 1 (original
+  protocol: 3 epochs; results in `results/run1-original/`) found Label-SFT ≥ Report-SFT,
+  with the report conditions undertrained by validation and training evidence alone:
+  Report-SFT's validation macro-F1 still rising (0.515 → 0.646 → 0.647) and its training
+  loss still ≈ 0.55 after 105 steps. Run 2 changes exactly two things for all conditions:
+  **6 epochs** (per-epoch validation selection unchanged) and a fourth condition,
+  **Multi-SFT** (Hsieh et al. 2023: each contract as a label task and as a report task,
+  answered in label mode; also evaluated in report mode). No other hyperparameter is
+  tuned: 34 validation contracts cannot support sweeps, and test results were already
+  seen. Results are reported per collection (real vs RSD), since base models score well
+  only on the textbook-pattern real contracts. Both runs are reported in the paper;
+  run 2 writes to `runs/run2-multi/` and `results/run2-multi/`.
 - **2026-09-26 · BF16 LoRA instead of QLoRA.** Training runs on a Colab H100, where the
   4B model fits unquantized (~8 GB in BF16); QLoRA was chosen only to fit smaller GPUs.
   Dropping 4-bit quantization removes quantization noise and speeds up training; LoRA

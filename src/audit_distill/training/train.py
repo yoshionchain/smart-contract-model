@@ -3,7 +3,8 @@
 All conditions train on the same shared cohort with identical settings; only the chat
 records differ. Loss covers assistant tokens only (prompt/completion records). After
 training, every epoch's adapter greedily decodes all validation queries in the
-condition's own format; the best validation macro-F1 wins (ties: earlier epoch).
+condition's own format (Multi-SFT: label format); the best validation macro-F1 wins
+(ties: earlier epoch).
 """
 
 import json
@@ -99,7 +100,10 @@ def environment() -> dict[str, object]:
     return info
 
 
-def train(condition: Format, config: TrainingConfig, root: Path, smoke: bool = False) -> dict:
+Condition = Literal["label", "report", "report_vf", "multi"]
+
+
+def train(condition: Condition, config: TrainingConfig, root: Path, smoke: bool = False) -> dict:
     import torch
     from datasets import Dataset
     from peft import LoraConfig
@@ -108,13 +112,15 @@ def train(condition: Format, config: TrainingConfig, root: Path, smoke: bool = F
 
     student, _, _ = load_student_config(config.student_config, root)
     student_manifest = verify_student_data(student)
+    # Multi-SFT trains on label and report records and is selected in label mode.
+    fmt: Format = "label" if condition == "multi" else condition
     rows = read_rows(student.output_dir / f"train_{condition}.jsonl")
-    validation = read_rows(student.output_dir / f"validation_{condition}.jsonl")
+    validation = read_rows(student.output_dir / f"validation_{fmt}.jsonl")
     cohort = json.loads((student.output_dir / "shared_cohort.json").read_text(encoding="utf-8"))
-    if [r["id"] for r in rows] != cohort["train_ids"]:
+    if list(dict.fromkeys(r["id"] for r in rows)) != cohort["train_ids"]:
         raise ValueError("Train records differ from the shared cohort")
     model_id, revision = config.base_model, config.model_revision
-    max_new_tokens = student.max_new_tokens[condition]
+    max_new_tokens = student.max_new_tokens[fmt]
     run_dir = config.output_dir / (f"smoke-{condition}" if smoke else condition.replace("_", "-"))
     if smoke:
         model_id, revision = config.smoke.model_id, config.smoke.model_revision
@@ -198,8 +204,7 @@ def train(condition: Format, config: TrainingConfig, root: Path, smoke: bool = F
             peft_model, tokenizer, validation, max_new_tokens, config.generation_batch_size
         )
         predicted = [
-            verdict(condition, text, r["line_count"])
-            for text, r in zip(raw, validation, strict=True)
+            verdict(fmt, text, r["line_count"]) for text, r in zip(raw, validation, strict=True)
         ]
         score = macro_f1(gold, predicted)
         epochs.append(
@@ -220,7 +225,12 @@ def train(condition: Format, config: TrainingConfig, root: Path, smoke: bool = F
     shutil.rmtree(adapter_dir, ignore_errors=True)
     shutil.copytree(run_dir / "checkpoints" / best["checkpoint"], adapter_dir)
 
-    selection = {"condition": condition, "epochs": epochs, "best_epoch": best["epoch"]}
+    selection = {
+        "condition": condition,
+        "selection_format": fmt,
+        "epochs": epochs,
+        "best_epoch": best["epoch"],
+    }
     write_json(run_dir / "selection.json", selection)
     write_json(
         run_dir / "training_run.json",

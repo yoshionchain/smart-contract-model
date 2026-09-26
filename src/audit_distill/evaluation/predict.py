@@ -86,7 +86,8 @@ def predict(config: EvaluationConfig, root: Path, split: str, smoke: bool = Fals
         model = base
         adapter_info = None
         if mode.adapter is not None:
-            run_dir = training.output_dir / (f"smoke-{mode.format}" if smoke else mode.adapter)
+            smoke_dir = "smoke-" + mode.adapter.replace("-", "_")
+            run_dir = training.output_dir / (smoke_dir if smoke else mode.adapter)
             adapter = run_dir / "adapter"
             if peft is None:
                 peft = PeftModel.from_pretrained(base, str(adapter), adapter_name=name)

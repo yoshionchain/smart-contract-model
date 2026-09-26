@@ -6,7 +6,7 @@ from pathlib import Path
 
 from audit_distill.training.train import load_training_config, train
 
-CONDITIONS = {"label": "label", "report": "report", "report-vf": "report_vf"}
+CONDITIONS = {"label": "label", "report": "report", "report-vf": "report_vf", "multi": "multi"}
 
 
 def main() -> None:

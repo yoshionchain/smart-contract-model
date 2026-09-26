@@ -222,6 +222,17 @@ def evaluate(config: EvaluationConfig, root: Path, split: str = "test") -> dict[
             entry["grounding"] = details[name]
         results["modes"][name] = entry
     results["bootstrap"] = bootstrap(groups, gold, predictions, config.comparisons, config)
+    # Same procedure within each collection (RSD is the hard, minimal-pair subset).
+    results["bootstrap_by_collection"] = {}
+    for c in sorted(set(collections)):
+        keep = [i for i, k in enumerate(collections) if k == c]
+        results["bootstrap_by_collection"][c] = bootstrap(
+            [groups[i] for i in keep],
+            [gold[i] for i in keep],
+            {m: [p[i] for i in keep] for m, p in predictions.items()},
+            config.comparisons,
+            config,
+        )
     output = config.results_dir
     output.mkdir(parents=True, exist_ok=True)
     (output / "predictions").mkdir(exist_ok=True)
@@ -259,11 +270,31 @@ def markdown(results: dict, config: EvaluationConfig) -> str:
             f"{m['invalid']} | {fmt(m['by_collection'].get('aggregated'))} | "
             f"{fmt(m['by_collection'].get('rsd'))} |"
         )
-    lines += ["", "| Difference | Point | 95% CI |", "| --- | ---: | ---: |"]
+    by = results["bootstrap_by_collection"]
+    lines += [
+        "",
+        "| Difference | All: point [95% CI] | Aggregated | RSD |",
+        "| --- | ---: | ---: | ---: |",
+    ]
     for left, right in config.comparisons:
-        low, high = intervals[f"{left} - {right}"]
-        point = results["modes"][left]["macro_f1"] - results["modes"][right]["macro_f1"]
-        lines.append(f"| {left} − {right} | {point:+.3f} | [{low:+.3f}, {high:+.3f}] |")
+        key = f"{left} - {right}"
+        cells = []
+        for point, (low, high) in [
+            (
+                results["modes"][left]["macro_f1"] - results["modes"][right]["macro_f1"],
+                intervals[key],
+            ),
+            *[
+                (
+                    results["modes"][left]["by_collection"][c]
+                    - results["modes"][right]["by_collection"][c],
+                    by[c]["intervals"][key],
+                )
+                for c in ("aggregated", "rsd")
+            ],
+        ]:
+            cells.append(f"{point:+.3f} [{low:+.3f}, {high:+.3f}]")
+        lines.append(f"| {left} − {right} | " + " | ".join(cells) + " |")
     lines += [
         "",
         "| Report mode | Valid reports | Cited lines on code | Conclusion states own verdict "
@@ -278,5 +309,10 @@ def markdown(results: dict, config: EvaluationConfig) -> str:
                 f"{fmt(g['conclusion_states_own_verdict'])} | {fmt(g['locations_on_code'])} |"
             )
     b = results["bootstrap"]
-    lines += ["", f"Bootstrap: {b['valid_replicates']} valid replicates over {b['groups']} groups."]
+    groups = ", ".join(f"{c} {v['groups']}" for c, v in by.items())
+    lines += [
+        "",
+        f"Bootstrap: {b['valid_replicates']} valid replicates over {b['groups']} test groups "
+        f"({groups}); paired percentile intervals, seed {config.bootstrap_seed}.",
+    ]
     return "\n".join(lines) + "\n"

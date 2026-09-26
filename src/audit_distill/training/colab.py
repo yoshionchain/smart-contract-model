@@ -17,7 +17,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 REMOTE = "/content/audit-distill"
-CONDITIONS = ("label", "report", "report-vf")
+CONDITIONS = ("label", "report", "report-vf", "multi")
 
 
 def colab(*args: str, stdin: str | None = None) -> None:

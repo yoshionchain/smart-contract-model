@@ -1,11 +1,13 @@
-"""Build the student datasets: one shared train cohort, three target formats, eval inputs.
+"""Build the student datasets: one shared train cohort, four conditions, eval inputs.
 
 Label-SFT, Report-SFT (analysis first) and Report-SFT-VF (verdict first) train on the
 same accepted train IDs in the same order; only the system prompt's stated format and
-the assistant target differ. A train query stays only if the teacher's label-blind
-report agreed with the label and its matched partner stayed too, and every condition's
-full chat sequence fits the limit. Validation and test keep every query (verdict-based
-checkpoint selection and evaluation need no teacher report). Nothing is truncated.
+the assistant target differ. Multi-SFT trains on both the label and the report record
+of every contract (Distilling Step-by-Step multi-task). A train query stays only if the
+teacher's label-blind report agreed with the label and its matched partner stayed too,
+and every condition's full chat sequence fits the limit. Validation and test keep every
+query (verdict-based checkpoint selection and evaluation need no teacher report).
+Nothing is truncated.
 """
 
 import json
@@ -228,6 +230,12 @@ def build_student_data(
             write_jsonl(stage / f"train_{condition}.jsonl", [records[condition][q] for q in kept])
             for split in EVAL_SPLITS:
                 write_jsonl(stage / f"{split}_{condition}.jsonl", evaluation[split][condition])
+        # Multi-SFT (Distilling Step-by-Step): every contract twice, as a label task and as
+        # an analysis-first report task, in the shared order.
+        write_jsonl(
+            stage / "train_multi.jsonl",
+            [records[task][q] | {"task": task} for q in kept for task in ("label", "report")],
+        )
         write_json(
             stage / "shared_cohort.json",
             {

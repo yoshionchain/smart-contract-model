@@ -1,7 +1,7 @@
 version: '3.0'
 training_config: configs/training.yaml
-predictions_dir: runs/eval
-results_dir: results
+predictions_dir: runs/run2-multi/eval
+results_dir: results/run2-multi
 teacher_ceiling_dir: runs/teacher/test-ceiling
 # Every mode answers the same 60 test contracts with greedy decoding.
 # adapter: a run directory under runs/ (its selected adapter), or null for the base model.
@@ -11,12 +11,16 @@ modes:
   label-sft: {format: label, adapter: label}
   report-sft: {format: report, adapter: report}
   report-sft-vf: {format: report_vf, adapter: report-vf}
+  multi-sft: {format: label, adapter: multi}
+  multi-sft-report: {format: report, adapter: multi}
 # Paired differences reported with intervals (left minus right).
 comparisons:
 - [report-sft, label-sft]
 - [report-sft, report-sft-vf]
 - [report-sft, base-report]
 - [label-sft, base-label]
+- [multi-sft, label-sft]
+- [multi-sft-report, report-sft]
 bootstrap_seed: 4242
 bootstrap_replicates: 2000
 bootstrap_max_draws: 20000
