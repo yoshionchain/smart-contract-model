@@ -1,0 +1,497 @@
+{
+  "bootstrap": {
+    "draws": 2000,
+    "groups": 27,
+    "intervals": {
+      "base-label": [
+        0.35944349171512235,
+        0.4904907455223692
+      ],
+      "base-report": [
+        0.34328358208955223,
+        0.81161487236404
+      ],
+      "collection-majority": [
+        0.2318561872909699,
+        0.39669421487603307
+      ],
+      "constant-absent": [
+        0.2318561872909699,
+        0.39669421487603307
+      ],
+      "label-sft": [
+        0.6727172957692947,
+        0.8919875788079002
+      ],
+      "label-sft - base-label": [
+        0.25835414486257935,
+        0.4832215172450734
+      ],
+      "report-sft": [
+        0.4449391178167135,
+        0.8267794644739616
+      ],
+      "report-sft - base-report": [
+        -0.09050565169888523,
+        0.2477614652098648
+      ],
+      "report-sft - label-sft": [
+        -0.2955067292854492,
+        0.03601477711036911
+      ],
+      "report-sft - report-sft-vf": [
+        -0.26462929698129706,
+        0.0217920512325942
+      ],
+      "report-sft-vf": [
+        0.6508894262716614,
+        0.8822553373875914
+      ],
+      "teacher": [
+        0.8426221918639951,
+        1.0
+      ],
+      "tfidf-logreg": [
+        0.5592507167961525,
+        0.8299323365709921
+      ],
+      "version-majority": [
+        0.27715441470571434,
+        0.5211001150535582
+      ]
+    },
+    "valid_replicates": 2000
+  },
+  "inputs": {
+    "predictions_manifest": "7b699eef94ad338712b8582b03cbd713d334ac7d1008da70247a32bff28d5289",
+    "teacher_ceiling_usage": "c5cef9b39680bfaace242c66b62c47626b62b22c73dbba982bd99fcd75ef94fd"
+  },
+  "modes": {
+    "base-label": {
+      "accuracy": 0.5333333333333333,
+      "by_collection": {
+        "aggregated": 0.5087719298245614,
+        "rsd": 0.3333333333333333
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 3,
+          "INVALID": 0,
+          "PRESENT": 27
+        },
+        "PRESENT": {
+          "ABSENT": 1,
+          "INVALID": 0,
+          "PRESENT": 29
+        }
+      },
+      "invalid": 0,
+      "macro_f1": 0.42544459644322846,
+      "macro_f1_valid_only": 0.42544459644322846,
+      "n": 60,
+      "present_precision": 0.5178571428571429,
+      "present_recall": 0.9666666666666667
+    },
+    "base-report": {
+      "accuracy": 0.6666666666666666,
+      "by_collection": {
+        "aggregated": 0.9282051282051282,
+        "rsd": 0.30434782608695654
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 14,
+          "INVALID": 0,
+          "PRESENT": 16
+        },
+        "PRESENT": {
+          "ABSENT": 4,
+          "INVALID": 0,
+          "PRESENT": 26
+        }
+      },
+      "grounding": {
+        "cited_line_numbers": 135,
+        "cited_lines_on_code": 0.9703703703703703,
+        "conclusion_states_own_verdict": 0.15,
+        "locations": 42,
+        "locations_on_code": 1.0,
+        "valid_reports": 60
+      },
+      "invalid": 0,
+      "macro_f1": 0.6527777777777778,
+      "macro_f1_valid_only": 0.6527777777777778,
+      "n": 60,
+      "present_precision": 0.6190476190476191,
+      "present_recall": 0.8666666666666667
+    },
+    "collection-majority": {
+      "accuracy": 0.5,
+      "by_collection": {
+        "aggregated": 0.3333333333333333,
+        "rsd": 0.3333333333333333
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 30,
+          "INVALID": 0,
+          "PRESENT": 0
+        },
+        "PRESENT": {
+          "ABSENT": 30,
+          "INVALID": 0,
+          "PRESENT": 0
+        }
+      },
+      "invalid": 0,
+      "macro_f1": 0.3333333333333333,
+      "macro_f1_valid_only": 0.3333333333333333,
+      "n": 60,
+      "present_precision": null,
+      "present_recall": 0.0
+    },
+    "constant-absent": {
+      "accuracy": 0.5,
+      "by_collection": {
+        "aggregated": 0.3333333333333333,
+        "rsd": 0.3333333333333333
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 30,
+          "INVALID": 0,
+          "PRESENT": 0
+        },
+        "PRESENT": {
+          "ABSENT": 30,
+          "INVALID": 0,
+          "PRESENT": 0
+        }
+      },
+      "invalid": 0,
+      "macro_f1": 0.3333333333333333,
+      "macro_f1_valid_only": 0.3333333333333333,
+      "n": 60,
+      "present_precision": null,
+      "present_recall": 0.0
+    },
+    "label-sft": {
+      "accuracy": 0.8,
+      "by_collection": {
+        "aggregated": 0.8916129032258064,
+        "rsd": 0.716256157635468
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 27,
+          "INVALID": 0,
+          "PRESENT": 3
+        },
+        "PRESENT": {
+          "ABSENT": 9,
+          "INVALID": 0,
+          "PRESENT": 21
+        }
+      },
+      "invalid": 0,
+      "macro_f1": 0.797979797979798,
+      "macro_f1_valid_only": 0.797979797979798,
+      "n": 60,
+      "present_precision": 0.875,
+      "present_recall": 0.7
+    },
+    "report-sft": {
+      "accuracy": 0.7,
+      "by_collection": {
+        "aggregated": 0.8916129032258064,
+        "rsd": 0.4909862142099682
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 18,
+          "INVALID": 0,
+          "PRESENT": 12
+        },
+        "PRESENT": {
+          "ABSENT": 6,
+          "INVALID": 0,
+          "PRESENT": 24
+        }
+      },
+      "grounding": {
+        "cited_line_numbers": 284,
+        "cited_lines_on_code": 0.9577464788732394,
+        "conclusion_states_own_verdict": 1.0,
+        "locations": 36,
+        "locations_on_code": 1.0,
+        "valid_reports": 60
+      },
+      "invalid": 0,
+      "macro_f1": 0.696969696969697,
+      "macro_f1_valid_only": 0.696969696969697,
+      "n": 60,
+      "present_precision": 0.6666666666666666,
+      "present_recall": 0.8
+    },
+    "report-sft-vf": {
+      "accuracy": 0.7833333333333333,
+      "by_collection": {
+        "aggregated": 0.8682795698924731,
+        "rsd": 0.716256157635468
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 24,
+          "INVALID": 0,
+          "PRESENT": 6
+        },
+        "PRESENT": {
+          "ABSENT": 6,
+          "INVALID": 1,
+          "PRESENT": 23
+        }
+      },
+      "grounding": {
+        "cited_line_numbers": 244,
+        "cited_lines_on_code": 0.9836065573770492,
+        "conclusion_states_own_verdict": 0.9830508474576272,
+        "locations": 29,
+        "locations_on_code": 1.0,
+        "valid_reports": 59
+      },
+      "invalid": 1,
+      "macro_f1": 0.7898305084745763,
+      "macro_f1_valid_only": 0.7965517241379311,
+      "n": 60,
+      "present_precision": 0.7931034482758621,
+      "present_recall": 0.7666666666666667
+    },
+    "teacher": {
+      "accuracy": 0.9333333333333333,
+      "by_collection": {
+        "aggregated": 0.9282051282051282,
+        "rsd": 0.9372549019607843
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 30,
+          "INVALID": 0,
+          "PRESENT": 0
+        },
+        "PRESENT": {
+          "ABSENT": 4,
+          "INVALID": 0,
+          "PRESENT": 26
+        }
+      },
+      "grounding": {
+        "cited_line_numbers": 277,
+        "cited_lines_on_code": 1.0,
+        "conclusion_states_own_verdict": 1.0,
+        "locations": 26,
+        "locations_on_code": 1.0,
+        "valid_reports": 60
+      },
+      "invalid": 0,
+      "macro_f1": 0.9330357142857143,
+      "macro_f1_valid_only": 0.9330357142857143,
+      "n": 60,
+      "present_precision": 1.0,
+      "present_recall": 0.8666666666666667
+    },
+    "tfidf-logreg": {
+      "accuracy": 0.7166666666666667,
+      "by_collection": {
+        "aggregated": 0.8541666666666667,
+        "rsd": 0.5733333333333333
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 27,
+          "INVALID": 0,
+          "PRESENT": 3
+        },
+        "PRESENT": {
+          "ABSENT": 14,
+          "INVALID": 0,
+          "PRESENT": 16
+        }
+      },
+      "invalid": 0,
+      "macro_f1": 0.706812302385743,
+      "macro_f1_valid_only": 0.706812302385743,
+      "n": 60,
+      "present_precision": 0.8421052631578947,
+      "present_recall": 0.5333333333333333
+    },
+    "version-majority": {
+      "accuracy": 0.5333333333333333,
+      "by_collection": {
+        "aggregated": 0.475,
+        "rsd": 0.3333333333333333
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 30,
+          "INVALID": 0,
+          "PRESENT": 0
+        },
+        "PRESENT": {
+          "ABSENT": 28,
+          "INVALID": 0,
+          "PRESENT": 2
+        }
+      },
+      "invalid": 0,
+      "macro_f1": 0.4034090909090909,
+      "macro_f1_valid_only": 0.4034090909090909,
+      "n": 60,
+      "present_precision": 1.0,
+      "present_recall": 0.06666666666666667
+    }
+  },
+  "n": 60,
+  "provenance": {
+    "git_commit": "a9e9ffe99f53fac83d5a53b4f0138c139b21ab9b",
+    "git_dirty": true,
+    "input_file_hashes": {
+      "SPEC.md": "8f12fdb002ab2e583cb073d403a5a706d0e9c371ce20365a1db9df011bdf666f",
+      "configs/data.yaml": "50b35c070089344992749fb5282c5053518b4656567f3b1bd006cbfbb06c7c93",
+      "configs/evaluation.yaml": "7096c5c4dc1b6f51a82a6c3aff829fa351d2bae5c1be298c68e76213fea9211c",
+      "configs/prompts/student_label_v3.txt": "f3091a9c1cd9a7be9f1faa285dd709c999bf61f658bde5a9fe733edd33a9b9c4",
+      "configs/prompts/student_report_v3.txt": "3431ef0808a464ea571c2d4ddd65d9db60f457d9349423fb0890224fcc9fd6a7",
+      "configs/prompts/student_report_vf_v3.txt": "d24bb17577e265a4e232def652777f9b3bc63ab2491c6cf100e61ffe114468b2",
+      "configs/prompts/teacher_v2.txt": "3f7cc24f0e334c92f47a2ef1e24fcdfdefa9be5f0c563da1a0c5aa8bec915c3f",
+      "configs/student.yaml": "b4851917b4933fe78f226ee7250d694af9188d80f3eb8510a3140b8cb4b5ad5b",
+      "configs/teacher.yaml": "4689187281c5216167da39fd424038b5a4367501c8ba17d3c7b83d3ef4931136",
+      "configs/training.yaml": "7afe18385aa443f616231d3321792152639543b722fcc804b28c89cb10c0189b",
+      "pyproject.toml": "c3567778b76938fab5cbc15057d7b05c56072e570cf835cc1e5f7835f5ad0d0d",
+      "schemas/audit_report.schema.json": "9714b9371c42c30c2f1410843c22312d40c2ee979995fd486d82b6895be883b4",
+      "schemas/teacher_answer.schema.json": "6436959c1f4c0a0812e4ff7552a07e8192a247afeb0aa80522f73d8b5247d6e9",
+      "scripts/build_dataset.py": "5e7357e83ee2b1e156d3e47b76297e49259891ea6b3aef04afea23cc76da5fef",
+      "scripts/build_student_dataset.py": "16955f832f08110f94bcf4904c8aae41d110727c93901c6ecf8412c40f79fc47",
+      "scripts/colab.py": "f18f11d321a20b9dab30e867c38e24e0b29635de16c3974350fb421dbcea1640",
+      "scripts/evaluate.py": "d7340ef5139a7b1995af8817370858626b20fa992b4bbbb415f97be7b7ac7774",
+      "scripts/fetch_data.py": "3ad262a1ed75c38ff49a726df7bdbfe3e7676b859a44c41a7d68fa1ed9a06fa3",
+      "scripts/generate_teacher.py": "36e31a94ada50bea4b1808eae08d072f9eff6d390b933a79a7b1e82ace89aa5b",
+      "scripts/predict.py": "35eb59dd342b789cb9a88ad2006d25758027b82d60033334601fb7444215b589",
+      "scripts/train.py": "90add22c0600b65cb552679faabd87b5f4c864e1e48527d6fce760d6125f485a",
+      "src/audit_distill/__init__.py": "bf649835768ae04cfb3723a30105395a784f9a4e7615a9c1412e393de4c2d68b",
+      "src/audit_distill/config.py": "121a46d6a7b233243ee934caa82d5f3a0417971c4823b58087719e21a89db65a",
+      "src/audit_distill/data/__init__.py": "cc1348ea7059a0f6333f453a5e790b2090c3cd776a7923bcf26766faf5479cd0",
+      "src/audit_distill/data/cli.py": "b6b023a41274cfd8a5b4fe378eee600f8d7ef9db543c4be306553696e8e20da3",
+      "src/audit_distill/data/comments.py": "9f9d776e1ecac0e202973ece32aa48eac69cf5666f3089cebc4d4ff7071086ab",
+      "src/audit_distill/data/fetch.py": "f94bcfbf54139b35d8e5a5bba75c9de15e58a0995abf03b3b070e654e71822b4",
+      "src/audit_distill/data/groups.py": "0764d99aa847f6a887184b2f999efb92f7527dfc593be0da0298aafaea3b8829",
+      "src/audit_distill/data/identity.py": "e67f65720aba89673f7fea26f72373faf09b97d0ca383e685c977118843404bd",
+      "src/audit_distill/data/line_numbers.py": "e0a1a638164bd6b0dcf63dffd3bbe1b6673586ecf2928aade3869ee92525e1ce",
+      "src/audit_distill/data/release.py": "3163b797898c22b4aa24aeef1f0ed57ed9b95a434a7236ca3ba2a0408b4a55d3",
+      "src/audit_distill/data/schema.py": "90ed285d897023d64d5265735a5e52cb7190addfdb090191515903e6e9d48caf",
+      "src/audit_distill/data/settings.py": "f68067bf2b28520c2b376f0acfc280fff9ae2d46d6634a77142e24a336d3a7b5",
+      "src/audit_distill/evaluation/__init__.py": "56e4b895bd7d9a3b3c3c306ce003fb343c8f0623223889dea70fc45f3a6f298a",
+      "src/audit_distill/evaluation/cli.py": "d79dcd7720a497aac371065b5a59cc8a91eaeeb25de4ad290557f8d794eb8dc2",
+      "src/audit_distill/evaluation/predict.py": "c222850512acf4288fcda42e1eea98f2c4b76cf601a7fb479075240a25d0008e",
+      "src/audit_distill/evaluation/score.py": "5dddf8d6c1c6145b497f00bc465a123df437344e14b3b373c35ff1fc51dbfed4",
+      "src/audit_distill/inference.py": "d2f66e52dada74f444454f16c13f9d2a7ea7848f32a6d509ea419026847b5edc",
+      "src/audit_distill/payload.py": "821059145780c2dd84e5a8a1f79dd9871ed5b0ba0373ee73d984070a7605be43",
+      "src/audit_distill/provenance.py": "b42bb7cd2355f11698b4470b0ba650e6105a0fb660c22d9e3b7c2425fea55111",
+      "src/audit_distill/scoped_reports.py": "c6312da46cf3ec82f073151cd845fdeb5a1d3f690faffc7414c5252bff4b7c52",
+      "src/audit_distill/student/__init__.py": "a7f91ebc43e058b016e1f8d247c6a7ccde82db154b60d27e1186960ca0e63182",
+      "src/audit_distill/student/cli.py": "6ac523c43c80d3b5d6e7f17fc30f1580c71940565bfb4f04a6bcccb173593430",
+      "src/audit_distill/student/dataset.py": "8cdeb243c2ad060a09b45595c5a00a1dd74663d56448c33459932064cbe9baf8",
+      "src/audit_distill/teacher/__init__.py": "b4a9c293153ef83fd766bed75c3babe2ad63842196533eac9926b22c71ffa35c",
+      "src/audit_distill/teacher/cli.py": "a890126aae9794857f7f552888186ecab09435ab7a9431aaf181e866f06b8bbd",
+      "src/audit_distill/teacher/codex.py": "f97a1b36b03fe8ea3eb4a48000048231106a3657f427bde749e1762611c35082",
+      "src/audit_distill/teacher/generate.py": "a829c7dadc5c26a7c57358871d8f982c1863a5354a39903412c88d53b783ad3e",
+      "src/audit_distill/training/__init__.py": "1fac93f56009ab9770d4d9c57c6f5385ec5b11cf59a86b73b84ffb0cebdd05b0",
+      "src/audit_distill/training/cli.py": "f3d9710da15546597f70198f41394235938229f85629a06165189e7643aaa7a8",
+      "src/audit_distill/training/colab.py": "ef9cf1575fded0c2708956e15a5eb4e413d6b18ed9571ec2d371911f4bb71858",
+      "src/audit_distill/training/train.py": "995836d2fe65bfaac9a6e1b3fece5d2bb20285107206fd9291444ad135e68ed4",
+      "uv.lock": "279a8c3ba689cf91ea7938fba7712037f011781d7912a542d0b53f6a37edec65"
+    },
+    "package_versions": {
+      "Jinja2": "3.1.6",
+      "MarkupSafe": "3.0.3",
+      "PyYAML": "6.0.3",
+      "accelerate": "1.15.0",
+      "aiohappyeyeballs": "2.7.1",
+      "aiohttp": "3.14.3",
+      "aiosignal": "1.4.0",
+      "annotated-types": "0.8.0",
+      "anyio": "4.15.1",
+      "attrs": "26.1.0",
+      "audit-distill": "0.1.0",
+      "certifi": "2026.7.22",
+      "charset-normalizer": "3.5.1",
+      "cloudpickle": "3.1.2",
+      "cuda-bindings": "12.9.9",
+      "cuda-pathfinder": "1.8.2",
+      "cuda-toolkit": "12.6.3",
+      "datasets": "5.0.1",
+      "dill": "0.4.1",
+      "filelock": "4.0.1",
+      "frozenlist": "1.8.0",
+      "fsspec": "2026.6.0",
+      "h11": "0.16.0",
+      "hf-xet": "1.6.0",
+      "httpcore": "1.0.9",
+      "httpx": "0.28.1",
+      "huggingface_hub": "0.36.2",
+      "idna": "3.20",
+      "joblib": "1.6.0",
+      "mpmath": "1.3.0",
+      "multidict": "6.9.1",
+      "multiprocess": "0.70.19",
+      "narwhals": "2.26.0",
+      "networkx": "3.7",
+      "numpy": "2.5.3",
+      "nvidia-cublas-cu12": "12.6.4.1",
+      "nvidia-cuda-cupti-cu12": "12.6.80",
+      "nvidia-cuda-nvrtc-cu12": "12.6.85",
+      "nvidia-cuda-runtime-cu12": "12.6.77",
+      "nvidia-cudnn-cu12": "9.10.2.21",
+      "nvidia-cufft-cu12": "11.3.0.4",
+      "nvidia-cufile-cu12": "1.11.1.6",
+      "nvidia-curand-cu12": "10.3.7.77",
+      "nvidia-cusolver-cu12": "11.7.1.2",
+      "nvidia-cusparse-cu12": "12.5.4.2",
+      "nvidia-cusparselt-cu12": "0.7.1",
+      "nvidia-nccl-cu12": "2.29.3",
+      "nvidia-nvjitlink-cu12": "12.9.86",
+      "nvidia-nvshmem-cu12": "3.4.5",
+      "nvidia-nvtx-cu12": "12.6.77",
+      "packaging": "26.3",
+      "pandas": "3.0.6",
+      "peft": "0.21.0",
+      "propcache": "0.5.4",
+      "psutil": "7.2.2",
+      "pyarrow": "25.0.1",
+      "pydantic": "2.13.5",
+      "pydantic_core": "2.46.5",
+      "python-dateutil": "2.9.0.post0",
+      "regex": "2026.9.10",
+      "requests": "2.34.2",
+      "ruff": "0.16.8",
+      "safetensors": "0.8.0",
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "setuptools": "84.0.0",
+      "six": "1.17.0",
+      "sympy": "1.14.0",
+      "threadpoolctl": "3.7.0",
+      "tokenizers": "0.22.2",
+      "torch": "2.14.0+cu126",
+      "tqdm": "4.70.1",
+      "transformers": "4.57.6",
+      "triton": "3.8.0",
+      "trl": "1.14.0",
+      "typing-inspection": "0.4.4",
+      "typing_extensions": "4.16.0",
+      "urllib3": "2.8.0",
+      "xxhash": "4.0.1",
+      "yarl": "1.25.1"
+    },
+    "python_version": "3.12.13"
+  },
+  "split": "test"
+}

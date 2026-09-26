@@ -99,7 +99,7 @@ def launch(session: str, name: str, commands: list[str]) -> None:
     )
     code = (
         "import subprocess, pathlib\n"
-        f"path = pathlib.Path({REMOTE!r}) / {f'{name}_job.sh'!r}\n"
+        f"path = pathlib.Path('/content') / {f'{name}_job.sh'!r}  # outside the repo\n"
         f"path.write_text({job!r})\n"
         "subprocess.Popen(['setsid', 'nohup', 'bash', str(path)], "
         "stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)\n"
