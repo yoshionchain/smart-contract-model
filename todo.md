@@ -31,6 +31,9 @@ Work down this list. [SPEC.md](SPEC.md) is the detailed guideline; its decision 
 - [x] **Implemented and checked:** `scripts/predict.py` (GPU; all five modes, strict parsing, raw outputs kept; CPU smoke passes) and `scripts/evaluate.py` (baselines fitted on train, teacher ceiling, macro-F1 and slices, paired group bootstrap, grounding/faithfulness; mechanically checked on synthetic inputs outside `results/`).
 - [x] **First evaluation (2026-09-26):** test macro-F1 Label-SFT 0.798, Report-SFT-VF 0.790, Report-SFT 0.697, Base-Report 0.653, Base-Label 0.425, teacher 0.933, TF-IDF 0.707 (`results/`). Only Label-SFT − Base-Label is clearly positive; report conditions lag on RSD.
 
+- [x] **Implemented and smoke-tested (2026-09-26):** extra-seed training/prediction and the causal faithfulness test; chunked upload of adapters for resumed VMs.
+- [ ] **Run (approval required):** seeds 43/44 for four conditions, predictions, faithfulness test; then `evaluate.py`.
+
 ## 6. Optional human rating (Phase 7)
 
 - [ ] Only if time allows: blinded Base-Report vs Report-SFT cards on up to 20 test contracts, rated for grounding and consistency.
@@ -40,4 +43,4 @@ Work down this list. [SPEC.md](SPEC.md) is the detailed guideline; its decision 
 - [ ] Generate only real dataset, resource, metric, uncertainty and agreement tables/figures. Write the ACL paper within the page limit, framed as rationale distillation; explain the v2.3 → v3.0 label-convention finding, the single-definition benchmark, bug-injection exclusions, the small test set, teacher selection and pretraining exposure.
 - [ ] Bring README commands and outputs into sync with the finished CLI. Verify a fresh `uv sync --locked`, Ruff, deterministic build and artifact-hash checks, and end-to-end reproduction. Do not present missing runs as results.
 
-**Immediate next step:** decide the final framing and follow-up analyses (faithfulness test, seeds), then the paper and presentation.
+**Immediate next step:** approve the A100 session for seeds 43/44 and the faithfulness test, then the paper and presentation.

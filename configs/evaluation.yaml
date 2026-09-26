@@ -29,3 +29,5 @@ tfidf_token_pattern: '[A-Za-z_$][A-Za-z0-9_$]*|[^\sA-Za-z0-9_$]+'
 tfidf_ngram_max: 2
 logistic_c: 1.0
 seed: 42
+# Extra training seeds for the SFT modes (run 2 is seed 42); summarized as mean ± SD.
+extra_seeds: [43, 44]

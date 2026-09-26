@@ -41,6 +41,7 @@ class EvaluationConfig(ConfigModel):
     tfidf_ngram_max: int
     logistic_c: float
     seed: int
+    extra_seeds: list[int] = []
 
 
 def load_evaluation_config(path: Path, root: Path) -> EvaluationConfig:
@@ -50,7 +51,14 @@ def load_evaluation_config(path: Path, root: Path) -> EvaluationConfig:
     return EvaluationConfig.model_validate(data)
 
 
-def predict(config: EvaluationConfig, root: Path, split: str, smoke: bool = False) -> dict:
+def predict(
+    config: EvaluationConfig,
+    root: Path,
+    split: str,
+    smoke: bool = False,
+    seed: int | None = None,
+) -> dict:
+    """Predict every mode; with `seed`, only the SFT modes of that extra training seed."""
     import torch
     from peft import PeftModel
     from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -59,10 +67,12 @@ def predict(config: EvaluationConfig, root: Path, split: str, smoke: bool = Fals
     student, _, _ = load_student_config(training.student_config, root)
     verify_student_data(student)
     model_id, revision = training.base_model, training.model_revision
-    output = config.predictions_dir / split
+    suffix = "" if seed is None else f"-seed{seed}"
+    output = config.predictions_dir / f"{split}{suffix}"
+    modes = {n: m for n, m in config.modes.items() if seed is None or m.adapter is not None}
     if smoke:
         model_id, revision = training.smoke.model_id, training.smoke.model_revision
-        output = config.predictions_dir.with_name("eval-smoke") / split
+        output = config.predictions_dir.with_name("eval-smoke") / f"{split}{suffix}"
     cuda = torch.cuda.is_available()
     if not smoke and not cuda:
         raise ValueError("Predictions for results need a CUDA GPU (use --smoke on CPU)")
@@ -77,7 +87,7 @@ def predict(config: EvaluationConfig, root: Path, split: str, smoke: bool = Fals
     peft: PeftModel | None = None
     summary: dict[str, dict] = {}
     # Base modes first, on the untouched model; then one adapter at a time.
-    ordered = sorted(config.modes.items(), key=lambda item: item[1].adapter is not None)
+    ordered = sorted(modes.items(), key=lambda item: item[1].adapter is not None)
     for name, mode in ordered:
         rows = read_rows(student.output_dir / f"{split}_{mode.format}.jsonl")
         budget = student.max_new_tokens[mode.format]
@@ -86,8 +96,10 @@ def predict(config: EvaluationConfig, root: Path, split: str, smoke: bool = Fals
         model = base
         adapter_info = None
         if mode.adapter is not None:
-            smoke_dir = "smoke-" + mode.adapter.replace("-", "_")
-            run_dir = training.output_dir / (smoke_dir if smoke else mode.adapter)
+            folder = f"{mode.adapter}{suffix}"
+            run_dir = training.output_dir / (
+                "smoke-" + folder.replace("-", "_") if smoke else folder
+            )
             adapter = run_dir / "adapter"
             if peft is None:
                 peft = PeftModel.from_pretrained(base, str(adapter), adapter_name=name)
@@ -123,6 +135,7 @@ def predict(config: EvaluationConfig, root: Path, split: str, smoke: bool = Fals
         summary[name] = {"format": mode.format, "adapter": adapter_info, "queries": len(rows)}
     manifest = {
         "split": split,
+        "seed": seed,
         "smoke": smoke,
         "model": {"id": model_id, "revision": revision},
         "modes": summary,

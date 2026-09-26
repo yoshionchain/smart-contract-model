@@ -1,7 +1,11 @@
-# Synthetic Audit Distillation — Specification
+# Distilling Explanations, Not Just Labels — Specification
 
-**Version:** 3.0 (2026-09-26) · **Status:** dataset, teacher reports and student data built; training next ·
-**Deadline:** 2026-09-30 23:59 · **Type:** university NLP project, ACL-format paper
+**Paper title:** *Distilling Explanations, Not Just Labels: Can Small Language Models Learn
+to Justify Smart Contract Vulnerability Judgments?*
+
+**Version:** 3.0 (2026-09-26) · **Status:** two training runs evaluated; faithfulness test
+and seed runs next, then paper and presentation · **Deadline:** 2026-09-30 23:59 ·
+**Type:** university NLP project, ACL-format paper
 
 This is the project guideline. It may change when a change clearly improves the
 project; record every approved change in the decision log (Section 17).
@@ -10,38 +14,41 @@ project; record every approved change in the decision log (Section 17).
 
 ## 1. Goal and research questions
 
-This is **rationale distillation** for a code-understanding task: does training a
-small language model on a large model's natural-language explanations help it judge
-whether a real Solidity contract is reentrant, and are its own explanations grounded?
-Code and labels come from one expert-verified benchmark with one written definition.
-The teacher writes explanations only; it never creates code or changes labels. Related
-work: Distilling Step-by-Step (Hsieh et al. 2023), Ho et al. 2023, Magister et al.
-2023, e-SNLI (Camburu et al. 2018), explanation faithfulness (Jacovi & Goldberg 2020;
-Wiegreffe & Marasović 2021), reentrancy benchmarks (Ressi et al. 2026).
+Large language models can judge whether code is vulnerable and explain why, but they
+are expensive to run. This project studies **rationale distillation**: fine-tuning a
+4B-parameter student (Qwen3-4B-Instruct-2507) on the natural-language explanations of a
+large teacher (GPT-6 Sol) instead of on labels alone. The task is binary: does a smart
+contract contain a reentrancy vulnerability? Code and labels come from one
+expert-verified benchmark with one written definition; the teacher writes explanations
+without seeing the label and never changes code or labels.
 
-- **RQ1 (main) — Do rationales help?** Does fine-tuning on teacher analyses followed by
-  the verdict (Report-SFT) improve verdicts over fine-tuning on labels alone
-  (Label-SFT)? Floors: the base model and lexical baselines; ceiling: the teacher.
-  **Order ablation:** the same reports with the verdict first (Report-SFT-VF) separate
-  "reasoning before deciding" from "extra training signal". **Multi-task (run 2):**
-  training on both the label and the report of each contract (Multi-SFT, Distilling
-  Step-by-Step) and answering in label mode tests rationales as auxiliary signal.
-- **RQ2 — Are the student's rationales grounded and faithful?** Do cited line numbers
-  exist and point at code, and does the analysis support the model's own verdict
-  (automatic metrics; optional blinded human rating)? Agreement with teacher text is
-  not correctness.
-- **RQ3 — Do the LLM and the expert labels agree?** How often does the label-blind
-  teacher agree with the benchmark labels, per collection and label, and what kinds of
-  cases does it reject? Contrast: on the earlier mixed-source release (v2.3) it agreed
-  only 62% (Section 17), because the sources used conflicting conventions.
+- **RQ1 — Do explanations improve the judgment?** Does training on teacher analyses
+  (Report-SFT; verdict-first Report-SFT-VF; multi-task Multi-SFT) improve verdicts over
+  training on labels alone (Label-SFT)? Floors: base model and lexical baselines;
+  ceiling: the teacher. Reported overall and separately on real-world contracts and on
+  hand-written minimal pairs (contrast sets).
+- **RQ2 — Are the student's explanations grounded and faithful?** Do cited lines point
+  at code and does the conclusion match the verdict (grounding), and does the verdict
+  actually depend on the analysis (faithfulness, tested causally by intervening on the
+  analysis, Section 10)?
+- **RQ3 — What does a label-blind teacher reveal about the data?** Its agreement with
+  the labels as a consistency check: 62% on the abandoned mixed-source dataset (sources
+  with conflicting labelling conventions) vs about 94% on the single-definition
+  benchmark.
 
-Hypotheses (directional; negative or mixed results are valid): H1 all SFT conditions
-beat their base-model format; H2 Report-SFT ≥ Label-SFT; H3 open: analysis-first may
-beat verdict-first by reasoning before deciding, or lose when a flawed analysis
-propagates; H4 Report-SFT analyses are better grounded than Base-Report analyses.
-Completion-token exposure differs between Label-SFT and the report conditions (not
-between the two report orders); report it. One seed and a small test set restrict
-claims about small differences.
+**Contributions (as supported by the results):** (1) a compact student that produces
+grounded, self-consistent vulnerability reports at the accuracy of a label-trained
+student; (2) a controlled comparison of supervision formats (label, analysis-first,
+verdict-first, multi-task) with seed variance; (3) a label-blind teacher as a dataset
+consistency check. Negative or mixed results are valid and are reported as such.
+
+**Related work to cite:** rationale/CoT distillation — Hsieh et al. 2023 (Distilling
+Step-by-Step), Ho et al. 2023, Magister et al. 2023, Li et al. 2023 (SCoTD); free-text
+explanations and faithfulness — Camburu et al. 2018 (e-SNLI), Wiegreffe et al. 2021,
+Jacovi & Goldberg 2020, Lanham et al. 2023; minimal pairs / contrast sets — Gardner et
+al. 2020, Warstadt et al. 2020; LLMs as annotators and label noise — Gilardi et al. 2023,
+Northcutt et al. 2021; fine-tuning variance — Dodge et al. 2020; LoRA — Hu et al. 2022;
+benchmark — Ressi et al. 2026.
 
 **Out of scope:** other vulnerability classes, bug-injected code, scanner votes as
 gold, LLM relabeling of any data, function-level labels or line localization (the
@@ -328,6 +335,18 @@ most the condition in progress); `fetch` downloads `runs/` without per-epoch che
 - **Agreement (RQ3):** teacher–label agreement on train/validation/test by collection
   and label, with disagreement and UNSUPPORTED counts, next to the v2.3 mixed-source
   result.
+- **Seeds:** Label-SFT, Report-SFT, Report-SFT-VF and Multi-SFT are also trained with
+  seeds 43 and 44 (run 2 = seed 42; everything else identical); the SFT modes are
+  reported as mean ± SD of test macro-F1 overall and per collection
+  (`train.py --seed`, `predict.py --seed`).
+- **Causal faithfulness (RQ2):** for every analysis-first report mode (Base-Report,
+  Report-SFT, Multi-SFT in report mode) and every test contract, the model's own greedy
+  analysis is replaced and the verdict re-decoded greedily with the answer forced up to
+  `"verdict":"`: (1) its own analysis (control: must reproduce its verdict); (2) the
+  neutral placeholder "No analysis."; (3) the analysis the same model wrote for the
+  matched opposite-label contract. Reported: share reproducing the own verdict, accuracy
+  after the empty analysis, and — over pairs whose two verdicts differ — the share of
+  verdicts that follow the swapped analysis (`scripts/faithfulness.py`).
 - Test data never tunes prompts, preprocessing or training.
 - Implementation: `scripts/predict.py` (GPU; `src/audit_distill/evaluation/predict.py`)
   writes raw outputs and strictly parsed verdicts per mode to `runs/eval/test/`;
@@ -348,8 +367,17 @@ do not depend on it.
 
 - Export deterministic error examples by stratum (false positives/negatives, INVALID,
   ungrounded or self-contradicting analyses); discuss 3–5 in the paper; never retune.
-- ACL format, ≤ 8 content pages: introduction (~1), related work (~1), method (~2–2.5),
-  results (~1.5–2), discussion (~1), conclusion (~0.5). One pipeline figure. All tables
+- ACL format, ≤ 8 content pages: introduction (~1), background (~0.75), related work
+  (~0.75), method (~2), results (~1.5–2), discussion (~1), conclusion (~0.5). One
+  pipeline figure and one running example (the 21-line minimal pair from the test set
+  whose versions differ only in whether the balance is reset before or after sending
+  money).
+- **Register:** written for NLP readers without blockchain knowledge. The background
+  section explains smart contracts, the reentrancy bug (with the running example),
+  knowledge and rationale distillation, and LoRA; afterwards field terms are used
+  freely (distillation, rationale, macro-F1, contrast sets, grounding, faithfulness).
+  Dataset-internal names (RSD, SCRUBD, pragma, SWC-107) stay out of the running text:
+  say "real-world contracts" and "hand-written minimal pairs"; cite the datasets. All tables
   from real result files; no placeholder that looks like a result.
 - Tables: dataset flow with every exclusion, composition (split × collection ×
   version), results for all modes with intervals and baselines, report validity and
@@ -392,7 +420,9 @@ uv run python scripts/generate_teacher.py --split test --ceiling       # after a
 HF_HUB_OFFLINE=1 uv run python scripts/build_student_dataset.py
 uv sync --group train && CUDA_VISIBLE_DEVICES= uv run python scripts/train.py --condition report --smoke
 uv run python scripts/colab.py up && uv run python scripts/colab.py train   # H100, after approval
-uv run python scripts/colab.py predict      # test predictions for all modes on the VM
+uv run python scripts/colab.py train --seeds 43 44         # extra seeds (after approval)
+uv run python scripts/colab.py predict --seeds 43 44       # all modes, then seed SFT modes
+uv run python scripts/colab.py faithfulness                # analysis interventions
 uv run python scripts/colab.py status | fetch | down
 uv run python scripts/evaluate.py           # baselines, ceiling, metrics -> results/
 # planned
@@ -436,6 +466,17 @@ versions are rejected; builds and dry runs never start teacher or GPU work.
 
 Decided by the project owner before any training run or model result.
 
+- **2026-09-26 · Framing and final analyses.** Title *Distilling Explanations, Not Just
+  Labels: Can Small Language Models Learn to Justify Smart Contract Vulnerability
+  Judgments?*; written for NLP readers without blockchain background (background
+  section, running example, no dataset-internal jargon). Run 2 showed all trained
+  conditions within ~0.03 test macro-F1, so two analyses are added, declared before
+  running: (a) **seeds** 43 and 44 for all four conditions (with run 2 as seed 42) to
+  report mean ± spread (Dodge et al. 2020); (b) a **causal faithfulness test** for the
+  analysis-first students (Lanham et al. 2023): the verdict is re-decoded after the
+  model's own analysis (control), a neutral empty analysis, and the analysis of the
+  matched opposite-label contract. No other training change; self-consistency and
+  multiple rationales were considered and dropped as out of scope for the deadline.
 - **2026-09-26 · Follow-up protocol (run 2), declared before running it.** Run 1 (original
   protocol: 3 epochs; results in `results/run1-original/`) found Label-SFT ≥ Report-SFT,
   with the report conditions undertrained by validation and training evidence alone:

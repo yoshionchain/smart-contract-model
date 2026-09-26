@@ -240,6 +240,10 @@ def evaluate(config: EvaluationConfig, root: Path, split: str = "test") -> dict[
         with (output / "predictions" / f"{name}.jsonl").open("w", encoding="utf-8") as stream:
             for qid, g, p in zip(ids, gold, predicted, strict=True):
                 stream.write(json.dumps({"id": qid, "gold": g, "predicted": p}) + "\n")
+    results["seeds"] = seed_summary(config, split, ids, gold, collections, predictions)
+    faith = prediction_dir / "faithfulness.json"
+    if faith.is_file():
+        results["faithfulness"] = json.loads(faith.read_text(encoding="utf-8"))["modes"]
     results["inputs"] = {
         "predictions_manifest": file_sha256(prediction_dir / "predictions_manifest.json"),
         "teacher_ceiling_usage": file_sha256(config.teacher_ceiling_dir / "usage.json"),
@@ -248,6 +252,42 @@ def evaluate(config: EvaluationConfig, root: Path, split: str = "test") -> dict[
     write_json(output / "metrics.json", results)
     (output / "results.md").write_text(markdown(results, config), encoding="utf-8")
     return results
+
+
+def seed_summary(
+    config: EvaluationConfig,
+    split: str,
+    ids: list[str],
+    gold: list[str],
+    collections: list[str],
+    predictions: dict[str, list[str]],
+) -> dict[str, dict]:
+    """Test macro-F1 of each SFT mode across training seeds (main run = config seed)."""
+    summary: dict[str, dict] = {}
+    for name, mode in config.modes.items():
+        if mode.adapter is None:
+            continue
+        per_seed = {config.seed: predictions[name]}
+        for seed in config.extra_seeds:
+            path = config.predictions_dir / f"{split}-seed{seed}" / f"{name}.jsonl"
+            if path.is_file():
+                rows = {r["id"]: r["predicted"] for r in read_rows(path)}
+                per_seed[seed] = [rows[i] for i in ids]
+        if len(per_seed) < 2:
+            continue
+        entry: dict[str, object] = {"seeds": sorted(per_seed)}
+        for scope in ("all", "aggregated", "rsd"):
+            keep = [i for i, c in enumerate(collections) if scope in ("all", c)]
+            values = [
+                macro_f1([gold[i] for i in keep], [p[i] for i in keep]) for p in per_seed.values()
+            ]
+            entry[scope] = {
+                "mean": float(np.mean(values)),
+                "sd": float(np.std(values, ddof=1)),
+                "per_seed": dict(zip(sorted(per_seed), values, strict=True)),
+            }
+        summary[name] = entry
+    return summary
 
 
 def markdown(results: dict, config: EvaluationConfig) -> str:
@@ -307,6 +347,31 @@ def markdown(results: dict, config: EvaluationConfig) -> str:
             lines.append(
                 f"| {name} | {g['valid_reports']} | {fmt(g['cited_lines_on_code'])} | "
                 f"{fmt(g['conclusion_states_own_verdict'])} | {fmt(g['locations_on_code'])} |"
+            )
+    if results.get("seeds"):
+        lines += [
+            "",
+            "| SFT mode (seeds) | All: mean ± SD | Aggregated | RSD |",
+            "| --- | ---: | ---: | ---: |",
+        ]
+        for name, entry in results["seeds"].items():
+            cells = [
+                f"{entry[s]['mean']:.3f} ± {entry[s]['sd']:.3f}"
+                for s in ("all", "aggregated", "rsd")
+            ]
+            lines.append(f"| {name} ({len(entry['seeds'])}) | " + " | ".join(cells) + " |")
+    if results.get("faithfulness"):
+        lines += [
+            "",
+            "| Faithfulness (analysis-first) | Contracts | Own analysis reproduces verdict "
+            "| Empty analysis: accuracy | Swapped analysis: follows donor |",
+            "| --- | ---: | ---: | ---: | ---: |",
+        ]
+        for name, f in results["faithfulness"].items():
+            lines.append(
+                f"| {name} | {f['contracts']} | {fmt(f['own_reproduces_verdict'])} | "
+                f"{fmt(f['empty_accuracy'])} | {fmt(f['swapped_follows_donor'])} "
+                f"(n={f['swap_pairs_with_different_verdicts']}) |"
             )
     b = results["bootstrap"]
     groups = ", ".join(f"{c} {v['groups']}" for c, v in by.items())

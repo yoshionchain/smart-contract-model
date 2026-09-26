@@ -1,16 +1,16 @@
-# Synthetic Audit Distillation
+# Distilling Explanations, Not Just Labels
 
-A university NLP experiment in rationale distillation: does training a small model
-(Qwen3-4B-Instruct-2507) on a large model's explanations help it judge whether a real
-Solidity contract is reentrant, and are its own explanations grounded? A teacher
-(GPT-6 Sol via Codex CLI) analyses each training contract without seeing its label;
-only reports whose verdict matches the expert label are kept. The student is
-fine-tuned with LoRA on labels only, on analysis-then-verdict reports, and on the
-same reports verdict-first, and compared with the base model, lexical baselines and
-the teacher.
+*Can Small Language Models Learn to Justify Smart Contract Vulnerability Judgments?*
 
-**Status:** the dataset, teacher reports and student training data are built; training
-is next — see [todo.md](todo.md). [SPEC.md](SPEC.md) is the detailed guideline
+A university NLP project on rationale distillation. A large teacher (GPT-6 Sol via Codex
+CLI) analyses smart contracts for reentrancy without seeing the label; only analyses
+whose verdict matches the expert label are kept. A 4B student (Qwen3-4B-Instruct-2507) is
+fine-tuned with LoRA on labels only, on analysis-then-verdict reports, on the same
+reports verdict-first, and on both tasks at once, and compared with the base model,
+lexical baselines and the teacher, overall and on hand-written minimal pairs.
+
+**Status:** two training runs are evaluated (`results/`); a faithfulness test and seed
+runs come next, then the paper — see [todo.md](todo.md). [SPEC.md](SPEC.md) is the detailed guideline
 and holds the decision log.
 
 ## Setup
@@ -112,7 +112,9 @@ uv run python scripts/colab.py train       # label, report, report-vf as a backg
 uv run python scripts/colab.py watch       # poll; download each finished condition; fail fast
 uv run python scripts/colab.py status      # progress
 uv run python scripts/colab.py sync        # upload newer code without touching runs/
-uv run python scripts/colab.py predict     # test predictions for all five modes
+uv run python scripts/colab.py train --seeds 43 44   # extra training seeds
+uv run python scripts/colab.py predict --seeds 43 44 # test predictions (all modes, then seeds)
+uv run python scripts/colab.py faithfulness          # swap/empty-analysis faithfulness test
 uv run python scripts/colab.py fetch       # adapters, selection, predictions, logs into runs/
 uv run python scripts/colab.py down        # release the VM
 uv run python scripts/evaluate.py          # baselines, teacher ceiling, metrics -> results/

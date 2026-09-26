@@ -103,7 +103,19 @@ def environment() -> dict[str, object]:
 Condition = Literal["label", "report", "report_vf", "multi"]
 
 
-def train(condition: Condition, config: TrainingConfig, root: Path, smoke: bool = False) -> dict:
+def run_name(condition: str, seed: int, default_seed: int) -> str:
+    """Run directory name: `report-vf`, or `report-vf-seed43` for an extra seed."""
+    name = condition.replace("_", "-")
+    return name if seed == default_seed else f"{name}-seed{seed}"
+
+
+def train(
+    condition: Condition,
+    config: TrainingConfig,
+    root: Path,
+    smoke: bool = False,
+    seed: int | None = None,
+) -> dict:
     import torch
     from datasets import Dataset
     from peft import LoraConfig
@@ -121,7 +133,11 @@ def train(condition: Condition, config: TrainingConfig, root: Path, smoke: bool 
         raise ValueError("Train records differ from the shared cohort")
     model_id, revision = config.base_model, config.model_revision
     max_new_tokens = student.max_new_tokens[fmt]
-    run_dir = config.output_dir / (f"smoke-{condition}" if smoke else condition.replace("_", "-"))
+    default_seed = config.seed
+    if seed is not None:
+        config = config.model_copy(update={"seed": seed})
+    name = run_name(condition, config.seed, default_seed)
+    run_dir = config.output_dir / (f"smoke-{name.replace('-', '_')}" if smoke else name)
     if smoke:
         model_id, revision = config.smoke.model_id, config.smoke.model_revision
         rows = rows[: config.smoke.train_examples]

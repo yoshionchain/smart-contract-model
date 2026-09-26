@@ -97,9 +97,43 @@ def bundle(root: Path) -> Path:
         archive.add(root / ".git", arcname=".git")
         for file in student:
             archive.add(file, arcname=str(file.relative_to(root)))
-        for condition in finished(root):
-            archive.add(condition, arcname=str(condition.relative_to(root)))
+        # Finished conditions and predictions of the current run, minus large weights,
+        # which `sync` uploads in chunks (the VM's file API rejects large uploads).
+        extra = [f for c in finished(root) for f in sorted(c.rglob("*")) if f.is_file()]
+        extra += sorted(f for f in (root / run_dir(root) / "eval").rglob("*") if f.is_file())
+        for file in extra:
+            if file.stat().st_size <= CHUNK:
+                archive.add(file, arcname=str(file.relative_to(root)))
     return path
+
+
+CHUNK = 40_000_000
+
+
+def upload_large(session: str, root: Path, file: Path) -> None:
+    """Upload a file in chunks and reassemble it on the VM, checking its SHA-256."""
+    import hashlib
+
+    target = f"{REMOTE}/{file.relative_to(root)}"
+    digest = hashlib.sha256(file.read_bytes()).hexdigest()
+    parts = []
+    with file.open("rb") as stream, tempfile.TemporaryDirectory() as temporary:
+        for index, chunk in enumerate(iter(lambda: stream.read(CHUNK), b"")):
+            part = Path(temporary) / f"part{index:03d}"
+            part.write_bytes(chunk)
+            remote_part = f"/content/upload/{file.name}.part{index:03d}"
+            colab("upload", "-s", session, str(part), remote_part)
+            parts.append(remote_part)
+    code = (
+        "import hashlib, pathlib\n"
+        f"target = pathlib.Path({target!r}); target.parent.mkdir(parents=True, exist_ok=True)\n"
+        f"data = b''.join(pathlib.Path(p).read_bytes() for p in {parts!r})\n"
+        f"assert hashlib.sha256(data).hexdigest() == {digest!r}, 'checksum mismatch'\n"
+        "target.write_bytes(data)\n"
+        f"[pathlib.Path(p).unlink() for p in {parts!r}]\n"
+        "print('assembled', target)\n"
+    )
+    print(remote(session, code, 300))
 
 
 def sync(session: str, root: Path) -> None:
@@ -114,6 +148,10 @@ def sync(session: str, root: Path) -> None:
         "print('extracted')\n"
     )
     remote(session, extract, 300)
+    for condition in finished(root):
+        for file in sorted(condition.rglob("*")):
+            if file.is_file() and file.stat().st_size > CHUNK:
+                upload_large(session, root, file)
     print(remote(session, shell(["git log --oneline -1; git status --short | head -5"]), 60))
 
 
@@ -192,21 +230,37 @@ def setup(session: str, root: Path) -> None:
         raise RuntimeError(f"VM setup failed: {state}")
 
 
-def train(session: str, root: Path, conditions: list[str]) -> None:
+def train(session: str, root: Path, conditions: list[str], seeds: list[int]) -> None:
+    """Train each condition (for each extra seed); finished runs are skipped."""
     base = run_dir(root)
+    commands = []
+    for seed in seeds or [None]:
+        for c in conditions:
+            name = c if seed is None else f"{c}-seed{seed}"
+            flag = "" if seed is None else f" --seed {seed}"
+            commands.append(
+                f"[ -f {base}/{name}/selection.json ] || uv run python scripts/train.py "
+                f"--condition {c}{flag} > runs/train-{name}.log 2>&1"
+            )
+    launch(session, "train", commands)
+
+
+def predict(session: str, seeds: list[int]) -> None:
+    """Test predictions for every mode, then the SFT modes of each extra seed."""
+    commands = ["uv run python scripts/predict.py > runs/predict.log 2>&1"]
+    commands += [
+        f"uv run python scripts/predict.py --seed {s} > runs/predict-seed{s}.log 2>&1"
+        for s in seeds
+    ]
+    launch(session, "predict", commands)
+
+
+def faithfulness(session: str) -> None:
     launch(
         session,
-        "train",
-        [
-            f"[ -f {base}/{c}/selection.json ] || "
-            f"uv run python scripts/train.py --condition {c} > runs/train-{c}.log 2>&1"
-            for c in conditions
-        ],
+        "faithfulness",
+        ["uv run python scripts/faithfulness.py > runs/faithfulness.log 2>&1"],
     )
-
-
-def predict(session: str) -> None:
-    launch(session, "predict", ["uv run python scripts/predict.py > runs/predict.log 2>&1"])
 
 
 def remote_state(session: str, root: Path) -> dict:
@@ -231,7 +285,8 @@ def status(session: str) -> None:
             shell(
                 [
                     "cat runs/STATUS 2>/dev/null || echo 'no job'",
-                    "for f in runs/train-*.log runs/predict.log; do [ -f $f ] || continue; "
+                    "for f in runs/train-*.log runs/predict*.log runs/faithfulness.log; do "
+                    "[ -f $f ] || continue; "
                     'echo "== $f"; '
                     "tail -c 1500 \"$f\" | tr '\\r' '\\n' | grep -v '^\\s*$' | tail -4; done",
                     "nvidia-smi --query-gpu=utilization.gpu,memory.used --format=csv,noheader",
@@ -279,12 +334,24 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "command",
-        choices=["up", "setup", "sync", "train", "predict", "watch", "status", "fetch", "down"],
+        choices=[
+            "up",
+            "setup",
+            "sync",
+            "train",
+            "predict",
+            "faithfulness",
+            "watch",
+            "status",
+            "fetch",
+            "down",
+        ],
     )
     parser.add_argument("conditions", nargs="*", help=f"subset of {CONDITIONS} (train only)")
     parser.add_argument("--session", default="audit-train")
     parser.add_argument("--gpu", default="A100")
     parser.add_argument("--interval", type=int, default=120, help="watch polling seconds")
+    parser.add_argument("--seeds", type=int, nargs="*", default=[], help="extra seeds")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     root = Path(__file__).resolve().parents[3]
@@ -299,9 +366,11 @@ def main() -> None:
             unknown = set(args.conditions) - set(CONDITIONS)
             if unknown:
                 parser.error(f"Unknown conditions: {sorted(unknown)}")
-            train(args.session, root, args.conditions or list(CONDITIONS))
+            train(args.session, root, args.conditions or list(CONDITIONS), args.seeds)
         elif args.command == "predict":
-            predict(args.session)
+            predict(args.session, args.seeds)
+        elif args.command == "faithfulness":
+            faithfulness(args.session)
         elif args.command == "watch":
             watch(args.session, root, args.interval)
         elif args.command == "status":
