@@ -286,13 +286,14 @@ scoring in `src/audit_distill/inference.py`. Checked: TRL's tokenization equals 
 built sequences for all 420 train records and the loss covers only the assistant answer
 and its end token.
 
-**Colab:** `scripts/colab.py` drives `google-colab-cli`: `up` rents an **H100** VM
-(`--gpu`; A100/L4 fallbacks), uploads a bundle (tracked files, `.git`, student data; no
-raw data) and runs `uv sync --locked --group train`; `train` starts the three conditions
-as a detached job on the VM (`colab exec` calls time out); `status` shows progress;
-`fetch` downloads `runs/` without per-epoch checkpoints (selected adapters, selection,
-validation predictions, `training_run.json` with environment and provenance); `down`
-releases the VM. No notebook-only logic. Real GPU jobs need approval.
+**Colab:** `scripts/colab.py` drives `google-colab-cli` (0.7.4): `up` rents an **A100**
+(`--gpu`; H100 was not available to the account), uploads a bundle (tracked files, `.git`,
+student data and any finished conditions of the current run; no raw data) and installs
+`uv sync --locked --group train` as a background job; `train` and `predict` run as
+detached jobs on the VM and skip finished conditions; `watch` polls, downloads each
+newly finished condition at once and fails fast if the VM disappears (a lost VM costs at
+most the condition in progress); `fetch` downloads `runs/` without per-epoch checkpoints;
+`down` releases the VM. No notebook-only logic. Real GPU jobs need approval.
 
 ## 10. Inference and metrics
 

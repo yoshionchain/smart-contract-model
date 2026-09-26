@@ -107,8 +107,9 @@ are committed in `data/manifests/`.
 ```bash
 uv sync --group train                                              # torch, TRL, PEFT
 CUDA_VISIBLE_DEVICES= uv run python scripts/train.py --condition report --smoke  # tiny CPU check
-uv run python scripts/colab.py up          # rent an H100 on Colab, upload code + student data
+uv run python scripts/colab.py up          # rent an A100 on Colab, upload code + data, install
 uv run python scripts/colab.py train       # label, report, report-vf as a background job
+uv run python scripts/colab.py watch       # poll; download each finished condition; fail fast
 uv run python scripts/colab.py status      # progress
 uv run python scripts/colab.py sync        # upload newer code without touching runs/
 uv run python scripts/colab.py predict     # test predictions for all five modes

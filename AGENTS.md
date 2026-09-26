@@ -48,7 +48,7 @@ HF_HUB_OFFLINE=1 uv run python scripts/build_dataset.py
 HF_HUB_OFFLINE=1 uv run python scripts/generate_teacher.py --split train --pilot --dry-run
 HF_HUB_OFFLINE=1 uv run python scripts/build_student_dataset.py
 uv sync --group train && CUDA_VISIBLE_DEVICES= uv run python scripts/train.py --condition report --smoke
-uv run python scripts/colab.py {up,train,predict,status,fetch,down}   # GPU: approval first
+uv run python scripts/colab.py {up,train,predict,watch,status,fetch,down}   # GPU: approval first
 uv run python scripts/evaluate.py
 ```
 
