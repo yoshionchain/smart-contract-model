@@ -30,18 +30,27 @@ class VMLost(RuntimeError):
     """The Colab session no longer exists."""
 
 
+class ExecHung(RuntimeError):
+    """A `colab exec` call did not return in time; the VM may still be fine."""
+
+
 def colab(*args: str, stdin: str | None = None) -> None:
     subprocess.run(["colab", *args], input=stdin, text=True, check=True)
 
 
 def remote(session: str, code: str, timeout: int) -> str:
     """Run Python on the VM kernel and return its output (raises VMLost if it is gone)."""
-    result = subprocess.run(
-        ["colab", "exec", "-s", session, "--timeout", str(timeout)],
-        input=code,
-        text=True,
-        capture_output=True,
-    )
+    try:
+        # `colab exec` can hang past its own timeout; enforce a hard local limit.
+        result = subprocess.run(
+            ["colab", "exec", "-s", session, "--timeout", str(timeout)],
+            input=code,
+            text=True,
+            capture_output=True,
+            timeout=timeout + 120,
+        )
+    except subprocess.TimeoutExpired as error:
+        raise ExecHung(f"colab exec did not return within {timeout + 120} s") from error
     output = result.stdout + result.stderr
     if "not found" in output and "Session" in output:
         raise VMLost(f"Colab session {session!r} no longer exists")
@@ -246,7 +255,12 @@ def watch(session: str, root: Path, interval: int = 120, fetch_results: bool = T
     """Poll until the job ends; fetch each newly finished condition; fail fast if VM is lost."""
     fetched: set[str] = set()
     while True:
-        state = remote_state(session, root)
+        try:
+            state = remote_state(session, root)
+        except ExecHung as error:
+            logger.warning("%s; retrying", error)
+            time.sleep(interval)
+            continue
         new = set(state["finished"]) - fetched
         if fetch_results and new:
             logger.info("Fetching newly finished conditions: %s", sorted(new))
