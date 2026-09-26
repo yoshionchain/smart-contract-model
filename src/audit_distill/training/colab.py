@@ -52,7 +52,7 @@ def remote(session: str, code: str, timeout: int) -> str:
     except subprocess.TimeoutExpired as error:
         raise ExecHung(f"colab exec did not return within {timeout + 120} s") from error
     output = result.stdout + result.stderr
-    if "not found" in output and "Session" in output:
+    if f"Session '{session}' not found" in output:
         raise VMLost(f"Colab session {session!r} no longer exists")
     if result.returncode != 0:
         raise RuntimeError(f"colab exec failed: {output[-2000:]}")
