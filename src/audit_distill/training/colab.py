@@ -126,8 +126,45 @@ def launch(session: str, name: str, commands: list[str]) -> None:
     print(remote(session, code, 60))
 
 
+ADOPT = """
+from colab_cli.common import state
+from colab_cli.state import SessionState
+from colab_cli.client import Variant
+known = {{s.endpoint for s in state.store.list().values()}}
+orphans = [a for a in state.client.list_assignments()
+           if a.endpoint not in known and a.accelerator.value.lower() == {gpu!r}]
+if len(orphans) != 1:
+    raise SystemExit(f"expected one orphaned {gpu} assignment, found {{len(orphans)}}")
+a = orphans[0]
+state.store.add(SessionState(
+    name={session!r}, token=a.runtime_proxy_info.token, url=a.runtime_proxy_info.url,
+    endpoint=a.endpoint, token_expires_at=a.runtime_proxy_info.expires_at(),
+    variant=Variant.GPU.value, accelerator=a.accelerator.value))
+print("adopted", a.endpoint)
+"""
+
+
+def new_session(session: str, gpu: str) -> None:
+    """`colab new`; if the CLI times out while Colab still assigns the GPU, adopt it."""
+    try:
+        colab("new", "-s", session, "--gpu", gpu)
+        return
+    except subprocess.CalledProcessError:
+        logger.warning("`colab new` failed; looking for the GPU Colab assigned anyway")
+    time.sleep(30)
+    tools = subprocess.run(["uv", "tool", "dir"], capture_output=True, text=True, check=True)
+    python = Path(tools.stdout.strip()) / "google-colab-cli/bin/python"
+    code = ADOPT.format(gpu=gpu.lower(), session=session)
+    subprocess.run([str(python), "-c", code], check=True)
+
+
 def up(session: str, gpu: str, root: Path) -> None:
-    colab("new", "-s", session, "--gpu", gpu)
+    new_session(session, gpu)
+    setup(session, root)
+
+
+def setup(session: str, root: Path) -> None:
+    """Upload the bundle and install the locked environment (background job)."""
     sync(session, root)
     launch(
         session,
@@ -228,7 +265,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "command",
-        choices=["up", "sync", "train", "predict", "watch", "status", "fetch", "down"],
+        choices=["up", "setup", "sync", "train", "predict", "watch", "status", "fetch", "down"],
     )
     parser.add_argument("conditions", nargs="*", help=f"subset of {CONDITIONS} (train only)")
     parser.add_argument("--session", default="audit-train")
@@ -240,6 +277,8 @@ def main() -> None:
     try:
         if args.command == "up":
             up(args.session, args.gpu, root)
+        elif args.command == "setup":
+            setup(args.session, root)
         elif args.command == "sync":
             sync(args.session, root)
         elif args.command == "train":
