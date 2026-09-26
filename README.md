@@ -110,8 +110,11 @@ CUDA_VISIBLE_DEVICES= uv run python scripts/train.py --condition report --smoke 
 uv run python scripts/colab.py up          # rent an H100 on Colab, upload code + student data
 uv run python scripts/colab.py train       # label, report, report-vf as a background job
 uv run python scripts/colab.py status      # progress
-uv run python scripts/colab.py fetch       # adapters, selection and logs into runs/
+uv run python scripts/colab.py sync        # upload newer code without touching runs/
+uv run python scripts/colab.py predict     # test predictions for all five modes
+uv run python scripts/colab.py fetch       # adapters, selection, predictions, logs into runs/
 uv run python scripts/colab.py down        # release the VM
+uv run python scripts/evaluate.py          # baselines, teacher ceiling, metrics -> results/
 ```
 
 LoRA settings (BF16 base, no quantization) are in [`configs/training.yaml`](configs/training.yaml). Each condition

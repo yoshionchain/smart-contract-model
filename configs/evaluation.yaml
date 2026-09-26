@@ -1,0 +1,27 @@
+version: '3.0'
+training_config: configs/training.yaml
+predictions_dir: runs/eval
+results_dir: results
+teacher_ceiling_dir: runs/teacher/test-ceiling
+# Every mode answers the same 60 test contracts with greedy decoding.
+# adapter: a run directory under runs/ (its selected adapter), or null for the base model.
+modes:
+  base-label: {format: label, adapter: null}
+  base-report: {format: report, adapter: null}
+  label-sft: {format: label, adapter: label}
+  report-sft: {format: report, adapter: report}
+  report-sft-vf: {format: report_vf, adapter: report-vf}
+# Paired differences reported with intervals (left minus right).
+comparisons:
+- [report-sft, label-sft]
+- [report-sft, report-sft-vf]
+- [report-sft, base-report]
+- [label-sft, base-label]
+bootstrap_seed: 4242
+bootstrap_replicates: 2000
+bootstrap_max_draws: 20000
+# Lexical baseline fitted on train only: identifier/operator 1-2-grams, fixed settings.
+tfidf_token_pattern: '[A-Za-z_$][A-Za-z0-9_$]*|[^\sA-Za-z0-9_$]+'
+tfidf_ngram_max: 2
+logistic_c: 1.0
+seed: 42

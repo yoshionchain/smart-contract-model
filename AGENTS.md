@@ -26,6 +26,9 @@ Current state and next steps: `todo.md`.
 - `src/audit_distill/training/` — LoRA training (BF16) with checkpoint selection (`train.py`)
   and the Colab CLI workflow (`colab.py`); `src/audit_distill/inference.py` holds shared
   greedy generation, strict verdict parsing and macro-F1.
+- `src/audit_distill/evaluation/` — test predictions for all modes (`predict.py`, GPU) and
+  scoring with baselines, teacher ceiling, group bootstrap and grounding (`score.py`);
+  results in `results/` (committed).
 - `src/audit_distill/scoped_reports.py` — report and teacher answer schemas, field
   orders, strict parsing and label-blind report validation.
 - `scripts/` — thin CLI entry points.
@@ -45,7 +48,8 @@ HF_HUB_OFFLINE=1 uv run python scripts/build_dataset.py
 HF_HUB_OFFLINE=1 uv run python scripts/generate_teacher.py --split train --pilot --dry-run
 HF_HUB_OFFLINE=1 uv run python scripts/build_student_dataset.py
 uv sync --group train && CUDA_VISIBLE_DEVICES= uv run python scripts/train.py --condition report --smoke
-uv run python scripts/colab.py {up,train,status,fetch,down}   # real GPU: approval first
+uv run python scripts/colab.py {up,train,predict,status,fetch,down}   # GPU: approval first
+uv run python scripts/evaluate.py
 ```
 
 `--dry-run` never calls the model. Without it, `generate_teacher.py` spends Codex

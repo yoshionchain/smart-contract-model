@@ -26,8 +26,8 @@ Work down this list. [SPEC.md](SPEC.md) is the detailed guideline; its decision 
 
 ## 5. Evaluate without tuning on held-out data (Phase 6)
 
-- [ ] **Implement and run:** baselines fitted on train only (constant, collection majority, Solidity-version majority, TF-IDF logistic regression).
-- [ ] **Implement and run:** deterministic Base-Label, Base-Report, Label-SFT, Report-SFT and Report-SFT-VF inference on the 60 test contracts, next to the baselines and the teacher ceiling. Macro-F1, PRESENT precision/recall, invalid rates, paired group-bootstrap intervals (Report-SFT − Label-SFT, Report-SFT − Report-SFT-VF, each − its base format), slices by collection and version, grounding/faithfulness (cited lines exist and are code; the conclusion states the report's own verdict), teacher–label agreement, raw predictions.
+- [x] **Implemented and checked:** `scripts/predict.py` (GPU; all five modes, strict parsing, raw outputs kept; CPU smoke passes) and `scripts/evaluate.py` (baselines fitted on train, teacher ceiling, macro-F1 and slices, paired group bootstrap, grounding/faithfulness; mechanically checked on synthetic inputs outside `results/`).
+- [ ] **Run:** after training, `colab.py predict` on the same VM, `fetch`, `down`, then `evaluate.py`.
 
 ## 6. Optional human rating (Phase 7)
 

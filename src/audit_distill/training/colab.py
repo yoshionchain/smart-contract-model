@@ -1,11 +1,11 @@
 """Drive training on a Colab GPU VM through the `colab` CLI (google-colab-cli).
 
-`up` rents the VM and uploads a bundle (tracked files, `.git` for provenance, the
-student data), then installs the locked environment with `uv sync --group train`.
-`train` starts the conditions as a detached background job on the VM (a `colab exec`
-call times out, training must not). `status` shows progress, `fetch` downloads the
-results without per-epoch checkpoints, `down` releases the VM. Every step is explicit;
-nothing here runs without the owner's approval of the GPU job.
+`up` rents the VM, uploads a bundle (tracked files, `.git` for provenance, the student
+data) and installs the locked environment with `uv sync --group train`; `sync` uploads a
+newer bundle without touching `runs/`. `train` and `predict` start detached background
+jobs on the VM (a `colab exec` call times out, training must not). `status` shows
+progress, `fetch` downloads the results without per-epoch checkpoints, `down` releases
+the VM. Nothing here runs without the owner's approval of the GPU job.
 """
 
 import argparse
@@ -58,21 +58,28 @@ def bundle(root: Path) -> Path:
     return path
 
 
-def up(session: str, gpu: str, root: Path) -> None:
-    colab("new", "-s", session, "--gpu", gpu)
+def sync(session: str, root: Path) -> None:
+    """Upload the current bundle and extract it over the repo on the VM (keeps `runs/`)."""
     path = bundle(root)
     logger.info("Uploading %s (%.1f MB)", path.name, path.stat().st_size / 1e6)
     colab("upload", "-s", session, str(path), "/content/bundle.tar.gz")
     extract = (
         "import tarfile, os\n"
         f"os.makedirs({REMOTE!r}, exist_ok=True)\n"
-        f"tarfile.open('/content/bundle.tar.gz').extractall({REMOTE!r})\n"
+        f"tarfile.open('/content/bundle.tar.gz').extractall({REMOTE!r}, filter='data')\n"
         "print('extracted')\n"
     )
     remote(session, extract, 120)
+    remote(session, shell(["git log --oneline -1; git status --short | head -5"]), 60)
+
+
+def up(session: str, gpu: str, root: Path) -> None:
+    colab("new", "-s", session, "--gpu", gpu)
+    sync(session, root)
     setup = shell(
         [
             "pip install -q uv 2>&1 | tail -1; uv --version",
+            f"git config --global --add safe.directory {REMOTE}",
             "uv sync --locked --group train 2>&1 | tail -3",
             "nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv",
             "uv run python -c 'import torch; print(torch.__version__, "
@@ -83,18 +90,16 @@ def up(session: str, gpu: str, root: Path) -> None:
     remote(session, setup, 1800)
 
 
-def train(session: str, conditions: list[str]) -> None:
-    runs = " ".join(conditions)
+def launch(session: str, name: str, commands: list[str]) -> None:
+    """Start shell commands as a detached job on the VM; `runs/STATUS` tracks it."""
+    body = "".join(f"  {c} || {{ echo FAILED {name} > runs/STATUS; exit 1; }}\n" for c in commands)
     job = (
-        "set -u\ncd " + REMOTE + "\nmkdir -p runs\necho RUNNING > runs/STATUS\n"
-        f"for c in {runs}; do\n"
-        "  uv run python scripts/train.py --condition $c > runs/train-$c.log 2>&1 "
-        "|| { echo FAILED $c > runs/STATUS; exit 1; }\n"
-        "done\necho DONE > runs/STATUS\n"
+        f"set -u\ncd {REMOTE}\nmkdir -p runs\necho RUNNING {name} > runs/STATUS\n"
+        f"{{\n{body}}}\necho DONE {name} > runs/STATUS\n"
     )
     code = (
         "import subprocess, pathlib\n"
-        f"path = pathlib.Path({REMOTE!r}) / 'train_job.sh'\n"
+        f"path = pathlib.Path({REMOTE!r}) / {f'{name}_job.sh'!r}\n"
         f"path.write_text({job!r})\n"
         "subprocess.Popen(['setsid', 'nohup', 'bash', str(path)], "
         "stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)\n"
@@ -103,13 +108,29 @@ def train(session: str, conditions: list[str]) -> None:
     remote(session, code, 60)
 
 
+def train(session: str, conditions: list[str]) -> None:
+    launch(
+        session,
+        "train",
+        [
+            f"uv run python scripts/train.py --condition {c} > runs/train-{c}.log 2>&1"
+            for c in conditions
+        ],
+    )
+
+
+def predict(session: str) -> None:
+    launch(session, "predict", ["uv run python scripts/predict.py > runs/predict.log 2>&1"])
+
+
 def status(session: str) -> None:
     remote(
         session,
         shell(
             [
                 "cat runs/STATUS 2>/dev/null || echo 'no job'",
-                'for f in runs/train-*.log; do echo "== $f"; '
+                "for f in runs/train-*.log runs/predict.log; do [ -f $f ] || continue; "
+                'echo "== $f"; '
                 "tail -c 1500 \"$f\" | tr '\\r' '\\n' | grep -v '^\\s*$' | tail -4; done",
                 "nvidia-smi --query-gpu=utilization.gpu,memory.used --format=csv,noheader",
             ]
@@ -138,7 +159,9 @@ def fetch(session: str, root: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["up", "train", "status", "fetch", "down"])
+    parser.add_argument(
+        "command", choices=["up", "sync", "train", "predict", "status", "fetch", "down"]
+    )
     parser.add_argument("conditions", nargs="*", help=f"subset of {CONDITIONS} (train only)")
     parser.add_argument("--session", default="audit-train")
     parser.add_argument("--gpu", default="H100")
@@ -147,11 +170,15 @@ def main() -> None:
     root = Path(__file__).resolve().parents[3]
     if args.command == "up":
         up(args.session, args.gpu, root)
+    elif args.command == "sync":
+        sync(args.session, root)
     elif args.command == "train":
         unknown = set(args.conditions) - set(CONDITIONS)
         if unknown:
             parser.error(f"Unknown conditions: {sorted(unknown)}")
         train(args.session, args.conditions or list(CONDITIONS))
+    elif args.command == "predict":
+        predict(args.session)
     elif args.command == "status":
         status(args.session)
     elif args.command == "fetch":

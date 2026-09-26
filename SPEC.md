@@ -320,6 +320,11 @@ releases the VM. No notebook-only logic. Real GPU jobs need approval.
   and label, with disagreement and UNSUPPORTED counts, next to the v2.3 mixed-source
   result.
 - Test data never tunes prompts, preprocessing or training.
+- Implementation: `scripts/predict.py` (GPU; `src/audit_distill/evaluation/predict.py`)
+  writes raw outputs and strictly parsed verdicts per mode to `runs/eval/test/`;
+  `scripts/evaluate.py` (CPU; `score.py`, settings in `configs/evaluation.yaml`) fits the
+  baselines on train, adds the teacher ceiling, and writes `results/metrics.json`,
+  `results/results.md` and per-mode predictions (committed).
 
 ## 11. Human report evaluation (optional)
 
@@ -378,9 +383,10 @@ uv run python scripts/generate_teacher.py --split test --ceiling       # after a
 HF_HUB_OFFLINE=1 uv run python scripts/build_student_dataset.py
 uv sync --group train && CUDA_VISIBLE_DEVICES= uv run python scripts/train.py --condition report --smoke
 uv run python scripts/colab.py up && uv run python scripts/colab.py train   # H100, after approval
+uv run python scripts/colab.py predict      # test predictions for all modes on the VM
 uv run python scripts/colab.py status | fetch | down
+uv run python scripts/evaluate.py           # baselines, ceiling, metrics -> results/
 # planned
-uv run python scripts/evaluate.py
 uv run python scripts/make_paper_assets.py
 ```
 
