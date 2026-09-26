@@ -9,8 +9,8 @@ fine-tuned with QLoRA on labels only, on analysis-then-verdict reports, and on t
 same reports verdict-first, and compared with the base model, lexical baselines and
 the teacher.
 
-**Status:** the v3.0 dataset is built and the teacher runner is ready; the teacher
-pilot is next — see [todo.md](todo.md). [SPEC.md](SPEC.md) is the detailed guideline
+**Status:** the dataset, teacher reports and student training data are built; training
+is next — see [todo.md](todo.md). [SPEC.md](SPEC.md) is the detailed guideline
 and holds the decision log.
 
 ## Setup
@@ -87,6 +87,20 @@ Real runs append every call and report to `runs/teacher/<run>/` and resume after
 interruption or a subscription limit. A report is kept only if it is valid, within 480
 tokens and agrees with the expert label; `usage.json` has the agreement per collection
 and label.
+
+## Student training data
+
+```bash
+HF_HUB_OFFLINE=1 uv run python scripts/build_student_dataset.py
+```
+
+Writes `data/processed/student/` from the release and the train teacher run
+([`configs/student.yaml`](configs/student.yaml)): the same 140 accepted train contracts
+(70 pairs) for Label-SFT, Report-SFT and Report-SFT-VF in one seeded order, as
+prompt/completion chat records; every validation and test contract as evaluation
+prompts for each format; and `shared_cohort.json`. A pair leaves together if the teacher
+disagreed with either label. The build is reproducible and its manifest and statistics
+are committed in `data/manifests/`.
 
 ## The report format
 

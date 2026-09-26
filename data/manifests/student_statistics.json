@@ -1,0 +1,69 @@
+{
+  "acceptance_bias": {
+    "all_train": {
+      "aggregated": {
+        "ABSENT": 35,
+        "PRESENT": 35
+      },
+      "rsd": {
+        "ABSENT": 43,
+        "PRESENT": 43
+      }
+    },
+    "kept": {
+      "aggregated": {
+        "ABSENT": 33,
+        "PRESENT": 33
+      },
+      "rsd": {
+        "ABSENT": 37,
+        "PRESENT": 37
+      }
+    },
+    "mean_source_tokens": {
+      "all_train": 953.5,
+      "kept": 974.6
+    },
+    "pragma": {
+      "all_train": {
+        "0.4": 63,
+        "0.5": 4,
+        "0.6": 3,
+        "0.8": 86
+      },
+      "kept": {
+        "0.4": 59,
+        "0.5": 4,
+        "0.6": 3,
+        "0.8": 74
+      }
+    }
+  },
+  "exclusion_reasons": {
+    "partner_removed": 8,
+    "teacher_disagreed": 8
+  },
+  "token_exposure": {
+    "label": {
+      "completion_tokens_median": 3.5,
+      "completion_tokens_total": 490,
+      "sequence_tokens_max": 5822
+    },
+    "report": {
+      "completion_tokens_median": 132.5,
+      "completion_tokens_total": 19123,
+      "sequence_tokens_max": 6130
+    },
+    "report_vf": {
+      "completion_tokens_median": 132.5,
+      "completion_tokens_total": 19123,
+      "sequence_tokens_max": 6130
+    }
+  },
+  "train_groups_per_label": {
+    "ABSENT": 58,
+    "PRESENT": 37
+  },
+  "train_kept": 140,
+  "train_pairs": 70
+}

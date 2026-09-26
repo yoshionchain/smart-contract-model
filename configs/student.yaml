@@ -1,0 +1,17 @@
+version: '3.0'
+# Student formatting: identical accepted train IDs for all three conditions.
+release_dir: data/processed/release
+teacher_dir: runs/teacher
+output_dir: data/processed/student
+manifest_dir: data/manifests
+prompts:
+  label: configs/prompts/student_label_v3.txt
+  report: configs/prompts/student_report_v3.txt
+  report_vf: configs/prompts/student_report_vf_v3.txt
+# Generation budget per evaluation format (prompt + budget must fit the sequence limit).
+max_new_tokens:
+  label: 16
+  report: 512
+  report_vf: 512
+min_train_groups_per_polarity: 30
+seed: 42

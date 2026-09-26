@@ -1,0 +1,44 @@
+{
+  "chat_template_sha256": "c87c39da4214fe8fee1f49f4b54bdb5ae1e1cd5aed22a356f3ffedb59964a715",
+  "counts": {
+    "test": 60,
+    "train": 140,
+    "validation": 34
+  },
+  "field_orders": {
+    "report": [
+      "analysis",
+      "verdict",
+      "location"
+    ],
+    "report_vf": [
+      "verdict",
+      "analysis",
+      "location"
+    ]
+  },
+  "files": {
+    "provenance.json": "499507c161b1cfe08c94baf5536fa9b0115e9b8fd19722a5db0937239535a829",
+    "shared_cohort.json": "79409f3e0478e303a6c8eaa22b33e5e8d7cc8a870d24491d4be99f98accb19c3",
+    "student_statistics.json": "c393893c73d6b4a46a3c9798b914b58c2f01864972c664877bd2c7857d26259d",
+    "test_label.jsonl": "eb5f2edbc47804d77f60bafebe8853ec3b5032fc83d92a43340c08ddbce117ba",
+    "test_report.jsonl": "e62f09c8f9feead30aef87a469adad4e366b5398508c59a4eaeec78860d1cb1d",
+    "test_report_vf.jsonl": "0cf7dd1b0a1ec95c7b358373460568a315428026df1ce78db5d99843679a2441",
+    "train_label.jsonl": "3d394b44b6fac80a3a8c4273e67a455d905e8333255856c7a9407fd339057c0f",
+    "train_report.jsonl": "9a68d891b79f0bcb753bb6466440a2fa53fe5470fe9872a681483f2de4aeea57",
+    "train_report_vf.jsonl": "2a36d390f9099cd417c2270ce090b7c20c8222ac3b1c628be6e7025d374e9d97",
+    "validation_label.jsonl": "060a39a408a62b4a9efcd87519d85d8027cee8625ef629105f0ea575202e3c89",
+    "validation_report.jsonl": "f6306bc015bad0139fa747812a38cea42dc59e08659ad1a66f941a5894d535a1",
+    "validation_report_vf.jsonl": "ca36aeb0d903beed41bb6645164b69a4c221c3d7c75135bcfe467a1233c01200"
+  },
+  "prompt_sha256": {
+    "label": "f3091a9c1cd9a7be9f1faa285dd709c999bf61f658bde5a9fe733edd33a9b9c4",
+    "report": "3431ef0808a464ea571c2d4ddd65d9db60f457d9349423fb0890224fcc9fd6a7",
+    "report_vf": "d24bb17577e265a4e232def652777f9b3bc63ab2491c6cf100e61ffe114468b2"
+  },
+  "release_content_sha256": "7349c0431fc895a89be8450eed4b6113944fc26f0951d8034c7d0fc68ef0ac03",
+  "student_content_sha256": "a145844830e07e77b532908d26f1231157ce1ca9d9dfefbfd1d83d32bbdb2664",
+  "teacher_settings_key": "53123075abf925257a82cc8f3fecb69067c43f3858991a6a904782fd805e498e",
+  "tokenizer": "Qwen/Qwen3-4B-Instruct-2507@cdbee75f17c01a7cc42f958dc650907174af0554",
+  "version": "3.0"
+}

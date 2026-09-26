@@ -13,12 +13,11 @@ Work down this list. [SPEC.md](SPEC.md) is the detailed guideline; its decision 
 - [x] **v3.0 pilot (2026-09-25):** 6 training contracts (3 real, 3 RSD; 3 per label), 6 calls, no retries, no tool use; 6/6 agree with the expert labels; all cited lines are code; analyses apply the three-part definition. `teacher_v2.txt` unchanged, pending the owner's go to freeze it.
 - [x] **First v3.0 production (2026-09-25):** 93.7% train agreement (148/158), 90% validation. Four train disagreements came from too-broad read-only wording (public getters); assumption 4 narrowed, release rebuilt (`7349c043…`: 78/78, 17/17, 30/30), first run kept in `runs/teacher-v3.0-first/`.
 - [x] **Production rerun (2026-09-26):** 190/190 calls valid, no retries. Train agreement 94.9% (148/156): 70/78 pairs survive → **140 training examples** (37 / 58 groups, gate passes). Validation 30/34 (three delegatecall scenarios ABSENT, one UNSUPPORTED — RQ3 finding; all 34 still serve checkpoint selection). Prompt `teacher_v2.txt` and the data definition are frozen.
-- [ ] **Approval required for the teacher ceiling:** after freezing, run once, label-blind, on the 60 test contracts (`--ceiling`). Outputs only feed the ceiling row and RQ3 test agreement.
+- [x] **Teacher ceiling (2026-09-26):** after a Codex outage (two calls failed before any answer, nothing spent), 60/60 test calls valid: 56/60 agree, macro-F1 0.933 (four reentrant contracts judged ABSENT). Used only for the ceiling row and RQ3.
 
-## 3. Build the matched student dataset (Phase 4)
+## 3. Build the matched student dataset (Phase 4, done)
 
-- [ ] **Implement:** canonical chat formatting and assistant-only loss for Label-SFT, Report-SFT (analysis first) and Report-SFT-VF (same reports, verdict first). Enforce the 6,000-token source budget, 480-token report target and 8,192-token sequence limit with the pinned tokenizer/template; exclude rather than truncate.
-- [ ] **Freeze:** identical sorted accepted train IDs for all three conditions in `shared_cohort.json` (rejected queries leave with their matched partner). Recheck the train group gate and report acceptance bias. Validation keeps all 34 queries for checkpoint selection.
+- [x] Chat formatting with the pinned Qwen3 template for Label-SFT, Report-SFT and Report-SFT-VF (system prompt per format, identical user payload, prompt/completion records for assistant-only loss); 140 shared train IDs (70 pairs, 37/58 groups, gate passes), all 34 validation and 60 test prompts per format; no truncation (longest 6,130 tokens); reproducible (`data/manifests/student_*.json`).
 
 ## 4. Train the student conditions (Phase 5)
 
@@ -39,4 +38,4 @@ Work down this list. [SPEC.md](SPEC.md) is the detailed guideline; its decision 
 - [ ] Generate only real dataset, resource, metric, uncertainty and agreement tables/figures. Write the ACL paper within the page limit, framed as rationale distillation; explain the v2.3 → v3.0 label-convention finding, the single-definition benchmark, bug-injection exclusions, the small test set, teacher selection and pretraining exposure.
 - [ ] Bring README commands and outputs into sync with the finished CLI. Verify a fresh `uv sync --locked`, Ruff, deterministic build and artifact-hash checks, and end-to-end reproduction. Do not present missing runs as results.
 
-**Immediate next step:** finish the production rerun, then build the student dataset (Phase 4).
+**Immediate next step:** implement the QLoRA training module and Colab workflow (Phase 5).

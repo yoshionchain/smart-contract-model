@@ -1,6 +1,6 @@
 # Synthetic Audit Distillation — Specification
 
-**Version:** 3.0 (2026-09-25) · **Status:** dataset built; teacher pilot next ·
+**Version:** 3.0 (2026-09-26) · **Status:** dataset, teacher reports and student data built; training next ·
 **Deadline:** 2026-09-30 23:59 · **Type:** university NLP project, ACL-format paper
 
 This is the project guideline. It may change when a change clearly improves the
@@ -252,9 +252,16 @@ replace it unless unusable (e.g. it cannot train at 8192 tokens on the Colab GPU
 | Report-SFT-VF | the same reports, verdict first | report (verdict-first order) |
 
 All adapters use the same accepted train IDs, order, seed, epochs and QLoRA settings,
-with loss on assistant tokens only. Prompts `student_label_v3.txt`,
-`student_report_v3.txt` and `student_report_vf_v3.txt` share the identical payload; the
-two report prompts differ only in the stated field order.
+with loss on assistant tokens only. System prompts `student_label_v3.txt`,
+`student_report_v3.txt` and `student_report_vf_v3.txt`; the user message is the same
+rendered payload the teacher saw (`audit_distill/payload.py`); the two report prompts
+differ only in the stated field order. `build_student_dataset.py` writes
+`data/processed/student/`: `train_<condition>.jsonl` (prompt/completion chat records in
+one seeded order), `{validation,test}_<condition>.jsonl` (every query, prompt only),
+`shared_cohort.json` and hashed statistics. Built: **140 train examples (70 pairs, 37/58
+groups per label)**; 8 teacher disagreements removed with their 8 partners; longest
+train sequence 6,130 tokens; completion tokens 490 (Label-SFT) vs 19,123 (each report
+condition).
 
 **QLoRA (locked, `configs/training.yaml`):** 4-bit NF4 with double quantization; LoRA
 r 16, alpha 32, dropout 0.05, bias none, targets q/k/v/o/gate/up/down_proj; lr 2e-4;
@@ -357,8 +364,8 @@ uv run python scripts/generate_teacher.py --split train --pilot --dry-run  # no 
 uv run python scripts/generate_teacher.py --split train --pilot        # after approval
 uv run python scripts/generate_teacher.py --split {train,validation}   # after approval
 uv run python scripts/generate_teacher.py --split test --ceiling       # after approval
+HF_HUB_OFFLINE=1 uv run python scripts/build_student_dataset.py
 # planned
-uv run python scripts/build_student_dataset.py
 uv run python scripts/train.py --condition {label,report,report-vf}    # Colab, after approval
 uv run python scripts/evaluate.py
 uv run python scripts/make_paper_assets.py
@@ -393,7 +400,8 @@ expert-labelled contracts (one definition) -> exclusions -> groups -> grouped sp
 
 `configs/data.yaml` (source pin, tokenizer/budgets, definition and assumptions,
 exclusions, grouping, split, balance, gates), `configs/teacher.yaml` (teacher, release
-pin, retries, pilot), `configs/training.yaml` (QLoRA). Unknown fields and incompatible
+pin, retries, pilot), `configs/student.yaml` (student prompts, generation budgets, train
+gate), `configs/training.yaml` (QLoRA). Unknown fields and incompatible
 versions are rejected; builds and dry runs never start teacher or GPU work.
 
 ## 17. Decision log

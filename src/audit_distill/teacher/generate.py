@@ -24,6 +24,7 @@ from tqdm import tqdm
 
 from audit_distill.config import ConfigModel, TokenizerConfig
 from audit_distill.data.release import verify_release
+from audit_distill.payload import render_query
 from audit_distill.provenance import digest, file_sha256, project_provenance, write_json
 from audit_distill.scoped_reports import (
     ReasonCode,
@@ -158,12 +159,13 @@ def render_prompt(template: str, query: TeacherQuery) -> str:
     """The rules followed by the one model input: check, definition, scope, source."""
     if template.count(QUERY_MARKER) != 1:
         raise ValueError(f"The teacher prompt must contain {QUERY_MARKER} exactly once")
-    scope = "the whole file" if query.scope_kind == "FILE" else query.scope_name
-    assumptions = "\n".join(f"- {text}" for text in query.assumptions)
-    rendered = (
-        f"check_id: {query.check_id}\ndefinition: {query.definition}\n"
-        f"scope: {query.scope_kind} {scope}\nassumptions:\n{assumptions}\n"
-        f"source:\n{query.source}"
+    rendered = render_query(
+        query.check_id,
+        query.definition,
+        query.scope_kind,
+        query.scope_name,
+        query.assumptions,
+        query.source,
     )
     return template.replace(QUERY_MARKER, rendered)
 
