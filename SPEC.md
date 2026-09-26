@@ -251,7 +251,7 @@ replace it unless unusable (e.g. it cannot train at 8192 tokens on the Colab GPU
 | Report-SFT | report, analysis first | report |
 | Report-SFT-VF | the same reports, verdict first | report (verdict-first order) |
 
-All adapters use the same accepted train IDs, order, seed, epochs and QLoRA settings,
+All adapters use the same accepted train IDs, order, seed, epochs and LoRA settings,
 with loss on assistant tokens only. System prompts `student_label_v3.txt`,
 `student_report_v3.txt` and `student_report_vf_v3.txt`; the user message is the same
 rendered payload the teacher saw (`audit_distill/payload.py`); the two report prompts
@@ -263,22 +263,33 @@ groups per label)**; 8 teacher disagreements removed with their 8 partners; long
 train sequence 6,130 tokens; completion tokens 490 (Label-SFT) vs 19,123 (each report
 condition).
 
-**QLoRA (locked, `configs/training.yaml`):** 4-bit NF4 with double quantization; LoRA
-r 16, alpha 32, dropout 0.05, bias none, targets q/k/v/o/gate/up/down_proj; lr 2e-4;
-3 epochs; batch 1 × grad-accum 4; weight decay 0.01; warmup 0.05; cosine; max grad norm
-1.0; gradient checkpointing; no packing; seed 42; max length 8192; BF16 if supported,
-else FP16; `paged_adamw_8bit`. Expected updates `3 × ceil(N_train / 4)`; log the actual
-count. No sweeps; a numerical-stability fix must be minimal and documented.
+**LoRA (locked, `configs/training.yaml`):** BF16 base model without quantization (H100);
+LoRA r 16, alpha 32, dropout 0.05, bias none, targets q/k/v/o/gate/up/down_proj (adapter
+weights kept in FP32 by PEFT); lr 2e-4; 3 epochs; batch 1 × grad-accum 4; weight decay
+0.01; warmup 0.05; cosine; max grad norm 1.0; gradient checkpointing; no packing; seed 42;
+max length 8192; BF16 autocast; `adamw_torch_fused`. Expected updates
+`3 × ceil(N_train / 4)`; log the actual count. No sweeps; a numerical-stability fix must
+be minimal and documented.
 
-**Checkpoint selection:** after each epoch, greedy-decode **all 34 validation queries**
-and keep the best validation macro-F1 against the benchmark labels (verdicts only, so
-validation needs no teacher reports; INVALID counts as wrong; ties: lower loss, then
-earlier epoch). Validation teacher reports only add to RQ3.
+**Checkpoint selection:** an adapter is saved after each epoch; after training, each
+epoch's adapter greedy-decodes **all 34 validation queries** in the condition's format
+and the best validation macro-F1 against the benchmark labels wins (verdicts only, so
+validation needs no teacher reports; INVALID counts as wrong; ties: earlier epoch — a
+validation loss would not be comparable across formats). Validation teacher reports only
+add to RQ3. Implementation: `src/audit_distill/training/train.py` (Transformers, TRL
+`SFTTrainer` with prompt/completion records and completion-only loss, PEFT;
+optional `uv` group `train`, `torch` from the CUDA 12.6 index); shared generation and
+scoring in `src/audit_distill/inference.py`. Checked: TRL's tokenization equals the
+built sequences for all 420 train records and the loss covers only the assistant answer
+and its end token.
 
-**Colab:** training runs through `google-colab-cli` (`uv tool install google-colab-cli`;
-`colab new -s audit-train --gpu L4`; T4 fallback; A100 optional), cloning the repo and
-running the same `uv` commands; download adapters, logs, effective config and package
-versions with `colab download`. No notebook-only logic. Real GPU jobs need approval.
+**Colab:** `scripts/colab.py` drives `google-colab-cli`: `up` rents an **H100** VM
+(`--gpu`; A100/L4 fallbacks), uploads a bundle (tracked files, `.git`, student data; no
+raw data) and runs `uv sync --locked --group train`; `train` starts the three conditions
+as a detached job on the VM (`colab exec` calls time out); `status` shows progress;
+`fetch` downloads `runs/` without per-epoch checkpoints (selected adapters, selection,
+validation predictions, `training_run.json` with environment and provenance); `down`
+releases the VM. No notebook-only logic. Real GPU jobs need approval.
 
 ## 10. Inference and metrics
 
@@ -330,7 +341,7 @@ do not depend on it.
   version), results for all modes with intervals and baselines, report validity and
   grounding, teacher agreement (v3.0 vs v2.3), resources (tokens, steps, GPU time).
 - **Allowed claims (if supported):** rationale supervision (and its position) changes
-  reentrancy verdicts/report behavior on this benchmark; QLoRA adapts this model;
+  reentrancy verdicts/report behavior on this benchmark; LoRA adapts this model;
   measured teacher–label agreement and its dependence on label conventions. **Never
   claim:** exhaustive detection, ABSENT = secure, teacher text as gold, locally reviewed
   labels, powered small improvements, general vulnerability competence, production
@@ -365,8 +376,10 @@ uv run python scripts/generate_teacher.py --split train --pilot        # after a
 uv run python scripts/generate_teacher.py --split {train,validation}   # after approval
 uv run python scripts/generate_teacher.py --split test --ceiling       # after approval
 HF_HUB_OFFLINE=1 uv run python scripts/build_student_dataset.py
+uv sync --group train && CUDA_VISIBLE_DEVICES= uv run python scripts/train.py --condition report --smoke
+uv run python scripts/colab.py up && uv run python scripts/colab.py train   # H100, after approval
+uv run python scripts/colab.py status | fetch | down
 # planned
-uv run python scripts/train.py --condition {label,report,report-vf}    # Colab, after approval
 uv run python scripts/evaluate.py
 uv run python scripts/make_paper_assets.py
 ```
@@ -401,13 +414,18 @@ expert-labelled contracts (one definition) -> exclusions -> groups -> grouped sp
 `configs/data.yaml` (source pin, tokenizer/budgets, definition and assumptions,
 exclusions, grouping, split, balance, gates), `configs/teacher.yaml` (teacher, release
 pin, retries, pilot), `configs/student.yaml` (student prompts, generation budgets, train
-gate), `configs/training.yaml` (QLoRA). Unknown fields and incompatible
+gate), `configs/training.yaml` (LoRA). Unknown fields and incompatible
 versions are rejected; builds and dry runs never start teacher or GPU work.
 
 ## 17. Decision log
 
 Decided by the project owner before any training run or model result.
 
+- **2026-09-26 · BF16 LoRA instead of QLoRA.** Training runs on a Colab H100, where the
+  4B model fits unquantized (~8 GB in BF16); QLoRA was chosen only to fit smaller GPUs.
+  Dropping 4-bit quantization removes quantization noise and speeds up training; LoRA
+  rank, targets and all hyperparameters are unchanged. The 8-bit paged optimizer is
+  replaced by standard fused AdamW, and `bitsandbytes` is no longer a dependency.
 - **2026-09-25 · Read-only wording fixed; teacher rerun.** The first v3.0 teacher run
   agreed with 93.7% of train labels (148/158; 138 train examples after pairwise
   removal). Four of its ten train disagreements flagged safe RSD variants only because

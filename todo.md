@@ -21,8 +21,8 @@ Work down this list. [SPEC.md](SPEC.md) is the detailed guideline; its decision 
 
 ## 4. Train the student conditions (Phase 5)
 
-- [ ] **Implement and smoke-test:** Python QLoRA modules and a documented Google Colab CLI workflow with the exact model, hyperparameters and seed in SPEC, with per-epoch greedy validation macro-F1 checkpoint selection. Save effective configs, tokenizer/prompt hashes, logs and adapters.
-- [ ] **Approval required for real Colab jobs:** show commands, runtime/resources, dataset and cohort hashes; check first that Qwen3-4B trains at 8,192 tokens on the chosen GPU. Then run the three SFT conditions. Keep Base as the unchanged model.
+- [x] **Implemented and smoke-tested:** `scripts/train.py` (BF16 LoRA via TRL/PEFT, completion-only loss, per-epoch adapters, post-training validation macro-F1 selection, full run records) and `scripts/colab.py` (H100 VM, bundle upload, locked `uv` env, detached job, status, fetch, stop). CPU smoke run passes; TRL tokenization matches all 420 train records and the loss covers only the answers.
+- [ ] **Approval required for the Colab H100 job:** `uv run python scripts/colab.py up`, then `train` (all three conditions in sequence), `status`, `fetch`, `down`. First check at `up` that the VM's driver runs the CUDA 12.6 `torch` build. (Approved 2026-09-26: BF16 LoRA, first run.)
 
 ## 5. Evaluate without tuning on held-out data (Phase 6)
 
@@ -38,4 +38,4 @@ Work down this list. [SPEC.md](SPEC.md) is the detailed guideline; its decision 
 - [ ] Generate only real dataset, resource, metric, uncertainty and agreement tables/figures. Write the ACL paper within the page limit, framed as rationale distillation; explain the v2.3 → v3.0 label-convention finding, the single-definition benchmark, bug-injection exclusions, the small test set, teacher selection and pretraining exposure.
 - [ ] Bring README commands and outputs into sync with the finished CLI. Verify a fresh `uv sync --locked`, Ruff, deterministic build and artifact-hash checks, and end-to-end reproduction. Do not present missing runs as results.
 
-**Immediate next step:** implement the QLoRA training module and Colab workflow (Phase 5).
+**Immediate next step:** approve the Colab H100 training job, then implement evaluation (Phase 6) while it runs.

@@ -5,7 +5,7 @@ A university NLP experiment in rationale distillation: does training a small mod
 Solidity contract is reentrant, and are its own explanations grounded? A teacher
 (GPT-6 Sol via Codex CLI) analyses each training contract without seeing its label;
 only reports whose verdict matches the expert label are kept. The student is
-fine-tuned with QLoRA on labels only, on analysis-then-verdict reports, and on the
+fine-tuned with LoRA on labels only, on analysis-then-verdict reports, and on the
 same reports verdict-first, and compared with the base model, lexical baselines and
 the teacher.
 
@@ -101,6 +101,23 @@ prompt/completion chat records; every validation and test contract as evaluation
 prompts for each format; and `shared_cohort.json`. A pair leaves together if the teacher
 disagreed with either label. The build is reproducible and its manifest and statistics
 are committed in `data/manifests/`.
+
+## Training
+
+```bash
+uv sync --group train                                              # torch, TRL, PEFT
+CUDA_VISIBLE_DEVICES= uv run python scripts/train.py --condition report --smoke  # tiny CPU check
+uv run python scripts/colab.py up          # rent an H100 on Colab, upload code + student data
+uv run python scripts/colab.py train       # label, report, report-vf as a background job
+uv run python scripts/colab.py status      # progress
+uv run python scripts/colab.py fetch       # adapters, selection and logs into runs/
+uv run python scripts/colab.py down        # release the VM
+```
+
+LoRA settings (BF16 base, no quantization) are in [`configs/training.yaml`](configs/training.yaml). Each condition
+trains on the same 140 contracts; after training, every epoch's adapter answers all 34
+validation contracts and the best validation macro-F1 is kept. The `--smoke` run uses a
+tiny random model only to exercise the code; it is never a result.
 
 ## The report format
 

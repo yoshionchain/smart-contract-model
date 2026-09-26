@@ -1,9 +1,10 @@
+version: '3.0'
 base_model: Qwen/Qwen3-4B-Instruct-2507
 model_revision: cdbee75f17c01a7cc42f958dc650907174af0554
+student_config: configs/student.yaml
+output_dir: runs
 max_seq_length: 8192
-quantization: 4bit
-bnb_4bit_quant_type: nf4
-bnb_4bit_use_double_quant: true
+# LoRA on the BF16 base model (locked, SPEC Section 9; H100, no quantization).
 lora_r: 16
 lora_alpha: 32
 lora_dropout: 0.05
@@ -12,7 +13,6 @@ lora_targets: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
 learning_rate: 0.0002
 num_train_epochs: 3
 per_device_train_batch_size: 1
-per_device_eval_batch_size: 1
 gradient_accumulation_steps: 4
 weight_decay: 0.01
 warmup_ratio: 0.05
@@ -20,4 +20,15 @@ lr_scheduler_type: cosine
 max_grad_norm: 1.0
 gradient_checkpointing: true
 packing: false
+optim: adamw_torch_fused
 seed: 42
+logging_steps: 1
+# Greedy validation decoding after training, one pass per saved epoch.
+generation_batch_size: 8
+# Local CPU smoke test only: a tiny random Qwen3 on a few examples; never a result.
+smoke:
+  model_id: trl-internal-testing/tiny-Qwen3ForCausalLM
+  model_revision: 25bb9b8963688237e94750f6f3e48f1947d3c7a3
+  train_examples: 4
+  validation_examples: 4
+  max_new_tokens: 8

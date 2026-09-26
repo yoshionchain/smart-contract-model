@@ -15,6 +15,12 @@ dependencies = [
 
 [dependency-groups]
 dev = ["ruff>=0.11"]
+train = [
+    "accelerate>=1.15",
+    "peft>=0.21,<1",
+    "torch>=2.9",
+    "trl>=1.14,<2",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -29,3 +35,12 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+# CUDA 12.6 wheels run on a wide range of drivers (Colab VMs); CPU elsewhere.
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu126", marker = "sys_platform == 'linux'" }]
