@@ -232,6 +232,10 @@ def setup(session: str, root: Path) -> None:
 
 def train(session: str, root: Path, conditions: list[str], seeds: list[int]) -> None:
     """Train each condition (for each extra seed); finished runs are skipped."""
+    launch(session, "train", train_commands(root, conditions, seeds))
+
+
+def train_commands(root: Path, conditions: list[str], seeds: list[int]) -> list[str]:
     base = run_dir(root)
     commands = []
     for seed in seeds or [None]:
@@ -242,17 +246,28 @@ def train(session: str, root: Path, conditions: list[str], seeds: list[int]) -> 
                 f"[ -f {base}/{name}/selection.json ] || uv run python scripts/train.py "
                 f"--condition {c}{flag} > runs/train-{name}.log 2>&1"
             )
-    launch(session, "train", commands)
+    return commands
 
 
-def predict(session: str, seeds: list[int]) -> None:
-    """Test predictions for every mode, then the SFT modes of each extra seed."""
-    commands = ["uv run python scripts/predict.py > runs/predict.log 2>&1"]
-    commands += [
+def predict_commands(seeds: list[int]) -> list[str]:
+    """All modes of the main run, or with `seeds` only the SFT modes of those seeds."""
+    if not seeds:
+        return ["uv run python scripts/predict.py > runs/predict.log 2>&1"]
+    return [
         f"uv run python scripts/predict.py --seed {s} > runs/predict-seed{s}.log 2>&1"
         for s in seeds
     ]
-    launch(session, "predict", commands)
+
+
+def predict(session: str, seeds: list[int]) -> None:
+    launch(session, "predict", predict_commands(seeds))
+
+
+def followup(session: str, root: Path, seeds: list[int]) -> None:
+    """One chained job: extra-seed training, their predictions, the faithfulness test."""
+    commands = train_commands(root, list(CONDITIONS), seeds) + predict_commands(seeds)
+    commands.append("uv run python scripts/faithfulness.py > runs/faithfulness.log 2>&1")
+    launch(session, "followup", commands)
 
 
 def faithfulness(session: str) -> None:
@@ -341,6 +356,7 @@ def main() -> None:
             "train",
             "predict",
             "faithfulness",
+            "followup",
             "watch",
             "status",
             "fetch",
@@ -371,6 +387,8 @@ def main() -> None:
             predict(args.session, args.seeds)
         elif args.command == "faithfulness":
             faithfulness(args.session)
+        elif args.command == "followup":
+            followup(args.session, root, args.seeds)
         elif args.command == "watch":
             watch(args.session, root, args.interval)
         elif args.command == "status":
