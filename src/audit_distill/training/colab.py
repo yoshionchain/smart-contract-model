@@ -121,7 +121,7 @@ def upload_large(session: str, root: Path, file: Path) -> None:
         for index, chunk in enumerate(iter(lambda: stream.read(CHUNK), b"")):
             part = Path(temporary) / f"part{index:03d}"
             part.write_bytes(chunk)
-            remote_part = f"/content/upload/{file.name}.part{index:03d}"
+            remote_part = f"/content/{file.parent.parent.name}-{file.name}.part{index:03d}"
             colab("upload", "-s", session, str(part), remote_part)
             parts.append(remote_part)
     code = (
