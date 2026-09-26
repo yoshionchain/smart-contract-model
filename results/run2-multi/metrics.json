@@ -1,0 +1,731 @@
+{
+  "bootstrap": {
+    "draws": 2000,
+    "groups": 27,
+    "intervals": {
+      "base-label": [
+        0.35944349171512235,
+        0.4904907455223692
+      ],
+      "base-report": [
+        0.34328358208955223,
+        0.81161487236404
+      ],
+      "collection-majority": [
+        0.2318561872909699,
+        0.39669421487603307
+      ],
+      "constant-absent": [
+        0.2318561872909699,
+        0.39669421487603307
+      ],
+      "label-sft": [
+        0.64376189357807,
+        0.9163606504994269
+      ],
+      "label-sft - base-label": [
+        0.24428701227459884,
+        0.501544776225316
+      ],
+      "multi-sft": [
+        0.5775327316466558,
+        0.9071313077469794
+      ],
+      "multi-sft - label-sft": [
+        -0.10941274817136881,
+        0.060341596234453315
+      ],
+      "multi-sft-report": [
+        0.5509582216869123,
+        0.8362807125307126
+      ],
+      "multi-sft-report - report-sft": [
+        -0.12800578670233279,
+        0.0481463899850849
+      ],
+      "report-sft": [
+        0.6060583033987288,
+        0.864037420679358
+      ],
+      "report-sft - base-report": [
+        -0.007942774173993897,
+        0.3393832150910191
+      ],
+      "report-sft - label-sft": [
+        -0.15877658335630235,
+        0.05921613641305423
+      ],
+      "report-sft - report-sft-vf": [
+        -0.15244542374923128,
+        0.07895014368428435
+      ],
+      "report-sft-vf": [
+        0.6297553435326402,
+        0.901450640806296
+      ],
+      "teacher": [
+        0.8426221918639951,
+        1.0
+      ],
+      "tfidf-logreg": [
+        0.5592507167961525,
+        0.8299323365709921
+      ],
+      "version-majority": [
+        0.27715441470571434,
+        0.5211001150535582
+      ]
+    },
+    "valid_replicates": 2000
+  },
+  "bootstrap_by_collection": {
+    "aggregated": {
+      "draws": 2256,
+      "groups": 16,
+      "intervals": {
+        "base-label": [
+          0.36507936507936506,
+          0.6507936507936507
+        ],
+        "base-report": [
+          0.811965811965812,
+          1.0
+        ],
+        "collection-majority": [
+          0.2413793103448276,
+          0.43209876543209874
+        ],
+        "constant-absent": [
+          0.2413793103448276,
+          0.43209876543209874
+        ],
+        "label-sft": [
+          0.811965811965812,
+          1.0
+        ],
+        "label-sft - base-label": [
+          0.24444444444444435,
+          0.5931656995486783
+        ],
+        "multi-sft": [
+          0.811965811965812,
+          1.0
+        ],
+        "multi-sft - label-sft": [
+          0.0,
+          0.0
+        ],
+        "multi-sft-report": [
+          0.6363636363636364,
+          0.9373040752351097
+        ],
+        "multi-sft-report - report-sft": [
+          -0.20272401433691756,
+          0.0
+        ],
+        "report-sft": [
+          0.725,
+          1.0
+        ],
+        "report-sft - base-report": [
+          -0.18100423472474292,
+          0.09321613702952447
+        ],
+        "report-sft - label-sft": [
+          -0.18100423472474292,
+          0.08783889281083526
+        ],
+        "report-sft - report-sft-vf": [
+          -0.12083333333333335,
+          0.10784516901538177
+        ],
+        "report-sft-vf": [
+          0.725,
+          1.0
+        ],
+        "teacher": [
+          0.811965811965812,
+          1.0
+        ],
+        "tfidf-logreg": [
+          0.681159420289855,
+          0.9691482226693494
+        ],
+        "version-majority": [
+          0.2413793103448276,
+          0.6470588235294117
+        ]
+      },
+      "valid_replicates": 2000
+    },
+    "rsd": {
+      "draws": 2000,
+      "groups": 11,
+      "intervals": {
+        "base-label": [
+          0.2894590643274854,
+          0.375
+        ],
+        "base-report": [
+          0.20930232558139536,
+          0.37254901960784315
+        ],
+        "collection-majority": [
+          0.2857142857142857,
+          0.3721044231646146
+        ],
+        "constant-absent": [
+          0.2857142857142857,
+          0.3721044231646146
+        ],
+        "label-sft": [
+          0.5274131274131274,
+          0.8571428571428571
+        ],
+        "label-sft - base-label": [
+          0.1894580000733267,
+          0.530824803251835
+        ],
+        "multi-sft": [
+          0.4571177944862156,
+          0.8380920870288248
+        ],
+        "multi-sft - label-sft": [
+          -0.1736910148674855,
+          0.09524428393583835
+        ],
+        "multi-sft-report": [
+          0.5072463768115942,
+          0.7539393939393939
+        ],
+        "multi-sft-report - report-sft": [
+          -0.1319813790895026,
+          0.13628428013183003
+        ],
+        "report-sft": [
+          0.519327731092437,
+          0.7490196078431373
+        ],
+        "report-sft - base-report": [
+          0.1859943977591037,
+          0.4617183675224124
+        ],
+        "report-sft - label-sft": [
+          -0.21597853748779205,
+          0.10101461038961035
+        ],
+        "report-sft - report-sft-vf": [
+          -0.2645969254995624,
+          0.13578283511307981
+        ],
+        "report-sft-vf": [
+          0.5238095238095237,
+          0.8584232447332366
+        ],
+        "teacher": [
+          0.8068181818181819,
+          1.0
+        ],
+        "tfidf-logreg": [
+          0.39750600764250915,
+          0.7280701754385965
+        ],
+        "version-majority": [
+          0.2857142857142857,
+          0.3721044231646146
+        ]
+      },
+      "valid_replicates": 2000
+    }
+  },
+  "inputs": {
+    "predictions_manifest": "5ebc9182704bc9bb13783f52a548ec2ebcfde5619cb3ffe868807cf14dfa1783",
+    "teacher_ceiling_usage": "c5cef9b39680bfaace242c66b62c47626b62b22c73dbba982bd99fcd75ef94fd"
+  },
+  "modes": {
+    "base-label": {
+      "accuracy": 0.5333333333333333,
+      "by_collection": {
+        "aggregated": 0.5087719298245614,
+        "rsd": 0.3333333333333333
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 3,
+          "INVALID": 0,
+          "PRESENT": 27
+        },
+        "PRESENT": {
+          "ABSENT": 1,
+          "INVALID": 0,
+          "PRESENT": 29
+        }
+      },
+      "invalid": 0,
+      "macro_f1": 0.42544459644322846,
+      "macro_f1_valid_only": 0.42544459644322846,
+      "n": 60,
+      "present_precision": 0.5178571428571429,
+      "present_recall": 0.9666666666666667
+    },
+    "base-report": {
+      "accuracy": 0.6666666666666666,
+      "by_collection": {
+        "aggregated": 0.9282051282051282,
+        "rsd": 0.30434782608695654
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 14,
+          "INVALID": 0,
+          "PRESENT": 16
+        },
+        "PRESENT": {
+          "ABSENT": 4,
+          "INVALID": 0,
+          "PRESENT": 26
+        }
+      },
+      "grounding": {
+        "cited_line_numbers": 135,
+        "cited_lines_on_code": 0.9703703703703703,
+        "conclusion_states_own_verdict": 0.15,
+        "locations": 42,
+        "locations_on_code": 1.0,
+        "valid_reports": 60
+      },
+      "invalid": 0,
+      "macro_f1": 0.6527777777777778,
+      "macro_f1_valid_only": 0.6527777777777778,
+      "n": 60,
+      "present_precision": 0.6190476190476191,
+      "present_recall": 0.8666666666666667
+    },
+    "collection-majority": {
+      "accuracy": 0.5,
+      "by_collection": {
+        "aggregated": 0.3333333333333333,
+        "rsd": 0.3333333333333333
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 30,
+          "INVALID": 0,
+          "PRESENT": 0
+        },
+        "PRESENT": {
+          "ABSENT": 30,
+          "INVALID": 0,
+          "PRESENT": 0
+        }
+      },
+      "invalid": 0,
+      "macro_f1": 0.3333333333333333,
+      "macro_f1_valid_only": 0.3333333333333333,
+      "n": 60,
+      "present_precision": null,
+      "present_recall": 0.0
+    },
+    "constant-absent": {
+      "accuracy": 0.5,
+      "by_collection": {
+        "aggregated": 0.3333333333333333,
+        "rsd": 0.3333333333333333
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 30,
+          "INVALID": 0,
+          "PRESENT": 0
+        },
+        "PRESENT": {
+          "ABSENT": 30,
+          "INVALID": 0,
+          "PRESENT": 0
+        }
+      },
+      "invalid": 0,
+      "macro_f1": 0.3333333333333333,
+      "macro_f1_valid_only": 0.3333333333333333,
+      "n": 60,
+      "present_precision": null,
+      "present_recall": 0.0
+    },
+    "label-sft": {
+      "accuracy": 0.8,
+      "by_collection": {
+        "aggregated": 0.9282051282051282,
+        "rsd": 0.6862745098039216
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 24,
+          "INVALID": 0,
+          "PRESENT": 6
+        },
+        "PRESENT": {
+          "ABSENT": 6,
+          "INVALID": 0,
+          "PRESENT": 24
+        }
+      },
+      "invalid": 0,
+      "macro_f1": 0.8,
+      "macro_f1_valid_only": 0.8,
+      "n": 60,
+      "present_precision": 0.8,
+      "present_recall": 0.8
+    },
+    "multi-sft": {
+      "accuracy": 0.8,
+      "by_collection": {
+        "aggregated": 0.9282051282051282,
+        "rsd": 0.6536796536796536
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 20,
+          "INVALID": 0,
+          "PRESENT": 10
+        },
+        "PRESENT": {
+          "ABSENT": 2,
+          "INVALID": 0,
+          "PRESENT": 28
+        }
+      },
+      "invalid": 0,
+      "macro_f1": 0.7963800904977376,
+      "macro_f1_valid_only": 0.7963800904977376,
+      "n": 60,
+      "present_precision": 0.7368421052631579,
+      "present_recall": 0.9333333333333333
+    },
+    "multi-sft-report": {
+      "accuracy": 0.7333333333333333,
+      "by_collection": {
+        "aggregated": 0.8155467720685112,
+        "rsd": 0.6389743589743591
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 21,
+          "INVALID": 0,
+          "PRESENT": 9
+        },
+        "PRESENT": {
+          "ABSENT": 7,
+          "INVALID": 0,
+          "PRESENT": 23
+        }
+      },
+      "grounding": {
+        "cited_line_numbers": 273,
+        "cited_lines_on_code": 0.9853479853479854,
+        "conclusion_states_own_verdict": 1.0,
+        "locations": 32,
+        "locations_on_code": 1.0,
+        "valid_reports": 60
+      },
+      "invalid": 0,
+      "macro_f1": 0.7330367074527253,
+      "macro_f1_valid_only": 0.7330367074527253,
+      "n": 60,
+      "present_precision": 0.71875,
+      "present_recall": 0.7666666666666667
+    },
+    "report-sft": {
+      "accuracy": 0.7666666666666667,
+      "by_collection": {
+        "aggregated": 0.8916129032258064,
+        "rsd": 0.6476476476476476
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 22,
+          "INVALID": 0,
+          "PRESENT": 8
+        },
+        "PRESENT": {
+          "ABSENT": 6,
+          "INVALID": 0,
+          "PRESENT": 24
+        }
+      },
+      "grounding": {
+        "cited_line_numbers": 289,
+        "cited_lines_on_code": 0.9826989619377162,
+        "conclusion_states_own_verdict": 1.0,
+        "locations": 32,
+        "locations_on_code": 1.0,
+        "valid_reports": 60
+      },
+      "invalid": 0,
+      "macro_f1": 0.7664071190211346,
+      "macro_f1_valid_only": 0.7664071190211346,
+      "n": 60,
+      "present_precision": 0.75,
+      "present_recall": 0.8
+    },
+    "report-sft-vf": {
+      "accuracy": 0.8,
+      "by_collection": {
+        "aggregated": 0.8916129032258064,
+        "rsd": 0.7117117117117118
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 23,
+          "INVALID": 0,
+          "PRESENT": 7
+        },
+        "PRESENT": {
+          "ABSENT": 5,
+          "INVALID": 0,
+          "PRESENT": 25
+        }
+      },
+      "grounding": {
+        "cited_line_numbers": 239,
+        "cited_lines_on_code": 0.9456066945606695,
+        "conclusion_states_own_verdict": 1.0,
+        "locations": 32,
+        "locations_on_code": 1.0,
+        "valid_reports": 60
+      },
+      "invalid": 0,
+      "macro_f1": 0.7997775305895439,
+      "macro_f1_valid_only": 0.7997775305895439,
+      "n": 60,
+      "present_precision": 0.78125,
+      "present_recall": 0.8333333333333334
+    },
+    "teacher": {
+      "accuracy": 0.9333333333333333,
+      "by_collection": {
+        "aggregated": 0.9282051282051282,
+        "rsd": 0.9372549019607843
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 30,
+          "INVALID": 0,
+          "PRESENT": 0
+        },
+        "PRESENT": {
+          "ABSENT": 4,
+          "INVALID": 0,
+          "PRESENT": 26
+        }
+      },
+      "grounding": {
+        "cited_line_numbers": 277,
+        "cited_lines_on_code": 1.0,
+        "conclusion_states_own_verdict": 1.0,
+        "locations": 26,
+        "locations_on_code": 1.0,
+        "valid_reports": 60
+      },
+      "invalid": 0,
+      "macro_f1": 0.9330357142857143,
+      "macro_f1_valid_only": 0.9330357142857143,
+      "n": 60,
+      "present_precision": 1.0,
+      "present_recall": 0.8666666666666667
+    },
+    "tfidf-logreg": {
+      "accuracy": 0.7166666666666667,
+      "by_collection": {
+        "aggregated": 0.8541666666666667,
+        "rsd": 0.5733333333333333
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 27,
+          "INVALID": 0,
+          "PRESENT": 3
+        },
+        "PRESENT": {
+          "ABSENT": 14,
+          "INVALID": 0,
+          "PRESENT": 16
+        }
+      },
+      "invalid": 0,
+      "macro_f1": 0.706812302385743,
+      "macro_f1_valid_only": 0.706812302385743,
+      "n": 60,
+      "present_precision": 0.8421052631578947,
+      "present_recall": 0.5333333333333333
+    },
+    "version-majority": {
+      "accuracy": 0.5333333333333333,
+      "by_collection": {
+        "aggregated": 0.475,
+        "rsd": 0.3333333333333333
+      },
+      "confusion": {
+        "ABSENT": {
+          "ABSENT": 30,
+          "INVALID": 0,
+          "PRESENT": 0
+        },
+        "PRESENT": {
+          "ABSENT": 28,
+          "INVALID": 0,
+          "PRESENT": 2
+        }
+      },
+      "invalid": 0,
+      "macro_f1": 0.4034090909090909,
+      "macro_f1_valid_only": 0.4034090909090909,
+      "n": 60,
+      "present_precision": 1.0,
+      "present_recall": 0.06666666666666667
+    }
+  },
+  "n": 60,
+  "provenance": {
+    "git_commit": "7f43de6ff64ba6b24aaaeb768410c1cb1620db4d",
+    "git_dirty": true,
+    "input_file_hashes": {
+      "SPEC.md": "048434863f6f60534451ba11d48fec8009b9216594fb4e1b99d94d6c1a713659",
+      "configs/data.yaml": "50b35c070089344992749fb5282c5053518b4656567f3b1bd006cbfbb06c7c93",
+      "configs/evaluation.yaml": "87a2d0cfff23dff25a4d80373e6fc6d4dd558d80a3824b10dbd6f52db4391463",
+      "configs/prompts/student_label_v3.txt": "f3091a9c1cd9a7be9f1faa285dd709c999bf61f658bde5a9fe733edd33a9b9c4",
+      "configs/prompts/student_report_v3.txt": "3431ef0808a464ea571c2d4ddd65d9db60f457d9349423fb0890224fcc9fd6a7",
+      "configs/prompts/student_report_vf_v3.txt": "d24bb17577e265a4e232def652777f9b3bc63ab2491c6cf100e61ffe114468b2",
+      "configs/prompts/teacher_v2.txt": "3f7cc24f0e334c92f47a2ef1e24fcdfdefa9be5f0c563da1a0c5aa8bec915c3f",
+      "configs/student.yaml": "b4851917b4933fe78f226ee7250d694af9188d80f3eb8510a3140b8cb4b5ad5b",
+      "configs/teacher.yaml": "4689187281c5216167da39fd424038b5a4367501c8ba17d3c7b83d3ef4931136",
+      "configs/training.yaml": "2fe85527145c174c8a2b338f1b5b03418c8c6ba8b359ac8e9439179eb9ccfc7b",
+      "pyproject.toml": "c3567778b76938fab5cbc15057d7b05c56072e570cf835cc1e5f7835f5ad0d0d",
+      "schemas/audit_report.schema.json": "9714b9371c42c30c2f1410843c22312d40c2ee979995fd486d82b6895be883b4",
+      "schemas/teacher_answer.schema.json": "6436959c1f4c0a0812e4ff7552a07e8192a247afeb0aa80522f73d8b5247d6e9",
+      "scripts/build_dataset.py": "5e7357e83ee2b1e156d3e47b76297e49259891ea6b3aef04afea23cc76da5fef",
+      "scripts/build_student_dataset.py": "16955f832f08110f94bcf4904c8aae41d110727c93901c6ecf8412c40f79fc47",
+      "scripts/colab.py": "f18f11d321a20b9dab30e867c38e24e0b29635de16c3974350fb421dbcea1640",
+      "scripts/evaluate.py": "d7340ef5139a7b1995af8817370858626b20fa992b4bbbb415f97be7b7ac7774",
+      "scripts/fetch_data.py": "3ad262a1ed75c38ff49a726df7bdbfe3e7676b859a44c41a7d68fa1ed9a06fa3",
+      "scripts/generate_teacher.py": "36e31a94ada50bea4b1808eae08d072f9eff6d390b933a79a7b1e82ace89aa5b",
+      "scripts/predict.py": "35eb59dd342b789cb9a88ad2006d25758027b82d60033334601fb7444215b589",
+      "scripts/train.py": "90add22c0600b65cb552679faabd87b5f4c864e1e48527d6fce760d6125f485a",
+      "src/audit_distill/__init__.py": "bf649835768ae04cfb3723a30105395a784f9a4e7615a9c1412e393de4c2d68b",
+      "src/audit_distill/config.py": "121a46d6a7b233243ee934caa82d5f3a0417971c4823b58087719e21a89db65a",
+      "src/audit_distill/data/__init__.py": "cc1348ea7059a0f6333f453a5e790b2090c3cd776a7923bcf26766faf5479cd0",
+      "src/audit_distill/data/cli.py": "b6b023a41274cfd8a5b4fe378eee600f8d7ef9db543c4be306553696e8e20da3",
+      "src/audit_distill/data/comments.py": "9f9d776e1ecac0e202973ece32aa48eac69cf5666f3089cebc4d4ff7071086ab",
+      "src/audit_distill/data/fetch.py": "f94bcfbf54139b35d8e5a5bba75c9de15e58a0995abf03b3b070e654e71822b4",
+      "src/audit_distill/data/groups.py": "0764d99aa847f6a887184b2f999efb92f7527dfc593be0da0298aafaea3b8829",
+      "src/audit_distill/data/identity.py": "e67f65720aba89673f7fea26f72373faf09b97d0ca383e685c977118843404bd",
+      "src/audit_distill/data/line_numbers.py": "e0a1a638164bd6b0dcf63dffd3bbe1b6673586ecf2928aade3869ee92525e1ce",
+      "src/audit_distill/data/release.py": "3163b797898c22b4aa24aeef1f0ed57ed9b95a434a7236ca3ba2a0408b4a55d3",
+      "src/audit_distill/data/schema.py": "90ed285d897023d64d5265735a5e52cb7190addfdb090191515903e6e9d48caf",
+      "src/audit_distill/data/settings.py": "f68067bf2b28520c2b376f0acfc280fff9ae2d46d6634a77142e24a336d3a7b5",
+      "src/audit_distill/evaluation/__init__.py": "56e4b895bd7d9a3b3c3c306ce003fb343c8f0623223889dea70fc45f3a6f298a",
+      "src/audit_distill/evaluation/cli.py": "d79dcd7720a497aac371065b5a59cc8a91eaeeb25de4ad290557f8d794eb8dc2",
+      "src/audit_distill/evaluation/predict.py": "312cdb71c2d7ff98d8509a0a2213ef3f4601e564f1e7558b6be3d09dbd8ff687",
+      "src/audit_distill/evaluation/score.py": "6f40afe09d1b532975d89a12640dfb871061b3fa0016107f520d9fcdc7117b46",
+      "src/audit_distill/inference.py": "d2f66e52dada74f444454f16c13f9d2a7ea7848f32a6d509ea419026847b5edc",
+      "src/audit_distill/payload.py": "821059145780c2dd84e5a8a1f79dd9871ed5b0ba0373ee73d984070a7605be43",
+      "src/audit_distill/provenance.py": "b42bb7cd2355f11698b4470b0ba650e6105a0fb660c22d9e3b7c2425fea55111",
+      "src/audit_distill/scoped_reports.py": "c6312da46cf3ec82f073151cd845fdeb5a1d3f690faffc7414c5252bff4b7c52",
+      "src/audit_distill/student/__init__.py": "a7f91ebc43e058b016e1f8d247c6a7ccde82db154b60d27e1186960ca0e63182",
+      "src/audit_distill/student/cli.py": "6ac523c43c80d3b5d6e7f17fc30f1580c71940565bfb4f04a6bcccb173593430",
+      "src/audit_distill/student/dataset.py": "ac55a048c16caca7e30a5bb53d252381e16f81393654bfe832759ca31c49def0",
+      "src/audit_distill/teacher/__init__.py": "b4a9c293153ef83fd766bed75c3babe2ad63842196533eac9926b22c71ffa35c",
+      "src/audit_distill/teacher/cli.py": "a890126aae9794857f7f552888186ecab09435ab7a9431aaf181e866f06b8bbd",
+      "src/audit_distill/teacher/codex.py": "f97a1b36b03fe8ea3eb4a48000048231106a3657f427bde749e1762611c35082",
+      "src/audit_distill/teacher/generate.py": "a829c7dadc5c26a7c57358871d8f982c1863a5354a39903412c88d53b783ad3e",
+      "src/audit_distill/training/__init__.py": "1fac93f56009ab9770d4d9c57c6f5385ec5b11cf59a86b73b84ffb0cebdd05b0",
+      "src/audit_distill/training/cli.py": "0a9cef777628757d14fbccce110fec104d37842043180e277ee8c181138422e6",
+      "src/audit_distill/training/colab.py": "48198bf6ae9b4accd821ecbfdbcce3308b78c03682c349c16fd9e4307354f0b7",
+      "src/audit_distill/training/train.py": "53cdeaf1d240d8c9a20097d000a3d6645c3cf521d20d51d72936b8451d9b3c69",
+      "uv.lock": "279a8c3ba689cf91ea7938fba7712037f011781d7912a542d0b53f6a37edec65"
+    },
+    "package_versions": {
+      "Jinja2": "3.1.6",
+      "MarkupSafe": "3.0.3",
+      "PyYAML": "6.0.3",
+      "accelerate": "1.15.0",
+      "aiohappyeyeballs": "2.7.1",
+      "aiohttp": "3.14.3",
+      "aiosignal": "1.4.0",
+      "annotated-types": "0.8.0",
+      "anyio": "4.15.1",
+      "attrs": "26.1.0",
+      "audit-distill": "0.1.0",
+      "certifi": "2026.7.22",
+      "charset-normalizer": "3.5.1",
+      "cloudpickle": "3.1.2",
+      "cuda-bindings": "12.9.9",
+      "cuda-pathfinder": "1.8.2",
+      "cuda-toolkit": "12.6.3",
+      "datasets": "5.0.1",
+      "dill": "0.4.1",
+      "filelock": "4.0.1",
+      "frozenlist": "1.8.0",
+      "fsspec": "2026.6.0",
+      "h11": "0.16.0",
+      "hf-xet": "1.6.0",
+      "httpcore": "1.0.9",
+      "httpx": "0.28.1",
+      "huggingface_hub": "0.36.2",
+      "idna": "3.20",
+      "joblib": "1.6.0",
+      "mpmath": "1.3.0",
+      "multidict": "6.9.1",
+      "multiprocess": "0.70.19",
+      "narwhals": "2.26.0",
+      "networkx": "3.7",
+      "numpy": "2.5.3",
+      "nvidia-cublas-cu12": "12.6.4.1",
+      "nvidia-cuda-cupti-cu12": "12.6.80",
+      "nvidia-cuda-nvrtc-cu12": "12.6.85",
+      "nvidia-cuda-runtime-cu12": "12.6.77",
+      "nvidia-cudnn-cu12": "9.10.2.21",
+      "nvidia-cufft-cu12": "11.3.0.4",
+      "nvidia-cufile-cu12": "1.11.1.6",
+      "nvidia-curand-cu12": "10.3.7.77",
+      "nvidia-cusolver-cu12": "11.7.1.2",
+      "nvidia-cusparse-cu12": "12.5.4.2",
+      "nvidia-cusparselt-cu12": "0.7.1",
+      "nvidia-nccl-cu12": "2.29.3",
+      "nvidia-nvjitlink-cu12": "12.9.86",
+      "nvidia-nvshmem-cu12": "3.4.5",
+      "nvidia-nvtx-cu12": "12.6.77",
+      "packaging": "26.3",
+      "pandas": "3.0.6",
+      "peft": "0.21.0",
+      "propcache": "0.5.4",
+      "psutil": "7.2.2",
+      "pyarrow": "25.0.1",
+      "pydantic": "2.13.5",
+      "pydantic_core": "2.46.5",
+      "python-dateutil": "2.9.0.post0",
+      "regex": "2026.9.10",
+      "requests": "2.34.2",
+      "ruff": "0.16.8",
+      "safetensors": "0.8.0",
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "setuptools": "84.0.0",
+      "six": "1.17.0",
+      "sympy": "1.14.0",
+      "threadpoolctl": "3.7.0",
+      "tokenizers": "0.22.2",
+      "torch": "2.14.0+cu126",
+      "tqdm": "4.70.1",
+      "transformers": "4.57.6",
+      "triton": "3.8.0",
+      "trl": "1.14.0",
+      "typing-inspection": "0.4.4",
+      "typing_extensions": "4.16.0",
+      "urllib3": "2.8.0",
+      "xxhash": "4.0.1",
+      "yarl": "1.25.1"
+    },
+    "python_version": "3.12.13"
+  },
+  "split": "test"
+}
