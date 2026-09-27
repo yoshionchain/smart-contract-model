@@ -238,6 +238,35 @@
       "valid_replicates": 2000
     }
   },
+  "faithfulness": {
+    "base-report": {
+      "contracts": 60,
+      "empty_accuracy": 0.5,
+      "empty_present_share": 0.0,
+      "own_reproduces_verdict": 1.0,
+      "swap_pairs_with_different_verdicts": 28,
+      "swapped_follows_donor": 1.0,
+      "swapped_keeps_own": 0.0
+    },
+    "multi-sft-report": {
+      "contracts": 60,
+      "empty_accuracy": 0.5,
+      "empty_present_share": 0.0,
+      "own_reproduces_verdict": 1.0,
+      "swap_pairs_with_different_verdicts": 32,
+      "swapped_follows_donor": 1.0,
+      "swapped_keeps_own": 0.0
+    },
+    "report-sft": {
+      "contracts": 60,
+      "empty_accuracy": 0.5,
+      "empty_present_share": 0.0,
+      "own_reproduces_verdict": 1.0,
+      "swap_pairs_with_different_verdicts": 40,
+      "swapped_follows_donor": 1.0,
+      "swapped_keeps_own": 0.0
+    }
+  },
   "inputs": {
     "predictions_manifest": "5ebc9182704bc9bb13783f52a548ec2ebcfde5619cb3ffe868807cf14dfa1783",
     "teacher_ceiling_usage": "c5cef9b39680bfaace242c66b62c47626b62b22c73dbba982bd99fcd75ef94fd"
@@ -586,7 +615,7 @@
   },
   "n": 60,
   "provenance": {
-    "git_commit": "371ce3d055146acdf9bd0054f66e313e657956f6",
+    "git_commit": "92176bed44403875a15907f7efb5f459f70aa19f",
     "git_dirty": false,
     "input_file_hashes": {
       "SPEC.md": "a73552a6aed5962bb06410b908c1d1d3567d979acbdeaee8415de29a4390a4b3",
@@ -641,7 +670,7 @@
       "src/audit_distill/teacher/generate.py": "a829c7dadc5c26a7c57358871d8f982c1863a5354a39903412c88d53b783ad3e",
       "src/audit_distill/training/__init__.py": "1fac93f56009ab9770d4d9c57c6f5385ec5b11cf59a86b73b84ffb0cebdd05b0",
       "src/audit_distill/training/cli.py": "036036225730c98a6c6950f96ec5c51a1bf1e3abb7c405178e70226f1076ef74",
-      "src/audit_distill/training/colab.py": "4e9c2158d31b6d4a20f615aa3ac7362407290b56bd6dcd40161bb7a7db26ad2a",
+      "src/audit_distill/training/colab.py": "1609d913859d639681cb27d6c57c71db5a03cf588e3b5bcdaf5f72229597ef2a",
       "src/audit_distill/training/train.py": "6244091f3f2b695c70066cc96b69f6505a29dfc40807fc45634b0feb03d9b12b",
       "uv.lock": "279a8c3ba689cf91ea7938fba7712037f011781d7912a542d0b53f6a37edec65"
     },

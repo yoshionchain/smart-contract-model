@@ -40,4 +40,10 @@
 | multi-sft (3) | 0.809 ± 0.019 | 0.940 ± 0.055 | 0.677 ± 0.030 |
 | multi-sft-report (3) | 0.711 ± 0.038 | 0.758 ± 0.100 | 0.658 ± 0.022 |
 
+| Faithfulness (analysis-first) | Contracts | Own analysis reproduces verdict | Empty analysis: accuracy | Swapped analysis: follows donor |
+| --- | ---: | ---: | ---: | ---: |
+| base-report | 60 | 1.000 | 0.500 | 1.000 (n=28) |
+| multi-sft-report | 60 | 1.000 | 0.500 | 1.000 (n=32) |
+| report-sft | 60 | 1.000 | 0.500 | 1.000 (n=40) |
+
 Bootstrap: 2000 valid replicates over 27 test groups (aggregated 16, rsd 11); paired percentile intervals, seed 4242.
