@@ -19,3 +19,7 @@ runs/
 *.pt
 *.bin
 checkpoints/
+
+# Paper sources stay local; only the finished PDF is committed.
+paper/*
+!paper/paper.pdf

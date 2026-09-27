@@ -5,7 +5,7 @@ release_content_sha256: 7349c0431fc895a89be8450eed4b6113944fc26f0951d8034c7d0fc6
 output_dir: runs/teacher
 prompt_path: configs/prompts/teacher_v2.txt
 schema_path: schemas/teacher_answer.schema.json
-# Locked teacher (SPEC Section 7): ChatGPT-subscription Codex CLI, no API, no fallback.
+# Locked teacher: ChatGPT-subscription Codex CLI, no API, no fallback model.
 codex_version: 0.156.1
 model: gpt-6-sol
 reasoning_effort: medium

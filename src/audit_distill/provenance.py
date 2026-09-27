@@ -41,7 +41,7 @@ def project_provenance(root: Path) -> dict[str, object]:
             *root.glob("schemas/**/*.json"),
             root / "pyproject.toml",
             root / "uv.lock",
-            root / "SPEC.md",
+            root / "docs/decision-log.md",
         ]
     )
     return {

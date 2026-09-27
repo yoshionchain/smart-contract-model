@@ -7,12 +7,10 @@ University NLP project on rationale distillation: fine-tune a small model
 to write a grounded analysis **before** its verdict. A label-blind teacher (GPT-6 Sol via
 Codex CLI) writes the training reports. Deadline: 2026-09-30.
 
-`SPEC.md` is the guideline and holds the decision log. It is not sacred: propose a
-change when it clearly improves the project, and record approved changes in its
-decision log (Section 17). Do not change datasets, labels, splits, models, schemas,
-metrics or training settings without the owner's approval.
-
-Current state and next steps: `todo.md`.
+The paper (`paper/`) is the main deliverable; `paper/material.md` collects every number,
+table and citation it needs. Record approved research changes in
+`docs/decision-log.md`. Do not change datasets, labels, splits, models, schemas, metrics
+or training settings without the owner's approval.
 
 ## Layout
 

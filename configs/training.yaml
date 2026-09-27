@@ -4,7 +4,7 @@ model_revision: cdbee75f17c01a7cc42f958dc650907174af0554
 student_config: configs/student.yaml
 output_dir: runs/run2-multi
 max_seq_length: 8192
-# LoRA on the BF16 base model (locked, SPEC Section 9; H100, no quantization).
+# LoRA on the BF16 base model (no quantization; trained on a Colab A100-40GB).
 lora_r: 16
 lora_alpha: 32
 lora_dropout: 0.05
