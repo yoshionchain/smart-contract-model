@@ -83,11 +83,13 @@ def finished(root: Path) -> list[Path]:
 
 
 def bundle(root: Path) -> Path:
-    """Tracked files, `.git`, student data and finished conditions (no raw data)."""
+    """Tracked files, `.git`, student data, release and finished conditions (no raw data)."""
     tracked = subprocess.run(
         ["git", "-C", str(root), "ls-files", "-z"], capture_output=True, text=True, check=True
     ).stdout.split("\0")
+    # Student data plus the release (the faithfulness test needs matched partners).
     student = sorted((root / "data/processed/student").glob("*"))
+    student += sorted((root / "data/processed/release").glob("*"))
     if not student:
         raise ValueError("Build the student data first (scripts/build_student_dataset.py)")
     path = Path(tempfile.mkdtemp()) / "bundle.tar.gz"

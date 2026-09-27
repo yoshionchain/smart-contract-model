@@ -586,12 +586,12 @@
   },
   "n": 60,
   "provenance": {
-    "git_commit": "7f43de6ff64ba6b24aaaeb768410c1cb1620db4d",
-    "git_dirty": true,
+    "git_commit": "371ce3d055146acdf9bd0054f66e313e657956f6",
+    "git_dirty": false,
     "input_file_hashes": {
-      "SPEC.md": "048434863f6f60534451ba11d48fec8009b9216594fb4e1b99d94d6c1a713659",
+      "SPEC.md": "a73552a6aed5962bb06410b908c1d1d3567d979acbdeaee8415de29a4390a4b3",
       "configs/data.yaml": "50b35c070089344992749fb5282c5053518b4656567f3b1bd006cbfbb06c7c93",
-      "configs/evaluation.yaml": "87a2d0cfff23dff25a4d80373e6fc6d4dd558d80a3824b10dbd6f52db4391463",
+      "configs/evaluation.yaml": "a4d90cc45a3808a21f36c3910c7f15660e450adfafc6ebe2ac21bbfecc62c1da",
       "configs/prompts/student_label_v3.txt": "f3091a9c1cd9a7be9f1faa285dd709c999bf61f658bde5a9fe733edd33a9b9c4",
       "configs/prompts/student_report_v3.txt": "3431ef0808a464ea571c2d4ddd65d9db60f457d9349423fb0890224fcc9fd6a7",
       "configs/prompts/student_report_vf_v3.txt": "d24bb17577e265a4e232def652777f9b3bc63ab2491c6cf100e61ffe114468b2",
@@ -606,6 +606,7 @@
       "scripts/build_student_dataset.py": "16955f832f08110f94bcf4904c8aae41d110727c93901c6ecf8412c40f79fc47",
       "scripts/colab.py": "f18f11d321a20b9dab30e867c38e24e0b29635de16c3974350fb421dbcea1640",
       "scripts/evaluate.py": "d7340ef5139a7b1995af8817370858626b20fa992b4bbbb415f97be7b7ac7774",
+      "scripts/faithfulness.py": "b506c90eaab29a3f97a14c8d8693f23e9770b16df6b1bbc891761af0f424bf06",
       "scripts/fetch_data.py": "3ad262a1ed75c38ff49a726df7bdbfe3e7676b859a44c41a7d68fa1ed9a06fa3",
       "scripts/generate_teacher.py": "36e31a94ada50bea4b1808eae08d072f9eff6d390b933a79a7b1e82ace89aa5b",
       "scripts/predict.py": "35eb59dd342b789cb9a88ad2006d25758027b82d60033334601fb7444215b589",
@@ -623,9 +624,10 @@
       "src/audit_distill/data/schema.py": "90ed285d897023d64d5265735a5e52cb7190addfdb090191515903e6e9d48caf",
       "src/audit_distill/data/settings.py": "f68067bf2b28520c2b376f0acfc280fff9ae2d46d6634a77142e24a336d3a7b5",
       "src/audit_distill/evaluation/__init__.py": "56e4b895bd7d9a3b3c3c306ce003fb343c8f0623223889dea70fc45f3a6f298a",
-      "src/audit_distill/evaluation/cli.py": "d79dcd7720a497aac371065b5a59cc8a91eaeeb25de4ad290557f8d794eb8dc2",
-      "src/audit_distill/evaluation/predict.py": "312cdb71c2d7ff98d8509a0a2213ef3f4601e564f1e7558b6be3d09dbd8ff687",
-      "src/audit_distill/evaluation/score.py": "6f40afe09d1b532975d89a12640dfb871061b3fa0016107f520d9fcdc7117b46",
+      "src/audit_distill/evaluation/cli.py": "7f103bec632e1095d65f523697e03e6cdc5a2acdc5c7e18b65a76b29a3e40d64",
+      "src/audit_distill/evaluation/faithfulness.py": "eb8505f1839f8d6f4103365996791daa3507e790b97bc4533382672e9bbe3559",
+      "src/audit_distill/evaluation/predict.py": "09f5103934936bc0afa5244654adb1644f88c4e6fa32f56562ff14724d0148f1",
+      "src/audit_distill/evaluation/score.py": "762f5f94ef4ed041d653fc5cfda15aa635e1560f96edf3eb56c95b8748cb0fe6",
       "src/audit_distill/inference.py": "d2f66e52dada74f444454f16c13f9d2a7ea7848f32a6d509ea419026847b5edc",
       "src/audit_distill/payload.py": "821059145780c2dd84e5a8a1f79dd9871ed5b0ba0373ee73d984070a7605be43",
       "src/audit_distill/provenance.py": "b42bb7cd2355f11698b4470b0ba650e6105a0fb660c22d9e3b7c2425fea55111",
@@ -638,9 +640,9 @@
       "src/audit_distill/teacher/codex.py": "f97a1b36b03fe8ea3eb4a48000048231106a3657f427bde749e1762611c35082",
       "src/audit_distill/teacher/generate.py": "a829c7dadc5c26a7c57358871d8f982c1863a5354a39903412c88d53b783ad3e",
       "src/audit_distill/training/__init__.py": "1fac93f56009ab9770d4d9c57c6f5385ec5b11cf59a86b73b84ffb0cebdd05b0",
-      "src/audit_distill/training/cli.py": "0a9cef777628757d14fbccce110fec104d37842043180e277ee8c181138422e6",
-      "src/audit_distill/training/colab.py": "48198bf6ae9b4accd821ecbfdbcce3308b78c03682c349c16fd9e4307354f0b7",
-      "src/audit_distill/training/train.py": "53cdeaf1d240d8c9a20097d000a3d6645c3cf521d20d51d72936b8451d9b3c69",
+      "src/audit_distill/training/cli.py": "036036225730c98a6c6950f96ec5c51a1bf1e3abb7c405178e70226f1076ef74",
+      "src/audit_distill/training/colab.py": "4e9c2158d31b6d4a20f615aa3ac7362407290b56bd6dcd40161bb7a7db26ad2a",
+      "src/audit_distill/training/train.py": "6244091f3f2b695c70066cc96b69f6505a29dfc40807fc45634b0feb03d9b12b",
       "uv.lock": "279a8c3ba689cf91ea7938fba7712037f011781d7912a542d0b53f6a37edec65"
     },
     "package_versions": {
@@ -726,6 +728,178 @@
       "yarl": "1.25.1"
     },
     "python_version": "3.12.13"
+  },
+  "seeds": {
+    "label-sft": {
+      "aggregated": {
+        "mean": 0.9282051282051281,
+        "per_seed": {
+          "42": 0.9282051282051282,
+          "43": 0.9282051282051282,
+          "44": 0.9282051282051282
+        },
+        "sd": 1.3597399555105182e-16
+      },
+      "all": {
+        "mean": 0.7679161372024432,
+        "per_seed": {
+          "42": 0.8,
+          "43": 0.7413049726933026,
+          "44": 0.7624434389140271
+        },
+        "sd": 0.0297277543307683
+      },
+      "rsd": {
+        "mean": 0.5947134622057222,
+        "per_seed": {
+          "42": 0.6862745098039216,
+          "43": 0.5134502923976608,
+          "44": 0.5844155844155844
+        },
+        "sd": 0.08687109557129506
+      },
+      "seeds": [
+        42,
+        43,
+        44
+      ]
+    },
+    "multi-sft": {
+      "aggregated": {
+        "mean": 0.9399393438103116,
+        "per_seed": {
+          "42": 0.9282051282051282,
+          "43": 0.8916129032258064,
+          "44": 1.0
+        },
+        "sd": 0.05513809525805453
+      },
+      "all": {
+        "mean": 0.8088247877229099,
+        "per_seed": {
+          "42": 0.7963800904977376,
+          "43": 0.7997775305895439,
+          "44": 0.8303167420814479
+        },
+        "sd": 0.018689936500867692
+      },
+      "rsd": {
+        "mean": 0.6773526773526773,
+        "per_seed": {
+          "42": 0.6536796536796536,
+          "43": 0.7117117117117118,
+          "44": 0.6666666666666667
+        },
+        "sd": 0.030456084090788673
+      },
+      "seeds": [
+        42,
+        43,
+        44
+      ]
+    },
+    "multi-sft-report": {
+      "aggregated": {
+        "mean": 0.7575432724174144,
+        "per_seed": {
+          "42": 0.8155467720685112,
+          "43": 0.8155467720685112,
+          "44": 0.6415362731152205
+        },
+        "sd": 0.10046500841250347
+      },
+      "all": {
+        "mean": 0.7112695896765375,
+        "per_seed": {
+          "42": 0.7330367074527253,
+          "43": 0.7330367074527253,
+          "44": 0.667735354124162
+        },
+        "sd": 0.03770175392269292
+      },
+      "rsd": {
+        "mean": 0.6582386706524638,
+        "per_seed": {
+          "42": 0.6389743589743591,
+          "43": 0.6532019704433498,
+          "44": 0.6825396825396826
+        },
+        "sd": 0.022215098831317392
+      },
+      "seeds": [
+        42,
+        43,
+        44
+      ]
+    },
+    "report-sft": {
+      "aggregated": {
+        "mean": 0.8662575261733747,
+        "per_seed": {
+          "42": 0.8916129032258064,
+          "43": 0.8155467720685112,
+          "44": 0.8916129032258064
+        },
+        "sd": 0.04391680129987777
+      },
+      "all": {
+        "mean": 0.7932279850597755,
+        "per_seed": {
+          "42": 0.7664071190211346,
+          "43": 0.7562146892655368,
+          "44": 0.8570621468926554
+        },
+        "sd": 0.05551640810391477
+      },
+      "rsd": {
+        "mean": 0.7197587143496541,
+        "per_seed": {
+          "42": 0.6476476476476476,
+          "43": 0.6860706860706861,
+          "44": 0.8255578093306288
+        },
+        "sd": 0.09361713969412623
+      },
+      "seeds": [
+        42,
+        43,
+        44
+      ]
+    },
+    "report-sft-vf": {
+      "aggregated": {
+        "mean": 0.9038103115522471,
+        "per_seed": {
+          "42": 0.8916129032258064,
+          "43": 0.8916129032258064,
+          "44": 0.9282051282051282
+        },
+        "sd": 0.021126530942058786
+      },
+      "all": {
+        "mean": 0.7773137577598673,
+        "per_seed": {
+          "42": 0.7997775305895439,
+          "43": 0.7827903091060986,
+          "44": 0.7493734335839599
+        },
+        "sd": 0.025644447931726082
+      },
+      "rsd": {
+        "mean": 0.6571362185397274,
+        "per_seed": {
+          "42": 0.7117117117117118,
+          "43": 0.6761133603238867,
+          "44": 0.5835835835835836
+        },
+        "sd": 0.06613851553464568
+      },
+      "seeds": [
+        42,
+        43,
+        44
+      ]
+    }
   },
   "split": "test"
 }

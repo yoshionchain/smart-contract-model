@@ -32,4 +32,12 @@
 | multi-sft-report | 60 | 0.985 | 1.000 | 1.000 |
 | teacher | 60 | 1.000 | 1.000 | 1.000 |
 
+| SFT mode (seeds) | All: mean ± SD | Aggregated | RSD |
+| --- | ---: | ---: | ---: |
+| label-sft (3) | 0.768 ± 0.030 | 0.928 ± 0.000 | 0.595 ± 0.087 |
+| report-sft (3) | 0.793 ± 0.056 | 0.866 ± 0.044 | 0.720 ± 0.094 |
+| report-sft-vf (3) | 0.777 ± 0.026 | 0.904 ± 0.021 | 0.657 ± 0.066 |
+| multi-sft (3) | 0.809 ± 0.019 | 0.940 ± 0.055 | 0.677 ± 0.030 |
+| multi-sft-report (3) | 0.711 ± 0.038 | 0.758 ± 0.100 | 0.658 ± 0.022 |
+
 Bootstrap: 2000 valid replicates over 27 test groups (aggregated 16, rsd 11); paired percentile intervals, seed 4242.
