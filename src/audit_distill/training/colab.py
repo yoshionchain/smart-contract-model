@@ -193,18 +193,26 @@ print("adopted", a.endpoint)
 """
 
 
-def new_session(session: str, gpu: str) -> None:
-    """`colab new`; if the CLI times out while Colab still assigns the GPU, adopt it."""
-    try:
-        colab("new", "-s", session, "--gpu", gpu)
-        return
-    except subprocess.CalledProcessError:
-        logger.warning("`colab new` failed; looking for the GPU Colab assigned anyway")
-    time.sleep(30)
+def new_session(session: str, gpu: str, attempts: int = 4) -> None:
+    """`colab new`, tolerant of CLI timeouts while Colab still assigns the GPU.
+
+    After a failed attempt, poll up to 3 minutes for an orphaned assignment and adopt
+    it; only if none appears, try again (so at most one VM exists at a time).
+    """
     tools = subprocess.run(["uv", "tool", "dir"], capture_output=True, text=True, check=True)
     python = Path(tools.stdout.strip()) / "google-colab-cli/bin/python"
     code = ADOPT.format(gpu=gpu.lower(), session=session)
-    subprocess.run([str(python), "-c", code], check=True)
+    for attempt in range(1, attempts + 1):
+        try:
+            colab("new", "-s", session, "--gpu", gpu)
+            return
+        except subprocess.CalledProcessError:
+            logger.warning("`colab new` failed (attempt %s); looking for an assigned GPU", attempt)
+        for _ in range(6):
+            time.sleep(30)
+            if subprocess.run([str(python), "-c", code]).returncode == 0:
+                return
+    raise RuntimeError(f"No {gpu} could be allocated after {attempts} attempts")
 
 
 def up(session: str, gpu: str, root: Path) -> None:
