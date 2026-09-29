@@ -1,0 +1,24 @@
+{
+  "best_epoch": 3,
+  "condition": "report",
+  "epochs": [
+    {
+      "checkpoint": "checkpoint-35",
+      "epoch": 1,
+      "invalid": 2,
+      "validation_macro_f1": 0.5147058823529411
+    },
+    {
+      "checkpoint": "checkpoint-70",
+      "epoch": 2,
+      "invalid": 0,
+      "validation_macro_f1": 0.6458333333333333
+    },
+    {
+      "checkpoint": "checkpoint-105",
+      "epoch": 3,
+      "invalid": 0,
+      "validation_macro_f1": 0.6470588235294118
+    }
+  ]
+}

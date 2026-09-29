@@ -1,0 +1,43 @@
+{
+  "best_epoch": 6,
+  "condition": "report_vf",
+  "epochs": [
+    {
+      "checkpoint": "checkpoint-35",
+      "epoch": 1,
+      "invalid": 6,
+      "validation_macro_f1": 0.6688034188034189
+    },
+    {
+      "checkpoint": "checkpoint-70",
+      "epoch": 2,
+      "invalid": 1,
+      "validation_macro_f1": 0.7132486388384756
+    },
+    {
+      "checkpoint": "checkpoint-105",
+      "epoch": 3,
+      "invalid": 3,
+      "validation_macro_f1": 0.7083333333333333
+    },
+    {
+      "checkpoint": "checkpoint-140",
+      "epoch": 4,
+      "invalid": 1,
+      "validation_macro_f1": 0.7060439560439561
+    },
+    {
+      "checkpoint": "checkpoint-175",
+      "epoch": 5,
+      "invalid": 0,
+      "validation_macro_f1": 0.7017543859649122
+    },
+    {
+      "checkpoint": "checkpoint-210",
+      "epoch": 6,
+      "invalid": 0,
+      "validation_macro_f1": 0.7332170880557978
+    }
+  ],
+  "selection_format": "report_vf"
+}

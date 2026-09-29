@@ -1,0 +1,43 @@
+{
+  "best_epoch": 4,
+  "condition": "report",
+  "epochs": [
+    {
+      "checkpoint": "checkpoint-35",
+      "epoch": 1,
+      "invalid": 3,
+      "validation_macro_f1": 0.4846743295019157
+    },
+    {
+      "checkpoint": "checkpoint-70",
+      "epoch": 2,
+      "invalid": 0,
+      "validation_macro_f1": 0.575
+    },
+    {
+      "checkpoint": "checkpoint-105",
+      "epoch": 3,
+      "invalid": 0,
+      "validation_macro_f1": 0.7571428571428571
+    },
+    {
+      "checkpoint": "checkpoint-140",
+      "epoch": 4,
+      "invalid": 0,
+      "validation_macro_f1": 0.8229166666666667
+    },
+    {
+      "checkpoint": "checkpoint-175",
+      "epoch": 5,
+      "invalid": 0,
+      "validation_macro_f1": 0.7638888888888888
+    },
+    {
+      "checkpoint": "checkpoint-210",
+      "epoch": 6,
+      "invalid": 0,
+      "validation_macro_f1": 0.7925021795989537
+    }
+  ],
+  "selection_format": "report"
+}
