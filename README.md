@@ -2,8 +2,8 @@
 
 *Can Small Language Models Learn to Justify Smart Contract Vulnerability Judgments?*
 
-University NLP project (Übung Informationslinguistik 2, Universität Regensburg). The paper
-is in [`paper/`](paper/).
+University NLP project (Übung Informationslinguistik 2, Universität Regensburg). The paper:
+[`paper/paper.pdf`](paper/paper.pdf).
 
 Large language models can judge whether code is vulnerable and explain why, but they are
 expensive to run. This project tests **rationale distillation**: a large teacher
@@ -59,9 +59,10 @@ src/audit_distill/ the Python package
 scripts/           one thin command per pipeline stage (see below)
 schemas/           JSON schemas of the report and the teacher answer
 data/manifests/    committed hashes and statistics of every data build
-results/           committed metrics, tables and per-model test predictions
+results/           committed metrics, tables, per-model test predictions and
+                   per-epoch validation scores (training/)
 docs/              decision log
-paper/             paper source, material and references
+paper/             the paper (PDF)
 ```
 
 The pipeline runs in stages; each stage reads the previous stage's hashed output:
@@ -83,7 +84,7 @@ benchmark (pinned) ─► build_dataset ─► generate_teacher ─► build_stu
   GPU with bf16 support (then run `scripts/train.py` etc. directly).
 
 ```bash
-git clone <this repository> && cd smart-contract-model
+git clone https://github.com/yoshionchain/smart-contract-model.git && cd smart-contract-model
 uv sync --locked                 # data, teacher and evaluation dependencies
 uv sync --locked --group train   # adds PyTorch (CUDA 12.6), Transformers, TRL, PEFT
 uv run ruff check src scripts    # optional lint
