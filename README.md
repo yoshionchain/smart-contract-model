@@ -150,3 +150,13 @@ One vulnerability type and one benchmark; a small test set (60 contracts), so in
 are wide; the real-world code is mostly old Solidity; the teacher filter may keep easier
 training examples; no human evaluation of report quality. ABSENT means "not reentrant by
 this definition", never "secure".
+
+## Use of AI tools
+
+This project was developed with help from an AI coding assistant (Claude Code). Under my
+direction, it wrote parts of the code, ran and monitored the experiments. I defined the
+research questions and made the research decisions: choice of task and data, the move to
+the expert-verified benchmark, the label-blind teacher setup, the training conditions and
+the paper's framing. I reviewed the code, results and text and take responsibility for the
+content. GPT-6 Sol (via the Codex CLI) is part of the method itself as the teacher model
+and is described in the paper.
